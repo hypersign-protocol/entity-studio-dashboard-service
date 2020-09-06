@@ -56,6 +56,7 @@ color: #888b8f;
 
     <div class="row">
       <div class="col-md-12" style="text-align: left">
+        <Info :message="description"/>
         <div class="card">
           <div class="card-header">
             <b-button v-b-toggle.collapse-1 variant="link">Create Schema</b-button>
@@ -165,12 +166,14 @@ color: #888b8f;
 import fetch from "node-fetch";
 import { generateCredential, signCredential } from "lds-sdk/dist/vc";
 import QrcodeVue from "qrcode.vue";
+import Info from '@/components/Info.vue'
 const { sha256hashStr } = require("../crypto-lib/symmetric");
 export default {
   name: "IssueCredential",
-  components: { QrcodeVue },
+  components: { QrcodeVue, Info },
   data() {
     return {
+      description: "Credential Schema defines what information will go inside a verifiable credential. For example: Directorate General of Civil Aviation (DGCA) can define a schema (or format) for flights tickets, being issued by all airline companies in India.",
       active: 0,
       host: location.hostname,
       user: {},

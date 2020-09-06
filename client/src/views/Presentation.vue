@@ -36,6 +36,7 @@
 
     <div class="row">
       <div class="col-md-12" style="text-align: left">
+        <Info :message="description"/>
         <div class="card">
           <div class="card-header">
             <b-button v-b-toggle.collapse-1 variant="link">Generate Presentation</b-button>
@@ -143,12 +144,24 @@
 import fetch from "node-fetch";
 import { generateCredential, signCredential, generatePresentation, signPresentation, verifyPresentation } from "lds-sdk/dist/vc";
 import QrcodeVue from "qrcode.vue";
+import Info from '@/components/Info.vue'
 const { sha256hashStr } = require("../crypto-lib/symmetric");
 export default {
   name: "Presentation",
-  components: { QrcodeVue },
+  components: { QrcodeVue, Info },
   data() {
     return {
+      description: "The subject (or holder) generates verifiable presentation from one or more verifiable \
+      credentials, issued by one or more issuers, that is shared with a specific verifier. \
+      A verifiable presentation is a tamper-evident presentation encoded in such a way that \
+      authorship of the data can be trusted after a process of cryptographic verification. \
+      Certain types of verifiable presentations might contain data that is synthesized from, \
+      but do not contain, the original verifiable credentials for example, in order to proof the \
+      subject that he/she is an adult, she/he does not have to tell his/her actual age \
+      (i.e. Zero knowledge proof). The airline passenger might not have to show the complete ticket\
+      to the secruity personal to pass the security check. The passenger will have ability to show \
+      just one document (the verifiable presentation) derived from his passport and air ticket to\
+      show at the security check.",
       active: 0,
       host: location.hostname,
       user: {},

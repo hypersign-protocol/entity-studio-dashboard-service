@@ -14,7 +14,7 @@
         <h6
           class="leftAlign"
           style="color:grey; font-style: italic;"
-        >A portal for issuer to issue credentials on Hypersign Identity network!</h6>
+        >A portal to issue and verify credentials on Hypersign Identity network!</h6>
         <hr style="opacity: 1.5" />
       </div>
       <div class="col-md-9 rightAlign marginLeft" v-if="$router.history.current.name != 'PKIIdLogin'">

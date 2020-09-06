@@ -36,6 +36,7 @@
 
     <div class="row">
       <div class="col-md-12" style="text-align: left">
+        <Info :message="description"/>
         <div class="card">
           <div class="card-header">
             <b-button v-b-toggle.collapse-1 variant="link">Issue Credential</b-button>
@@ -123,12 +124,14 @@
 import fetch from "node-fetch";
 import { generateCredential, signCredential } from "lds-sdk/dist/vc";
 import QrcodeVue from "qrcode.vue";
+import Info from '@/components/Info.vue'
 const { sha256hashStr } = require("../crypto-lib/symmetric");
 export default {
   name: "IssueCredential",
-  components: { QrcodeVue },
+  components: { QrcodeVue, Info },
   data() {
     return {
+      description: "An issuer can issue a credential to a subject (or holder) which can be verfied by the verifier independently, without having him to connect with the issuer. They are a part of our daily lives; driver's licenses are used to assert that we are capable of operating a motor vehicle, university degrees can be used to assert our level of education, and government-issued passports enable us to travel between countries.  For example: an airline company can issue a flight ticket (\"verfiable credential\") using schema (issued by DGCA) to the passenger.",
       active: 0,
       host: location.hostname,
       user: {},

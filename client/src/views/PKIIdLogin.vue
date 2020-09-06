@@ -113,8 +113,8 @@ export default {
       proof: "",
       fullPage: true,
       isLoading: false,
-      privateKey: "61BJKDZDiYiXqTwWPapyx59XuqXpTiqTj8ZFqivbGAmXSfyGnxeUBMCTcmWXZPUBc3Y24iA3vjNSMebjmouFMjUc",
-      did: "did:hs:6af8fa78-ac40-4dd7-9ba0-b4641ef35545#z6MknoNTxEWCrhsJ29EZCzcbkBw9pjXqRLaCzBUoUKxr4Ktk",
+      privateKey: "3isrtEJ4gt1ZHkdUYYph1WFAtzfqAL5WM6Hh1NC2hmWnDfBypXjt5oUFdAqQdiess2vqqQ3iF6x4fDVuvLw454sn",
+      did: "did:hs:892325a4-75c9-465c-882b-91e3ca5143c3",
     };
   },
   created(){
