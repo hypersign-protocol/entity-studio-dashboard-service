@@ -45,8 +45,6 @@
   font-size: xxx-large;
   background: aliceblue;
   border-bottom: 1px solid #8080802b;
-  min-width: 240px;
-  min-height: 100px;
 }
 .fVal {
   font-size: small;
@@ -66,7 +64,7 @@
             <div class="card-header">Authored Schemas</div>
           </div>
         </div>
-        <div class="col-md-5" style="margin-left:15%">
+        <div class="col-md-5">
           <div class="card">
             <div class="card-body tile">{{credentialCount}}</div>
             <div class="card-header">Issued Credentials</div>
@@ -74,7 +72,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-12 leftAlign">
+    <div class="col-md-10 leftAlign">
       <div class="card">
         <div class="card-body">
           <div class="row">
