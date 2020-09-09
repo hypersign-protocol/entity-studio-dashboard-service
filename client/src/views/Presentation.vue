@@ -47,7 +47,7 @@
                 <div class="col-md-6">
                   <form style="max-height:300px; min-height: 300px; overflow:auto; padding: 5px">
                     <div class="form-group">
-                      <label class="floatLeft">Upload Verifiable Credential:</label>
+                      <label class="floatLeft">Upload Verifiable Credential (s):</label>
                       <input ref="vcFile" type="file" class="form-control" placeholder @change="onFileChange" />
                     </div>
                     <div class="form-group" v-for="attr in issueCredAttributes" :key="attr.name">
@@ -66,12 +66,12 @@
                 <div class="col-md-6" style="padding: 30px" v-if="isCredentialIssued">
                   <div class="form-group" style="text-align:center">
                     <qrcode-vue :value="signedVerifiablePresentation" :size="200" level="H"></qrcode-vue>
-                    <label class="title">Scan the QR code using Hypersign Wallet to authenticate!</label>
+                    <label class="title">Scan the QR code using Hypersign Wallet!</label>
                   </div>
                   <div class="form-group" style="text-align:center">
                     <p></p>
                     <h5>OR</h5>
-                    <button class="btn btn-link" @click="downloadCredentials()">Download Credential</button>
+                    <button class="btn btn-link" @click="downloadCredentials()">Download Presentation</button>
                   </div>
                 </div>
               </div>
@@ -91,7 +91,7 @@
             <div class="card-body">
               <div class="row">
                 <div class="col-md-6">
-                  <form style="max-height:300px; min-height: 300px; overflow:auto; padding: 5px">
+                  <form style="max-height:450px; min-height: 450px; overflow:auto; padding: 5px">
                     <div class="form-group">
                       <label class="floatLeft">Upload Verifiable Presentation:</label>
                       <input ref="vpFile" type="file" class="form-control" placeholder @change="onFileChange" />
@@ -104,9 +104,11 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                  <form style="max-height:300px; min-height: 300px; overflow:auto; padding: 5px">
-                  <div class="form-group">
-                    <ul class="list-group">
+                  <form class="card" style="padding: 5px">
+                    <div class="card-header" style="padding:5px"> <a :href="presentationDetails.credentialType.url" target="_blank">{{presentationDetails.credentialType.name}}</a></div>
+                  <div class="form-group" style="max-height:400px; min-height: 400px; overflow:auto; padding: 5px">
+                    <div class="card-body">
+                    <ul class="list-group" style="font-size:smaller">
                       <li class="list-group-item"><label><b>Issuer  DID:</b> {{presentationDetails.issuerDid}}</label></li>
                       <li class="list-group-item"><label><b>Subject DID:</b> {{presentationDetails.holderDid}}</label></li>
                       <li class="list-group-item"><label><b>Issuance Date:</b> {{presentationDetails.issuanceDate}}</label></li>
@@ -118,8 +120,8 @@
                             </li>
                           </ul> 
                       </li>
-                       
                     </ul>
+                    </div>
                   </div>
                   <div class="form-group" hidden>
                     <label class="floatLeft">Presentation Details:</label> 
@@ -190,7 +192,9 @@ export default {
       isLoading: false,
       holderDid: "did:hs:8b915133-cb8b-4151-9a63-1b91f702297f",
       signedVerifiablePresentation: {},
-      presentationDetails: {},
+      presentationDetails: {
+        credentialType: {}
+      },
       isClaims: false
     };
   },
@@ -349,6 +353,10 @@ export default {
       console.log(vp)
       const vc = vp.verifiableCredential[0]
       this.presentationDetails = {}
+      this.presentationDetails.credentialType = {
+        name :vc.type[1],
+        url: vc['@context'][1]['hsscheme']
+      }
       this.presentationDetails.issuerDid = vc.issuer
       this.presentationDetails.holderDid = vc.credentialSubject.id
       this.presentationDetails.issuanceDate = vc.issuanceDate

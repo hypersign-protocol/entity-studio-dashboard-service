@@ -74,7 +74,7 @@
                 <div class="col-md-6" style="padding: 30px" v-if="isCredentialIssued">
                   <div class="form-group" style="text-align:center">
                     <qrcode-vue :value="signedVerifiableCredential" :size="200" level="H"></qrcode-vue>
-                    <label class="title">Scan the QR code using Hypersign Wallet to authenticate!</label>
+                    <label class="title">Scan the QR code using Hypersign Wallet!</label>
                   </div>
                   <div class="form-group" style="text-align:center">
                     <p></p>
