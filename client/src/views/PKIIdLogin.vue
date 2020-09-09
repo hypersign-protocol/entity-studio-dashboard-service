@@ -77,7 +77,7 @@
                 class="btn btn-outline-primary floatLeft"
               >View Proof</button> -->
               Do not have account?
-              <a href="http://localhost:5001/explorer/newdid" target="_blank">Create DID</a>
+              <a :href="`${this.$config.explorer.BASE_URL}${this.$config.explorer.NEW_DID_EP}`" target="_blank">Create DID</a>
             </div>
           </form>
         </div>
@@ -118,7 +118,7 @@ export default {
     };
   },
   created(){
-    const url = `http://${this.host}:9000/api/auth/challenge`;
+    const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.AUTH_CHALLENGE_EP}`;
     console.log(url)
     fetch(url)
     .then(res => res.json())
@@ -229,7 +229,7 @@ export default {
         headers['x-auth-token'] = this.challenge.JWTChallenge;
         await this.generateProof();
       } else {
-        url = `http://${this.host}:9000/api/auth/login`;
+        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.AUTH_LOGIN_EP}`;
       }
       const userData = {
         username: this.username,

@@ -102,7 +102,7 @@ export default {
     };
   },
   created() {
-    const url = `http://localhost:5000/network/info`;
+    const url = `${this.$config.nodeServer.BASE_URL}${this.$config.nodeServer.NETWORK_STATUS_EP}`;
     fetch(url)
     .then(res => res.json())
     .then(json => {

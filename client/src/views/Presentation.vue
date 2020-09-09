@@ -308,7 +308,7 @@ export default {
       this.readFile(file, this.onfileLoadSuccess)
     },
     getCredentials(attributesMap) {
-      const schemaUrl = `http://localhost:5000/api/schema/get/${this.selected}`;
+      const schemaUrl = `${this.$config.nodeServer.BASE_URL}${this.$config.nodeServer.SCHEMA_GET_EP}${this.selected}`;
       return generateCredential(schemaUrl, {
         subjectDid: this.holderDid,
         issuerDid: this.user.publicKey,
@@ -344,7 +344,6 @@ export default {
       }
     },
     viewPresentation(){
-      console.log('.......................................................')
       const vp = JSON.parse(localStorage.getItem("presentation"));
       if(!vp) this.notifyErr("VP is null")
       console.log(vp)

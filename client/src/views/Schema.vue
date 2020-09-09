@@ -231,7 +231,7 @@ export default {
         });
     },
     fetchSchemas() {
-      const url = `http://localhost:5000/api/schema/list`;
+      const url = `${this.$config.nodeServer.BASE_URL}${this.$config.nodeServer.SCHEMA_LIST_EP}`;
       fetch(url)
         .then((res) => res.json())
         .then((j) => {
@@ -304,7 +304,7 @@ export default {
         return this.notifyErr("Error: SchemaName can not be blank");
       if (this.attributes.length == 0)
         return this.notifyErr("Error: Atleast one attribute is requreeid");
-      const url = `http://localhost:5000/api/schema/create`;
+      const url = `${this.$config.nodeServer.BASE_URL}${this.$config.nodeServer.SCHEMA_CREATE_EP}`;
       const schemaData = {
         name: this.credentialName,
         owner: this.user.id,

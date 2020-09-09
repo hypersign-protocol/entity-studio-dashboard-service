@@ -194,12 +194,12 @@ export default {
       let url = "";
       let options = {}
       if(type === "SCHEMA"){
-        url = `http://localhost:5000/api/schema/list`;
+        url = `${this.$config.nodeServer.BASE_URL}${this.$config.nodeServer.SCHEMA_LIST_EP}`;
         options  = {
           method: "GET"
         }
       }else{
-        url = `http://localhost:9000/api/credential/list`;
+        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_LIST_EP}`;
         options  = {
           method: "GET",
           headers: {'x-auth-token': this.authToken}
@@ -294,7 +294,7 @@ export default {
     },
 
     getCredentials(attributesMap) {
-      const schemaUrl = `http://localhost:5000/api/schema/get/${this.selected}`;
+      const schemaUrl = `${this.$config.nodeServer.BASE_URL}${this.$config.nodeServer.SCHEMA_GET_EP}/${this.selected}`;
       return generateCredential(schemaUrl, {
         subjectDid: this.holderDid,
         issuerDid: this.user.publicKey,
@@ -312,8 +312,9 @@ export default {
         }
       );
     },
-    async issueCredential() {  
-      this.isLoading = true
+    async issueCredential() { 
+      try{
+        this.isLoading = true
       // generateAttributeMap
       const attributeMap = await this.generateAttributeMap();
 
@@ -324,7 +325,7 @@ export default {
       );
       this.signedVerifiableCredential = signedVerifiableCredential;
 
-      const url = "http://localhost:9000/api/credential/issue";
+      const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_ISSUE_EP}`;
       const headers = {
         "Content-Type": "application/json",
         "x-auth-token": this.authToken,
@@ -343,7 +344,6 @@ export default {
       })
         .then((res) => res.json())
         .then((j) => {
-          
           if (j.status != 200) throw new Error(`Error: ${j.error}`);
           if (j.status === 200) {
             this.isCredentialIssued = true;
@@ -356,9 +356,13 @@ export default {
           }
         })
         .catch((e) => {
-          this.notifyErr(`Error: ${e.message}`)
           this.isLoading = false
+          this.notifyErr(`Error: ${e.message}`)
         });
+      } catch(e){
+        this.isLoading = false
+        this.notifyErr(`Error: ${e.message}`)
+      }
     },
   },
 };
