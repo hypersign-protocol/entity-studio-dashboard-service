@@ -3,20 +3,12 @@
 ```bash
 cd server
 npm i
-mv .env.sample .env // rename remove .sample from  .env.sample
-npm run newdb // to setup database. Do not run this everytime.
-npm run dev // finally run the server
+npm run setup // to setup env and database
+npm run start  // to run the server
+npm run dev // to run the server in dev env
 ```
 
 The server runs on port `5000`. Please look into `.env` file to change paramaters. 
-
-Other commands:
-
-```bash
-npm run build
-npm run test
-npm run start 
-```
 
 ## APIs
 
