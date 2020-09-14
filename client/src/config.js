@@ -19,5 +19,9 @@ module.exports = {
     explorer: {
         BASE_URL: process.env.EXPLORER_BASE_URL || "http://localhost:5001/",
         NEW_DID_EP: process.env.EXPLORER_NEW_DID_EP || "explorer/newdid"
+    },
+    app: {
+        name: process.env.VUE_APP_TITLE || "Hypersign Studio",
+        decription: process.env.VUE_APP_DESC || "A portal to issue and verify credentials on Hypersign Identity network!"
     }   
 }

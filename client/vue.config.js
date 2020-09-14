@@ -1,6 +1,6 @@
 module.exports = {
   baseUrl: process.env.NODE_ENV === 'production'
-    ? '/crypto/'
+    ? '/login/'
     : '/',
   devServer: {
       port: 9001

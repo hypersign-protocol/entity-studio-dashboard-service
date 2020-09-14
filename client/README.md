@@ -1,10 +1,34 @@
-### Client
+## Client
+
+### Setup
 
 ```js
 cd client
 npm i
-npm run serve
+```
+
+### Run
+
+#### Dev env
+
+```bash
+npm run dev
 ```
 
 
-On success full run, the app will run on [`http://localhost:8080/`]()
+On success full run, the app will run on [`http://localhost:9001/`](). You can set this port in   `vue.config.js` file.
+
+#### Prod env
+
+```bash
+cp .env.staging .env
+npm run serve
+```
+
+Make sure you change the env var as per your requirement.
+
+### Build
+
+```bash
+npm run build
+```
