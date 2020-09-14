@@ -15,7 +15,7 @@ echo "Installing node modules..."
 # npm i
 echo "Node module installation done."
 echo "Building the project...."
-npm run build-stage
+npm run build
 echo "Building done."
 echo "Client setup done=================================="
 cd -
