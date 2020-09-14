@@ -42,5 +42,5 @@ ADD . /usr/src/app
 RUN chmod +x ./build-docker.sh
 RUN ./build-docker.sh
 EXPOSE $PORT
-CMD ["node", "server/dist/index.js"]
+CMD cd server && npm run start
 
