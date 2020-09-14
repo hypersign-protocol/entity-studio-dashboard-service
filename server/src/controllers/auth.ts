@@ -4,8 +4,6 @@ import IUser  from '../models/IUser'
 import { logger, jwtSecret, jwtExpiryInMilli } from '../config'
 import jwt from 'jsonwebtoken';
 import { getChallange, verify } from 'lds-sdk'
-const  {sha256hashStr} = require('../utils/hash')
-import fetch from 'node-fetch'
 
 const check = (req: Request, res: Response) => {
     const param = {

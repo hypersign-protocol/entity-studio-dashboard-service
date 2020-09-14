@@ -1,3 +1,7 @@
+#!/bin/bash
+
+set -e
+
 echo "================REBUILDING START========================="
 echo ""
 echo ""
