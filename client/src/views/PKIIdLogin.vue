@@ -91,8 +91,7 @@ import QrcodeVue from "qrcode.vue";
 import { sign } from "lds-sdk";
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
-import { encryptData } from '../crypto-lib/symmetric'
-const {sha256hashStr} = require("../crypto-lib/symmetric");
+const {sha256hashStr} = require("../utils/hash");
 export default {
   name: "Login",
   components: {
@@ -262,9 +261,6 @@ export default {
               this.$router.push("dashboard");
             }
           }
-          //const encryptedUserData = encryptData(this.$route.query.appId, JSON.stringify(j.message.user))
-          //const redirect_uri = this.$route.query.redirect_uri + '?userData=' + encryptedUserData
-          //window.location.href = redirect_uri; 
         });
      }catch(e){
        this.clean();

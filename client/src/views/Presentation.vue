@@ -147,7 +147,6 @@ import fetch from "node-fetch";
 import { generateCredential, signCredential, generatePresentation, signPresentation, verifyPresentation } from "lds-sdk/dist/vc";
 import QrcodeVue from "qrcode.vue";
 import Info from '@/components/Info.vue'
-const { sha256hashStr } = require("../crypto-lib/symmetric");
 export default {
   name: "Presentation",
   components: { QrcodeVue, Info },

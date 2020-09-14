@@ -136,7 +136,6 @@ color: #888b8f;
 import fetch from "node-fetch";
 import { generateCredential, signCredential } from "lds-sdk/dist/vc";
 import QrcodeVue from "qrcode.vue";
-const { sha256hashStr } = require("../crypto-lib/symmetric");
 export default {
   name: "IssueCredential",
   components: {QrcodeVue},

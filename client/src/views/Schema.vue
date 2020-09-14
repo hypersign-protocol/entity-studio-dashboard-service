@@ -167,7 +167,6 @@ import fetch from "node-fetch";
 import { generateCredential, signCredential } from "lds-sdk/dist/vc";
 import QrcodeVue from "qrcode.vue";
 import Info from '@/components/Info.vue'
-const { sha256hashStr } = require("../crypto-lib/symmetric");
 export default {
   name: "IssueCredential",
   components: { QrcodeVue, Info },
