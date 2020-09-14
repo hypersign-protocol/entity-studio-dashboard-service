@@ -36,5 +36,6 @@ ADD . /usr/src/app
 # setting up the project
 RUN chmod +x ./build-docker.sh
 RUN ./build-docker.sh
+EXPOSE $PORT
 CMD ["node", "server/dist/index.js"]
 
