@@ -15,7 +15,7 @@ export default function app() {
     app.use(cors());
     app.use(cookieParser());
     app.use(bodyParser.json());
-    app.use(express.static('public/dist'));
+    app.use(express.static('public'));
 
 
     app.use('/api/app', appRoutes)

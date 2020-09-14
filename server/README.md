@@ -1,5 +1,7 @@
 ## Server
 
+Make sure you build the client project first. Follow instructions [here](../client/README.md#build) to build the client app.
+
 ```bash
 cd server
 npm i
