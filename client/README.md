@@ -21,7 +21,7 @@ On success full run, the app will run on [`http://localhost:9001/`](). You can s
 #### Prod env
 
 ```bash
-cp .env.staging .env
+npm run setEnv
 npm run serve
 ```
 

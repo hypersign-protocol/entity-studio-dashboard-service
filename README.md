@@ -9,7 +9,7 @@
 ## Re build
 
 ```sh
-./re-buiildall.sh
+./re-buildall.sh
 ```
 
 What it does?

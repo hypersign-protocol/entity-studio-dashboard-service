@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "vue-cli-service serve --mode production",
     "dev": "vue-cli-service serve --mode staging",
+    "setEnv": "cp .env.staging .env",
     "build": "vue-cli-service build",
     "build-stage": "vue-cli-service build --mode staging",
     "lint": "vue-cli-service lint",

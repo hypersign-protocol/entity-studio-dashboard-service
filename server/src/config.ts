@@ -36,7 +36,8 @@ const db =  new sqlite.Database(db_path, (err) => {
     }
 });
 
-// DID Related
+// DID Related: 
+// TODO: Not required for this project. so remove
 const did = {
     sheme : process.env.DID_SCHEME || 'did',
     method : process.env.DID_METHOD_NAME || 'hypersign',
