@@ -19,13 +19,6 @@ npm run dev // to run the server in dev env
 The server runs on port `5000`. Please look into `.env` file to change paramaters. 
 
 
-### Dokerization
-
-```bash
-docker build -t hypersignprotocol/studio:1.0.0 .
-docker run -p 9000:9000 hypersignprotocol/studio:1.0.0
-```
-
 ### APIs
 
 - `api/auth/register`: To register a user
