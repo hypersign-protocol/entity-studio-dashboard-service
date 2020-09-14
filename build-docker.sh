@@ -30,7 +30,7 @@ echo "Installing node modules..."
 # npm i
 echo "Node module installation done."
 echo "Building the project...."
-npm run setup
+npm run setup-noenv
 echo "Building done."
 echo "Server setup done=================================="
 echo ""
