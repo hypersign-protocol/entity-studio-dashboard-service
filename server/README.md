@@ -1,6 +1,12 @@
 ## Server
 
-Make sure you build the client project first. Follow instructions [here](../client/README.md#build) to build the client app.
+### Pre-requisite
+
+* You must setup the [core](https://github.com/hypersign-protocol/core) project before proceeding.
+* Make sure you build the client project first. Follow instructions [here](../client/README.md#build) to build the client app.
+* NPM and Node is required.
+
+### Setup and Building
 
 ```bash
 cd server
@@ -12,7 +18,7 @@ npm run dev // to run the server in dev env
 
 The server runs on port `5000`. Please look into `.env` file to change paramaters. 
 
-## APIs
+### APIs
 
 - `api/auth/register`: To register a user
 - `api/auth/login`: Tp authenticate a user

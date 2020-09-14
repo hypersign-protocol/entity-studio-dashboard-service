@@ -1,5 +1,13 @@
 # studio
 
+## Pre-requiisite
+
+* You must setup the [core](https://github.com/hypersign-protocol/core) project before proceeding.
+* Node js (`12+`) is required.
+* NPM (`6.14+`) is required.
+
+## Re build
+
 ```sh
 ./re-buiildall.sh
 ```
@@ -10,7 +18,7 @@ What it does?
 * It builds the client app
 * It builds the server app (including database reset)
 
-### Run the server
+## Run the server
 
 ```sh
 cd server
