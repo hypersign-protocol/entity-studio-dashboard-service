@@ -10,10 +10,14 @@ WORKDIR /usr/src/app
 # RUN /bin/bash -c "source /usr/src/app/server/.env.staging"
 
 # pushing the code inside
+COPY server/package*.json ./server/
+COPY client/package*.json ./client/
+RUN  cd server && npm install && cd -
+RUN  cd client && npm install && cd -
 ADD . /usr/src/app
 
 # setting up the project
-RUN chmod +x ./re-buildall.sh
-RUN ./re-buildall.sh
+RUN chmod +x ./build-docker.sh
+RUN ./build-docker.sh
 CMD ["node", "server/dist/index.js"]
 
