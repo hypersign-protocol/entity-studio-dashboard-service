@@ -57,7 +57,29 @@ docker run -it -v ${PWD}:/app -v /app/node_modules -p 9001:9001 hypersignprotoco
 ```
 We are mounting the current directory for source code and running the container. 
 
--- 
+
+## With Env Variable at run time
+
+### Build
+
+```bash
+docker build -f Dockerfile-env -t hypersignprotocol/studio-client:env .
+```
+
+### Pull
+
+```bash
+docker pull hypersignprotocol/studio-client:env
+```
+
+### Run
+
+```bash
+docker run -it --env VUE_APP_TITLE="HS Studio Test Application"  -p 9001:9001 hypersignprotocol/studio-client:env
+```
+
+
+--- 
 
 * On success full run, the app will run on [`http://localhost:9001/`]().
 * [Ref](https://shekhargulati.com/2019/01/18/dockerizing-a-vue-js-application/)
