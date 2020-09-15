@@ -20,6 +20,13 @@ The server runs on port `9000`. Please look into `.env` file to change paramater
 
 ### Docker
 
+#### Pull the image
+
+```bash
+docker pull hypersignprotocol/studio-server:<tag>
+```
+
+
 #### Building the image
 
 ```bash
