@@ -1,9 +1,12 @@
 ## Client
 
-### Setup
+### Manul Setup
+
+If do not want to setup manul, then skip to the docker [section](#or-simply-use-docker-container). 
 
 ```js
-cd client
+git clone https://github.com/hypersign-protocol/studio #Pull the studio repo
+cd studio/client
 npm i
 ```
 
@@ -14,9 +17,6 @@ npm i
 ```bash
 npm run dev
 ```
-
-
-On success full run, the app will run on [`http://localhost:9001/`](). You can set this port in   `vue.config.js` file.
 
 #### Prod env
 
@@ -32,3 +32,34 @@ Make sure you change the env var as per your requirement.
 ```bash
 npm run build
 ```
+
+## Or Simply Use Docker Container
+
+### Pull the image
+
+```bash
+docker pull hypersignprotocol/studio-client
+```
+
+### Run container
+
+Cone the repo and change directory
+
+```bash
+git clone https://github.com/hypersign-protocol/studio #Pull the studio repo
+cd studio/client
+```
+
+Now run the container. 
+
+```bash
+docker run -it -v ${PWD}:/app -v /app/node_modules -p 9001:9001 hypersignprotocol/studio-client
+```
+We are mounting the current directory for source code and running the container. 
+
+-- 
+
+* On success full run, the app will run on [`http://localhost:9001/`]().
+* [Ref](https://shekhargulati.com/2019/01/18/dockerizing-a-vue-js-application/)
+
+
