@@ -16,14 +16,28 @@ npm run start  // to run the server
 npm run dev // to run the server in dev env
 ```
 
-The server runs on port `5000`. Please look into `.env` file to change paramaters. 
+The server runs on port `9000`. Please look into `.env` file to change paramaters. 
 
+### Docker
 
-### APIs
+#### Building the image
 
-- `api/auth/register`: To register a user
-- `api/auth/login`: Tp authenticate a user
-- `api/auth/verify`: Verifies the authToken passed in header for client
-- `api/auth/challenge`: To get a new challenge
-- `api/blog/created`: Protected with JSON web token
+```bash
+docker build -t hypersignprotocol/studio-server .
+```
+
+#### Running the container
+
+```bash
+docker run \
+    --env PORT=9000 \
+    --env LOG_FILEPATH="../log/studio-server.log" \
+    --env LOG_DIR="./log" \
+    --env LOG_TIMESTAMP_FORMAT="YYYY-MM-DD HH:mm:ss.SSS" \
+    --env LOG_LEVEL="debug" \
+    --env DATABASE_FILEPATH="../db/studio-server.db" \
+    --env JWT_SECRET="my\$ecreEtKeY@123" \
+    -p 9000:9000 hypersignprotocol/studio-server
+```
+
 
