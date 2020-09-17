@@ -50,7 +50,8 @@ const jwtExpiryInMilli = 240000
 const nodeServer = {
     baseURl: process.env.NODE_SERVER_BASE_URL || "http://localhost:5000/",
     didCreateEp: process.env.NODE_SERVER_DID_CREATE_EP || "api/did/create",
-    schemaCreateEp: process.env.NODE_SERVER_SCHEMA_CREATE_EP || "api/schema/create"
+    schemaCreateEp: process.env.NODE_SERVER_SCHEMA_CREATE_EP || "api/schema/create",
+    schemaGetEp: process.env.NODE_SERVER_SCHEMA_GET_EP || "api/schema/get"
 }
 export  {
     port,

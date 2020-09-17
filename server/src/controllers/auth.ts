@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { User } from '../services/user.service';
-import IUser  from '../models/IUser'
+import IUser from '../models/IUser'
 import { logger, jwtSecret, jwtExpiryInMilli } from '../config'
 import jwt from 'jsonwebtoken';
 import { getChallange, verify } from 'lds-sdk'
@@ -17,29 +17,82 @@ const check = (req: Request, res: Response) => {
     Object.keys(param).forEach((k) => {
         query += `${k}=${param[k]}&`
     })
-    query = query.slice(0, query.length-1)
+    query = query.slice(0, query.length - 1)
     res.redirect(`http://localhost:8080/login${query}`)
 }
 
 
-const register = async (req: Request, res: Response) => {
-    try{
+const register_old = async (req: Request, res: Response) => {
+    try {
         logger.debug(req.body)
-        const body:IUser = req.body        
-        const user = new User({...body})
+        const body: IUser = req.body
+        const user = new User({ ...body })
         // if(user.publicKey == "") throw new Error("PublicKey field can not be null")
-        const userindbstr  = await user.fetch()
-        if(userindbstr) throw new Error(`User ${user.publicKey} already exists`)
+        const userindbstr = await user.fetch()
+        if (userindbstr) throw new Error(`User ${user.publicKey} already exists`)
         const createdU = await user.create();
-        res.status(200).send({ status: 200, message: createdU, error: null})
-    }catch(e){
-        res.status(500).send({ status: 500, message: null, error: e.message})
+        res.status(200).send({ status: 200, message: createdU, error: null })
+    } catch (e) {
+        res.status(500).send({ status: 500, message: null, error: e.message })
     }
 }
 
+const register = async (req: Request, res: Response) => {
+    try {
+        console.log(req.body)
+        logger.debug(req.body)
+        const body: IUser = req.body
+        const user = new User({ ...body })
+        const userindbstr = await user.fetch(false)
+        if (userindbstr) throw new Error(`User ${user.email} already exists. Please login with Hypersign Credential`)
+        // will use the publicKey field for storing did
+        // Generate Verifiable credential for this 
+        const createdU = await user.create();
+        const userData = JSON.parse(createdU);        
+        jwt.sign(
+            userData,
+            jwtSecret,
+            { expiresIn: jwtExpiryInMilli },
+            (err, token) => {
+                if (err) throw new Error(err)
+                const link = `http://localhost:9000/api/auth/credential?token=${token}`
+                res.status(200).send({
+                    status: 200,
+                    message: `Hi ${user.fname}, \n\n\
+                            Welcome to Hypersign!\n\
+                            Please click on this link or scan the QR code to get the Hypersign Auth Credential to be able to \
+                            login into websites that supports Hypersign login. This link is only valid till ${jwtExpiryInMilli} millisecond\n\n\
+                            ${link}\n\n\
+                            Thank & Regards,\n\
+                            Team Hypersign`,
+                    error: null
+                })
+            })
+    } catch (e) {
+        res.status(500).send({ status: 500, message: null, error: e.message })
+    }
+}
+
+const getCredential = (req, res) => {
+    try {
+        const token  = req.query.token;
+        jwt.verify(token, jwtSecret, async (err, data) => {
+            if (err) res.status(403).send({ status: 403, message: "Unauthorized.", error: null })
+            const user = new User({...data })
+            const userindbstr = await user.fetch(false)
+            if (!userindbstr) throw new Error(`User ${user.email} invalid`)
+            const vc = await user.generateCredential();
+            res.status(200).send({ status: 200, message: vc, error: null })
+        })
+    } catch (e) {
+        res.status(500).send({ status: 500, message: null, error: e.message })
+    }
+
+}
+
 const login = async (req: Request, res: Response) => {
-    try{
-        const challengeExtractedFromChToken = res.locals.data? res.locals.data.challenge : "";
+    try {
+        const challengeExtractedFromChToken = res.locals.data ? res.locals.data.challenge : "";
         const loginType = req.query.type;
         let x: IUser = {} as any;
         let userInDb: IUser = {} as any;
@@ -47,28 +100,28 @@ const login = async (req: Request, res: Response) => {
         let { username, password, proof, publicKey, domain } = req.body;
 
         // Basic authenticatoin
-        if(!loginType){
-            if(!password || !username) throw new Error('PublicKey or password or username is empty')
+        if (!loginType) {
+            if (!password || !username) throw new Error('PublicKey or password or username is empty')
             x = { password, username } as any;
             const userObj = new User(x)
-            const userindbstr  = await userObj.fetch(false)
-            if(!userindbstr) throw new Error(`Invalid user. Please register to login`)
+            const userindbstr = await userObj.fetch(false)
+            if (!userindbstr) throw new Error(`Invalid user. Please register to login`)
             userInDb = JSON.parse(userindbstr)
-            if((userInDb.username != username) && (userInDb.password != password)) throw new Error("Unauthorized: Username or password mismatch")
+            if ((userInDb.username != username) && (userInDb.password != password)) throw new Error("Unauthorized: Username or password mismatch")
             userData = userInDb;
         }
-        
+
         // PKI Authentcatoin: Verify the signature
-        if(loginType == 'PKI'){
-            
-            if(!proof || !domain) throw new Error('proof, controller, publicKey, challenge, domain is empty')
+        if (loginType == 'PKI') {
+
+            if (!proof || !domain) throw new Error('proof, controller, publicKey, challenge, domain is empty')
             proof = JSON.parse(proof)
             logger.debug(`Before verifying the proof, ch = ${challengeExtractedFromChToken}`)
-            const res = await verify({doc: proof, challenge: challengeExtractedFromChToken, domain })
+            const res = await verify({ doc: proof, challenge: challengeExtractedFromChToken, domain })
             logger.debug(`After verifying the proof, res = ${JSON.stringify(res)}`)
-            if(res.verified == true){
+            if (res.verified == true) {
                 logger.debug('Proof verified')
-                const id  = proof['id']
+                const id = proof['id']
                 delete proof['proof']
                 // TODO:
                 //      verify the did   
@@ -78,37 +131,39 @@ const login = async (req: Request, res: Response) => {
                 // Edit:  this check is not required cause, the sdk will take care of this.
                 //Check if the didDoc matches with the didDoc passed here if not throw error    
                 // if(JSON.stringify(j.message) === JSON.stringify(proof)){
-                    const userObj = new User({...proof, username: proof['id'], id: proof['id'],fname: proof.name, publicKey: proof['publicKey'][0].id}) 
-                    userData = {
-                        id: userObj.id,
-                        publicKey: userObj.publicKey,
-                        fname: userObj.fname,
-                        username: userObj.username,
-                        email: userObj.email
-                    }
+                const userObj = new User({ ...proof, username: proof['id'], id: proof['id'], fname: proof.name, publicKey: proof['publicKey'][0].id })
+                userData = {
+                    id: userObj.id,
+                    publicKey: userObj.publicKey,
+                    fname: userObj.fname,
+                    username: userObj.username,
+                    email: userObj.email
+                }
                 // }else{
                 //     throw new Error("Invalid didDoc.")
                 // }
-            }else{
+            } else {
                 logger.debug('Proof could not verified')
                 throw new Error("Unauthorized: Proof can not be verified!")
             }
         }
 
         jwt.sign(
-            userData, 
-            jwtSecret, 
+            userData,
+            jwtSecret,
             { expiresIn: jwtExpiryInMilli },
             (err, token) => {
-                if(err) throw new Error(err)
-                res.status(200).send({ status: 200, message: {
-                    m: "Sussfully loggedIn",
-                    jwtToken: token,
-                    user: userData
-                }, error: null})
-        })       
-    }catch(e){
-        res.status(500).send({ status: 500, message: null, error: e.message})
+                if (err) throw new Error(err)
+                res.status(200).send({
+                    status: 200, message: {
+                        m: "Sussfully loggedIn",
+                        jwtToken: token,
+                        user: userData
+                    }, error: null
+                })
+            })
+    } catch (e) {
+        res.status(500).send({ status: 500, message: null, error: e.message })
     }
 }
 
@@ -121,16 +176,19 @@ const getNewChallenge = (req: Request, res: Response) => {
     console.log('In the challenge api')
     const challenge = getChallange();
     jwt.sign(
-        {challenge}, 
-        jwtSecret, 
+        { challenge },
+        jwtSecret,
         { expiresIn: jwtExpiryInMilli },
         (err, token) => {
-            if(err) throw new Error(err)
-            res.status(200).send({ status: 200, message: {
-                JWTChallenge: token,
-                challenge}, error: null})
+            if (err) throw new Error(err)
+            res.status(200).send({
+                status: 200, message: {
+                    JWTChallenge: token,
+                    challenge
+                }, error: null
+            })
 
-    })  
+        })
     // res.status(200).send({ status: 200, message: getChallange() });
 }
 
@@ -139,5 +197,6 @@ export default {
     register,
     login,
     recover,
-    getNewChallenge
+    getNewChallenge,
+    getCredential
 }

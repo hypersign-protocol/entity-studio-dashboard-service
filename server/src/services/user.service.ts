@@ -1,6 +1,11 @@
 import IUser  from '../models/IUser';
 import { DBService, SchemaType } from './db.service';
 import { getChallange } from 'lds-sdk'
+import { generateCredential, signCredential } from "lds-sdk/dist/vc";
+import { logger, nodeServer } from '../config';
+import { retriveKeys } from '../setup/bootstrapCredential'
+
+const SCHEMA_ID = "sch_19d2b59d-14fd-47"
 export class User implements IUser{
     id: string;
     fname: string;
@@ -48,12 +53,52 @@ export class User implements IUser{
         return this.toString(newUser)
     }
 
+    private async getCredentials() {
+        const schemaUrl = `${nodeServer.baseURl}${nodeServer.schemaGetEp}/${SCHEMA_ID}`;
+        const issuerKeys = JSON.parse(await retriveKeys());
+
+        const attributesMap = {
+            "Name": this.fname,
+            " Email": this.email
+        }
+        const credential = await generateCredential(schemaUrl, {
+          subjectDid: this.publicKey,
+          issuerDid: issuerKeys.publicKey.id,
+          expirationDate: new Date().toISOString(),
+          attributesMap,
+        })
+
+        const signedCredential = await signCredential(credential, issuerKeys.publicKey.id, issuerKeys.privateKeyBase58)
+        return signedCredential
+    }
+
+    async generateCredential() { 
+        // try{
+            const verifiableCredential = await this.getCredentials();
+            // const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_ISSUE_EP}`;
+            // const headers = {
+            //     "Content-Type": "application/json",
+            //     "x-auth-token": this.authToken,
+            // };
+            // const body = {
+            //     subject: this.subjectDid,
+            //     schemaId: this.selected,
+            //     dataHash: signedVerifiableCredential,
+            //     appId: "appI123",
+            // };       
+            return verifiableCredential; 
+        // } catch(e){
+        //     logger.info(`Error: ${e.message}`)
+        // }
+    }
+    
+
     async fetch(ifPki = true){
         let obj= {}
         if(ifPki){
             obj = {username: this.username, password: this.password, publicKey: this.publicKey}
         }else{
-            obj = {username: this.username, password: this.password}
+            obj = {email: this.email}
         }
         let user:IUser = await this.dbSerice.getOne(SchemaType.User, obj);
         return this.toString(user)

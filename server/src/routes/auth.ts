@@ -34,4 +34,6 @@ router.get('/did', async (req, res) => {
     })
 })
 
+router.get('/credential', authCtrl.getCredential)
+
 export default router;
