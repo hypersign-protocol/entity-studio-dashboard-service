@@ -17,8 +17,8 @@
         >{{$config.app.decription}}</h6>
         <hr style="opacity: 1.5" />
       </div>
-      <div class="col-md-9 rightAlign marginLeft" v-if="$router.history.current.name != 'PKIIdLogin'">
-        <button @click="goToNextPage(m.name)"  class="btn btn-link" v-for="m in menu" :key="m.name">{{m.name}}</button>
+      <div class="col-md-9 rightAlign marginLeft" v-if="!($router.history.current.name == 'PKIIdLogin')">
+        <button @click="goToNextPage(m.name)"  class="btn btn-link" v-for="m in menu" :key="m.name">{{ m.isShow? m.name: "" }}</button>
         <hr style="opacity: 1.5" />
       </div>
     </div>
@@ -99,8 +99,8 @@ export default {
         {
           name: "Logout",
           path: "/studio/login",
-          isShow: true,
-        },
+          isShow: false,
+        },        
       ]
     }
   },

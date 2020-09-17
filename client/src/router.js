@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import PKIIdLogin from './views/PKIIdLogin.vue'
+import Register from './views/Register.vue'
 // import AppDetails from './views/AppDetails.vue'
 // import IssueCredential from './views/IssueCredential.vue'
 import Credential from './views/Credential.vue'
@@ -35,6 +36,11 @@ const router =  new Router({
       meta: {
         requiresAuth: true
       } 
+    },
+    {
+      path: '/studio/register',
+      name: 'register',
+      component: Register
     },
     // {
     //   path: '/studio/profile',

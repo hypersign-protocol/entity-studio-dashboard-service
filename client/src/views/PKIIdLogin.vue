@@ -77,7 +77,7 @@
                 class="btn btn-outline-primary floatLeft"
               >View Proof</button> -->
               Do not have account?
-              <a :href="`${this.$config.explorer.BASE_URL}${this.$config.explorer.NEW_DID_EP}`" target="_blank">Create DID</a>
+              <a href="/studio/register" target="_blank">Create DID</a>
             </div>
           </form>
         </div>
