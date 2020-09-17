@@ -11,6 +11,7 @@ export default interface IUser{
     hash?: string;
     birthdate?:string;
     jobTitle?:string;
+    isActive: string;
 }
 
 

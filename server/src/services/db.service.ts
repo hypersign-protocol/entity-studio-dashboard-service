@@ -5,7 +5,7 @@ import IApplication from '../models/IApplication';
 import { db, logger } from '../config'
 
 const FieldMap = Object.freeze({
-    User: ["id","fname","lname","phoneNumber","username","password","email","publicKey","privateKey","hash","birthdate","jobTitle"],
+    User: ["id","fname","lname","phoneNumber","username","password","email","publicKey","privateKey","hash","birthdate","jobTitle", "isActive"],
     Application: ["id","appId","appSecret","isActive", "name", "userId"],
     VerifiableCredential: ["id",    "subject",    "issuer",    "schemaId",    "dataHash"]
 })
@@ -86,6 +86,7 @@ export class DBService{
                 break;
             }
             case QueryType.UpdateRows: {
+                query = `UPDATE ${tableName} SET`;
                 break
             }
             case QueryType.GetRows: {
@@ -202,9 +203,37 @@ export class DBService{
     //     })
     // }
 
-    update(){
+    update(type: SchemaType, params: {}, clause: {}): Promise<any> {
+        return new Promise((resolve, reject) => {
+            console.log(clause)
+            let query = this.getQuery(QueryType.UpdateRows, type);
+            let field = ""
+            Object.entries(params).forEach(kv => {
+                field += `${kv[0]}='${kv[1]}',`
+            })
+            field = field.substring(0, field.lastIndexOf(","))
+            query = query + " " + field
 
+            const clausesKeys = Object.keys(clause)
+            if (clausesKeys.length > 0) {
+                let cl = ""
+                clausesKeys.forEach(k => {
+                    cl += `${k}='${clause[k]}' AND `
+                })
+                cl = cl.substring(0, cl.lastIndexOf("AND"))
+                query = query + ' WHERE ' + cl;
+            }
+            logger.debug('Before updating the user query = ' + query)
+            db.run(query, (err, res) => {
+                if (err) {
+                    reject(err)
+                }
+                logger.debug(`Method: Update: After creating  ${SchemaType[type]} table res= ${res}`);
+                resolve("SUCCESS")
+            })
+        })
     }
+
 
     delete(type: SchemaType, params):Promise<any>{
         return new Promise((resolve, reject) => {

@@ -82,6 +82,8 @@ const getCredential = (req, res) => {
             const userindbstr = await user.fetch(false)
             if (!userindbstr) throw new Error(`User ${user.email} invalid`)
             const vc = await user.generateCredential();
+            // activate this user
+            await user.update();
             res.status(200).send({ status: 200, message: vc, error: null })
         })
     } catch (e) {
@@ -137,7 +139,8 @@ const login = async (req: Request, res: Response) => {
                     publicKey: userObj.publicKey,
                     fname: userObj.fname,
                     username: userObj.username,
-                    email: userObj.email
+                    email: userObj.email,
+                    isActive: userObj.isActive
                 }
                 // }else{
                 //     throw new Error("Invalid didDoc.")

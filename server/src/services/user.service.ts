@@ -21,6 +21,7 @@ export class User implements IUser{
     birthdate: string;
     jobTitle: string;
     prefix: string;
+    isActive: string;
     constructor({ id = " ", fname = "", lname = "", username ="", phoneNumber = "", password ="", email = "", publicKey, privateKey = "", hash ="", birthdate ="", jobTitle=""}: IUser){
         this.id = id; // new uuid
         this.fname = fname;
@@ -36,6 +37,7 @@ export class User implements IUser{
         this.jobTitle = jobTitle;
         this.dbSerice = new DBService();
         this.prefix = 'usr_';
+        this.isActive = "0"
     }
 
     toString(user: IUser){
@@ -103,4 +105,14 @@ export class User implements IUser{
         let user:IUser = await this.dbSerice.getOne(SchemaType.User, obj);
         return this.toString(user)
     }
+
+    async update(){
+        return await this.dbSerice.update(SchemaType.User, {
+            isActive: "1",
+        }, {
+            email: this.email,
+            publicKey: this.publicKey
+        })
+    }
+
 }
