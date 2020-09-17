@@ -12,6 +12,7 @@
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
     "build": "tsc -p .",
+    "bootstrap": "npm run start -- --bootstrap",
     "test": "mocha -r ts-node/register src/tests/**/*.test.ts"
   },
   "author": "Vishwas Anand Bhushan",

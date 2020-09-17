@@ -1,7 +1,7 @@
 const commandLineArgs = require('command-line-args')
 const commandLineUsage = require('command-line-usage')
 import setupDb from './setup/db.setup';
-
+import { bootstrap } from './setup/bootstrapCredential'
 export default async function setCmdArgs() {
     const optionDefinitions = [
         {
@@ -21,14 +21,20 @@ export default async function setCmdArgs() {
             alias: 'n',
             type: Boolean,
             description: 'Setup the database.'
+        },
+        {
+            name: 'bootstrap',
+            alias: 'b',
+            type: Boolean,
+            description: 'Register a did and HypersignAuthCredentail on the network.'
         }
     ]
     const options = commandLineArgs(optionDefinitions)
     if (options.help) {
         const usage = commandLineUsage([
             {
-                header: 'Core',
-                content: 'A registry server to store did and resolve it into did doc.'
+                header: 'Studio',
+                content: 'A web portal to issue and verify credentails'
             },
             {
                 header: 'Options',
@@ -41,11 +47,16 @@ export default async function setCmdArgs() {
         console.log(usage)
         return false;
     } else if (options.newdb) {
-        console.log("Setting up new database..")
+        console.log("=====================Setting Up database===========================")
         await setupDb();
-        console.log("Database setup done. You can start the server")
+        console.log("=====================Setting Up database===========================")
         return false;
-    } else {
+    } else if (options.bootstrap){
+        console.log("=====================Bootstraping did/schemas===========================")
+        await bootstrap();
+        console.log("=====================Bootstraping did/schemas===========================")
+    }
+    else {
         console.log(options)
         return true;
     }

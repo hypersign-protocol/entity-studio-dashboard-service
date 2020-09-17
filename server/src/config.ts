@@ -22,6 +22,7 @@ const logger = log.createSimpleLogger({
 logger.setLevel(process.env.LOG_LEVEL || 'info')
 
 const port = process.env.PORT || 5000
+const host = process.env.HOST || "localhost";
 
 
 // DATABASE
@@ -45,11 +46,19 @@ const did = {
 
 const jwtSecret = process.env.JWT_SECRET || 'secretKey'
 const jwtExpiryInMilli = 240000
+
+const nodeServer = {
+    baseURl: process.env.NODE_SERVER_BASE_URL || "http://localhost:5000/",
+    didCreateEp: process.env.NODE_SERVER_DID_CREATE_EP || "api/did/create",
+    schemaCreateEp: process.env.NODE_SERVER_SCHEMA_CREATE_EP || "api/schema/create"
+}
 export  {
     port,
+    host,
     logger,
     db,
     did,
     jwtSecret,
-    jwtExpiryInMilli
+    jwtExpiryInMilli,
+    nodeServer
 }
