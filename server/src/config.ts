@@ -53,6 +53,15 @@ const nodeServer = {
     schemaCreateEp: process.env.NODE_SERVER_SCHEMA_CREATE_EP || "api/schema/create",
     schemaGetEp: process.env.NODE_SERVER_SCHEMA_GET_EP || "api/schema/get"
 }
+
+const mail = {
+   host: process.env.MAIL_HOST || "smtp.gmail.com",
+   port: process.env.MAIL_PORT || 465 ,
+   user: process.env.MAIL_USERNAME || "example@gmail.com",
+   pass: process.env.MAIL_PASSWORD || "ExamplePassword1@",
+   name: process.env.MAIL_NAME || "Hypermine Admin",
+}
+
 export  {
     port,
     host,
@@ -61,5 +70,6 @@ export  {
     did,
     jwtSecret,
     jwtExpiryInMilli,
-    nodeServer
+    nodeServer,
+    mail
 }
