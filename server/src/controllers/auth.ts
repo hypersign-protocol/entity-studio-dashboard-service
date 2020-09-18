@@ -1,12 +1,14 @@
 import { Request, Response } from 'express';
 import { User } from '../services/user.service';
 import IUser from '../models/IUser'
-import { logger, jwtSecret, jwtExpiryInMilli } from '../config'
+import { logger, jwtSecret, jwtExpiryInMilli, mail } from '../config'
 import jwt from 'jsonwebtoken';
 import { getChallange, verify } from 'lds-sdk'
 import { retrive, store } from '../utils/file'
 import path from 'path'
 import fs from 'fs'
+import regMailTemplate from '../mailTemplates/registration';
+import { MailService } from '../services/mail.service'
 
 const check = (req: Request, res: Response) => {
     const param = {
@@ -46,8 +48,9 @@ const register = async (req: Request, res: Response) => {
         logger.debug(req.body)
         const body: IUser = req.body
         const user = new User({ ...body })
-        const userindbstr = await user.fetch(false)
-        if (userindbstr) throw new Error(`User ${user.email} already exists. Please login with Hypersign Credential`)
+        // const userindbstr = await user.fetch(false)
+        // if (userindbstr) throw new Error(`User ${user.email} already exists. Please login with Hypersign Credential`)
+        
         // will use the publicKey field for storing did
         // Generate Verifiable credential for this 
         const createdU = await user.create();
@@ -56,22 +59,30 @@ const register = async (req: Request, res: Response) => {
             userData,
             jwtSecret,
             { expiresIn: jwtExpiryInMilli },
-            (err, token) => {
+            async (err, token) => {
                 if (err) throw new Error(err)
                 const link = `http://localhost:9000/api/auth/credential?token=${token}`
-
-                //TODO: Send email
-                res.status(200).send({
-                    status: 200,
-                    message: `Hi ${user.fname}, \n\n\
-                            Welcome to Hypersign!\n\
-                            Please click on this link or scan the QR code to get the Hypersign Auth Credential to be able to \
-                            login into websites that supports Hypersign login. This link is only valid till ${jwtExpiryInMilli} millisecond\n\n\
-                            ${link} \n\n\
-                            Thank & Regards,\n\
-                            Team Hypersign`,
-                    error: null
-                })
+                const mailService =  new MailService({...mail});
+                console.log(mailService)
+                let mailTemplate = regMailTemplate;
+                mailTemplate = mailTemplate.replace('@@RECEIVERNAME@@', user.fname)
+                mailTemplate = mailTemplate.replace('@@LINK@@', link)
+                mailTemplate = mailTemplate.replace('@@LINK@@', link)
+                console.log(mailTemplate)
+                try{
+                    //TODO: Send email
+                    console.log('Before sending the mail')
+                    const info = await mailService.sendEmail(user.email, mailTemplate, "Account Registration | Hypersign Studio")    
+                    console.log('Mail is sent ' + info.messageId)
+                    
+                    res.status(200).send({
+                        status: 200,
+                        message: info,
+                        error: null
+                    })
+                }catch(e){
+                    throw new Error(`Could not send email to ${user.email}. Please check the email address properly.`)
+                }
             })
     } catch (e) {
         res.status(500).send({ status: 500, message: null, error: e.message })
