@@ -21,67 +21,81 @@
 .floatRight {
   float: right;
 }
-.title{
-  color: grey
+.title {
+  color: grey;
+}
+
+h5 {
+   width: 100%; 
+   text-align: center; 
+   border-bottom: 1px solid #80808045; 
+   line-height: 0.1em;
+   margin: 10px 0 20px; 
+} 
+
+h5 span { 
+    background:#fff; 
+    padding:0 10px; 
 }
 </style>
 <template>
-  <div class="row">
-    <loading :active.sync="isLoading" 
-        :can-cancel="true" 
-        :is-full-page="fullPage"></loading>
-
-    <div class="col-md-8" style="margin-left: 17%">
-      <b-card no-body style="padding: 40px">
-        <div class="row">
-          <form action="#" class="col-md-6">
-            <div class="form-group"  style="border-right: 1px solid #8080804f;">
-              <qrcode-vue :value="QRCodeValue" :size="200" level="H"></qrcode-vue>
-              <label class="title">Scan the QR code using Hypersign Wallet to authenticate!</label>
+  <div class="row" style="margin-left: 17%;">
+    <loading :active.sync="isLoading" :can-cancel="true" :is-full-page="fullPage"></loading>
+    <div class="col-md-7" style="font-size: small;color:grey;">
+      Can we put one big image here?
+    </div>
+    <div class="col-md-3" style="font-size: small;color:grey">
+      <form action="#" style="padding:6px">
+        <b-card no-body style="padding: 40px">
+          <div class="row">
+            <form action="#" class="col-md-12">
+              <div class="form-group">
+                <qrcode-vue :value="QRCodeValue" :size="150" level="H"></qrcode-vue>
+                <label>Scan the QR code using Hypersign App in your mobile phone to authenticate!</label>
+              </div>
+              <div class="form-group">
+              <h5><span>OR</span></h5>
+              </div>
+              <div class="form-group">
+                <label class="floatLeft">Upload keys.json:</label>
+                <input
+                  type="file"
+                  class="form-control"
+                  placeholder
+                  @change="onFileChange"
+                  accept="*.json"
+                />
+              </div>
+              <div class="form-group">
+                <label class="floatLeft">Upload vc.json:</label>
+                <input type="file" class="form-control" placeholder @change="onFileChange" />
+              </div>
+            </form>
+          </div>
+          <div class="row">
+            <div class="col-sm-3" hidden>
+              <button
+                type="button"
+                data-toggle="modal"
+                @click="downloadPresentation()"
+                class="btn btn-primary btn-sm floatLeft"
+              >View Proof</button>
             </div>
-          </form>
-          <form action="#" class="col-md-6" style="padding:6px">
-            <div class="form-group" hidden>
-              <label class="floatLeft">Upload DIDDoc:</label>
-              <input
-                type="file"
-                class="form-control"
-                placeholder
-                @change="onFileChange"
-                accept="*.json"
-              />
-            </div>
-            <div class="form-group" hidden>
-              <label class="floatLeft">Upload Keys:</label>
-              <input type="file" class="form-control" placeholder @change="onFileChange" />
-            </div>
-            <div class="form-group">
-              <label class="floatLeft">Enter privatekey:</label>
-              <input type="text" class="form-control" placeholder="Enter privatekey" v-model="privateKey"/>
-            </div>
-            <div class="form-group">
-              <label class="floatLeft">Enter did or publickeyId:</label>
-              <input type="text" class="form-control" placeholder="Enter did or publickeyId" v-model="did"/>
-            </div>
-            <div class="form-group">
+            <div class="col-sm-3">
               <button
                 type="button"
                 data-toggle="modal"
                 @click="login('PKI')"
-                class="btn btn-outline-primary btn-sm floatLeft"
+                class="btn btn-primary btn-sm floatLeft"
               >Login</button>
-              <!-- <button
-                type="button"
-                data-toggle="modal"
-                @click="downloadProof()"
-                class="btn btn-outline-primary floatLeft"
-              >View Proof</button> -->
-              Do not have account?
-              <a href="/studio/register" target="_blank">Create DID</a>
             </div>
-          </form>
-        </div>
-      </b-card>
+            <div class="col-md-9 floatRight">
+              Do not have account?
+              <a href="/register_pki">SignUp</a>
+            </div>
+          </div>
+        </b-card>
+      </form>
     </div>
   </div>
 </template>
@@ -89,14 +103,15 @@
 <script>
 import QrcodeVue from "qrcode.vue";
 import { sign } from "lds-sdk";
-import Loading from 'vue-loading-overlay';
-import 'vue-loading-overlay/dist/vue-loading.css';
-const {sha256hashStr} = require("../utils/hash");
+import Loading from "vue-loading-overlay";
+import {  generatePresentation, signPresentation } from "lds-sdk/dist/vc";
+import "vue-loading-overlay/dist/vue-loading.css";
+const { sha256hashStr } = require("../utils/hash");
 export default {
   name: "Login",
   components: {
     QrcodeVue,
-    Loading
+    Loading,
   },
   data() {
     return {
@@ -109,73 +124,90 @@ export default {
       QRCodeValue: this.$route.query,
       credentials: {},
       userData: {},
-      proof: "",
+      user: {},
+      verifiablePresentation: "",
       fullPage: true,
       isLoading: false,
-      privateKey: "3isrtEJ4gt1ZHkdUYYph1WFAtzfqAL5WM6Hh1NC2hmWnDfBypXjt5oUFdAqQdiess2vqqQ3iF6x4fDVuvLw454sn",
+      isCredentialIssued: false,
+      privateKey:
+        "3isrtEJ4gt1ZHkdUYYph1WFAtzfqAL5WM6Hh1NC2hmWnDfBypXjt5oUFdAqQdiess2vqqQ3iF6x4fDVuvLw454sn",
       did: "did:hs:892325a4-75c9-465c-882b-91e3ca5143c3",
     };
   },
-  created(){
+  created() {
     const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.AUTH_CHALLENGE_EP}`;
-    console.log(url)
+    console.log(url);
     fetch(url)
-    .then(res => res.json())
-    .then(json => {
-      console.log(json);
-      if(json.status == 200){
-        this.challenge = json.message
-      }
-    })
-    .catch(e => this.notifyErr(`Error: ${e.message}`))
+      .then((res) => res.json())
+      .then((json) => {
+        console.log(json);
+        if (json.status == 200) {
+          this.challenge = json.message;
+        }
+      })
+      .catch((e) => this.notifyErr(`Error: ${e.message}`));
   },
-  mounted(){
-      this.clean();
+  mounted() {
+    this.clean();
   },
   methods: {
-    clean(){
-      localStorage.removeItem('authToken')
-      localStorage.removeItem('user')
-      localStorage.removeItem("credentials")
-      localStorage.removeItem("userData")
+    clean() {
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("user");
+      localStorage.removeItem("credentials");
+      localStorage.removeItem("userData");
     },
-    notifySuccess(msg){
+    notifySuccess(msg) {
       this.$notify({
-          group: 'foo',
-          title: 'Information',
-          type: 'success',
-          text: msg
-        });
+        group: "foo",
+        title: "Information",
+        type: "success",
+        text: msg,
+      });
     },
-    notifyErr(msg){
+    notifyErr(msg) {
       this.$notify({
-          group: 'foo',
-          title: 'Error',
-          type: 'error',
-          text: msg
-        });
+        group: "foo",
+        title: "Error",
+        type: "error",
+        text: msg,
+      });
     },
     gotosubpage: (id) => {
       this.$router.push(`${id}`);
     },
-    async generateProof() {
-      console.log({did: this.did, pvkey:  this.privateKey})
-      // this.credentials = JSON.parse(localStorage.getItem("credentials"));
-      // console.log(this.credentials);
-      // this.userData = JSON.parse(localStorage.getItem("userData"));
-      // console.log(this.userData);
-      if(this.did != "" && this.privateKey !=""){
-        const p = await sign({
-          did: this.did,
-          privateKeyBase58: this.privateKey,
-          challenge: this.challenge.challenge,
-          domain: this.domain,
-        });
-
-        this.proof = JSON.stringify(p);
-      } else {
-        throw new Error("Error: did and privatekey are requried");
+    async generatePresentation() {  
+      this.isLoading = true
+      try{
+        const keys = JSON.parse(localStorage.getItem("keys"));
+        console.log(keys)
+        this.user.privateKey = keys.privateKeyBase58
+        this.user.id = keys.publicKey.id
+        this.user.did = this.user.id.split('#')[0]
+        const vc = JSON.parse(localStorage.getItem("credential"));
+        console.log(vc)
+        this.user.name = vc['credentialSubject']['Name']
+        this.user.email = vc['credentialSubject'][' Email']
+        if(!vc) throw new Error('VC is null')
+        const vp_unsigned = await generatePresentation(vc, this.user.id);
+        const vp_signed = await signPresentation(vp_unsigned, this.user.id, this.user.privateKey, this.challenge.challenge)
+        this.verifiablePresentation = JSON.stringify(vp_signed)
+        this.isLoading = false
+        this.isCredentialIssued = true;
+        this.notifySuccess("Presentation generated and sigend")
+        localStorage.removeItem('credential')
+        localStorage.removeItem('keys')
+      }catch(e){
+        this.isLoading = false
+        this.notifyErr(e.message)
       }
+    },
+    async downloadPresentation() {
+      await this.generatePresentation()
+      this.forceFileDownload(
+        this.verifiablePresentation,
+        "vp.json"
+      );
     },
     forceFileDownload(data, fileName) {
       const url = window.URL.createObjectURL(new Blob([data]));
@@ -185,88 +217,82 @@ export default {
       document.body.appendChild(link);
       link.click();
     },
-    async downloadProof() {
-      try{
-        await this.generateProof();
-        this.forceFileDownload(this.proof, "proof.json");
-      }catch(e){
-        this.notifyErr(e.message)
-      }
+    readFile(file, cb){
+      console.log('Inside reaffileDs')
+      const reader = new FileReader();
+      reader.onload = cb
+      reader.readAsText(file);
     },
     onFileChange(event) {
-      try {
-        const file = event.target.files[0];
-        const reader = new FileReader();
-        reader.onload = readSuccess;
-        function readSuccess (evt) {
-          const fileJSON = JSON.parse(evt.target.result);
-          if (!fileJSON) throw new Error("Incorrect file");
-          if (fileJSON["privateKeyBase58"]) {
-            localStorage.setItem("credentials", JSON.stringify(fileJSON));
-          } else if (fileJSON["@context"]) {
-            localStorage.setItem("userData", JSON.stringify(fileJSON));
-          } else {
-            throw new Error("Incorrect file");
-          }
+      const file = event.target.files[0];
+      this.readFile(file, this.onfileLoadSuccess)
+    },
+    onfileLoadSuccess (evt){
+        console.log('Inside callback')
+        const fileJSON = JSON.parse(evt.target.result);
+        if (!fileJSON) this.notifyErr("Incorrect file");
+        if(fileJSON["type"] && fileJSON["type"].find(x => x == 'VerifiableCredential')){
+          console.log('Inside callback: vc')
+          localStorage.removeItem('credential')
+          localStorage.setItem("credential", JSON.stringify(fileJSON));  
+        }else if(fileJSON['privateKeyBase58']){
+          console.log('Inside callback: keys')
+          localStorage.removeItem('keys')
+          localStorage.setItem("keys", JSON.stringify(fileJSON));  
+        }else{
+          this.notifyErr("Invalid file")
         }
-        reader.readAsText(file);
-      } catch (e) {
-        this.clean();
-        this.notifyErr(`Error: ${e.message}`);
-      }
     },
     async login(type) {
-      
-     try{
-      this.isLoading = true;
-      let url = "";
-      let headers = {
-        "Content-Type": "application/json"
-      }
-      if (type === "PKI") {
+      try {
+        this.isLoading = true;
+        let url = "";
+        let headers = {
+          "Content-Type": "application/json",
+        };
+        
         url = `http://${this.host}:9000/api/auth/login_pki?type=PKI`;
-        headers['x-auth-token'] = this.challenge.JWTChallenge;
-        await this.generateProof();
-      } else {
-        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.AUTH_LOGIN_EP}`;
-      }
-      const userData = {
-        username: this.username,
-        password: this.password != " " ? sha256hashStr(this.password): this.password,
-        proof: this.proof,
-        challenge: this.challenge? this.challenge.challenge: "",
-        domain: this.domain,
-      };
-      fetch(url, {
-        body: JSON.stringify(userData),
-        method: "POST",
-        headers: headers,
-      })
-        .then((res) => res.json())
-        .then((j) => {
-          this.isLoading = false;
-          if (j && j.status == 500) {
-            return this.notifyErr(`Error:  ${j.error}`);
-          }
-          
-          console.log(j.message)
-
-          localStorage.setItem("authToken", j.message.jwtToken);
-          j.message.user['privateKey'] = this.privateKey
-          localStorage.setItem("user", JSON.stringify(j.message.user));
-          if (localStorage.getItem("authToken") != null) {
-            if (this.$route.params.nextUrl != null) {
-              this.$router.push(this.$route.params.nextUrl);
-            } else {
-              this.$router.push("dashboard");
+        headers["x-auth-token"] = this.challenge.JWTChallenge;
+        await this.generatePresentation();
+        
+        const userData = {
+          fname: this.user.name,
+          email: this.user.email,
+          publicKey: this.user.did,
+          proof: this.verifiablePresentation,
+          challenge: this.challenge ? this.challenge.challenge : "",
+          domain: this.domain,
+        };
+        fetch(url, {
+          body: JSON.stringify(userData),
+          method: "POST",
+          headers: headers,
+        })
+          .then((res) => res.json())
+          .then((j) => {
+            this.isLoading = false;
+            if (j && j.status == 500) {
+              return this.notifyErr(`Error:  ${j.error}`);
             }
-          }
-        });
-     }catch(e){
-       this.clean();
-       this.isLoading = false;
-       this.notifyErr(`Error: ${e.message}`)
-     }
+
+            console.log(j.message);
+
+            localStorage.setItem("authToken", j.message.jwtToken);
+            j.message.user["privateKey"] = this.user.privateKey;
+            localStorage.setItem("user", JSON.stringify(j.message.user));
+            if (localStorage.getItem("authToken") != null) {
+              if (this.$route.params.nextUrl != null) {
+                this.$router.push(this.$route.params.nextUrl);
+              } else {
+                this.$router.push("dashboard");
+              }
+            }
+          });
+      } catch (e) {
+        this.clean();
+        this.isLoading = false;
+        this.notifyErr(`Error: ${e.message}`);
+      }
     },
   },
 };

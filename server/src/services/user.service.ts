@@ -96,12 +96,8 @@ export class User implements IUser{
     }
     
 
-    async fetch(ifPki = true){
-        let obj= {}
-        if(ifPki){
-            obj = {username: this.username, password: this.password, publicKey: this.publicKey}
-        }else{
-            // obj = {email: this.email, publicKey: this.publicKey}
+    async fetch(obj = {}){    
+        if(obj == {}){
             obj = {email: this.email}
         }
         let user:IUser = await this.dbSerice.getOne(SchemaType.User, obj);

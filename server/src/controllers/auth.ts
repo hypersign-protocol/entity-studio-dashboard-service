@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { User } from '../services/user.service';
 import IUser from '../models/IUser'
-import { logger, jwtSecret, jwtExpiryInMilli, mail } from '../config'
+import { logger, jwtSecret, jwtExpiryInMilli, mail, port, host } from '../config'
 import jwt from 'jsonwebtoken';
 import { getChallange, verify } from 'lds-sdk'
+import { verifyPresentation } from "lds-sdk/dist/vc";
 import { retrive, store } from '../utils/file'
 import path from 'path'
 import fs from 'fs'
@@ -26,7 +27,6 @@ const check = (req: Request, res: Response) => {
     res.redirect(`http://localhost:8080/login${query}`)
 }
 
-
 const register_old = async (req: Request, res: Response) => {
     try {
         logger.debug(req.body)
@@ -48,35 +48,38 @@ const register = async (req: Request, res: Response) => {
         logger.debug(req.body)
         const body: IUser = req.body
         const user = new User({ ...body })
-        const userindbstr = await user.fetch(false)
+        const userindbstr = await user.fetch({
+            email: user.email,
+            publicKey: user.publicKey
+        })
         if (userindbstr) throw new Error(`User ${user.email} already exists. Please login with Hypersign Credential`)
-        
+
         // will use the publicKey field for storing did
         // Generate Verifiable credential for this 
         const createdU = await user.create();
-        const userData = JSON.parse(createdU);        
+        const userData = JSON.parse(createdU);
         jwt.sign(
             userData,
             jwtSecret,
             { expiresIn: jwtExpiryInMilli },
             async (err, token) => {
                 if (err) throw new Error(err)
-                const link = `http://localhost:9000/api/auth/credential?token=${token}`
-                const mailService =  new MailService({...mail});
+                const link = `http://${host}:${port}/api/auth/credential?token=${token}`
+                const mailService = new MailService({ ...mail });
                 let mailTemplate = regMailTemplate;
                 mailTemplate = mailTemplate.replace('@@RECEIVERNAME@@', user.fname)
                 mailTemplate = mailTemplate.replace('@@LINK@@', link)
-                try{
+                try {
                     //TODO: Send email
                     logger.debug('Before sending the mail')
-                    const info = await mailService.sendEmail(user.email, mailTemplate, "Account Registration | Hypersign Studio")    
+                    const info = await mailService.sendEmail(user.email, mailTemplate, "Account Registration | Hypersign Studio")
                     logger.debug('Mail is sent ' + info.messageId)
                     res.status(200).send({
                         status: 200,
                         message: info,
                         error: null
                     })
-                }catch(e){
+                } catch (e) {
                     throw new Error(`Could not send email to ${user.email}. Please check the email address properly.`)
                 }
             })
@@ -87,21 +90,21 @@ const register = async (req: Request, res: Response) => {
 
 const getCredential = (req, res) => {
     try {
-        const token  = req.query.token;
+        const token = req.query.token;
         console.log(token)
-        if(!token){
+        if (!token) {
             throw new Error("Token is not passed")
         }
         jwt.verify(token, jwtSecret, async (err, data) => {
             if (err) res.status(403).send({ status: 403, message: "Unauthorized.", error: null })
-            const user = new User({...data })
+            const user = new User({ ...data })
             const userindbstr = await user.fetch(false)
             if (!userindbstr) throw new Error(`User ${user.email} invalid`)
             const vc = await user.generateCredential();
-            
+
             // create temporary dir
-            const vcDir = path.join(__dirname  + "/../" +"temp/")
-            if (!fs.existsSync(vcDir)){
+            const vcDir = path.join(__dirname + "/../" + "temp/")
+            if (!fs.existsSync(vcDir)) {
                 fs.mkdirSync(vcDir);
             }
 
@@ -110,7 +113,7 @@ const getCredential = (req, res) => {
             await store(vc, filePath);
             // activate this user
             await user.update();
-            
+
             // send vc to download.
             res.download(filePath);
             // res.status(200).send({ status: 200, message: vc, error: null })
@@ -121,149 +124,66 @@ const getCredential = (req, res) => {
 
 }
 
+async function verifyVP(vp, challenge) {
+    if (!vp) throw new Error('vp is null')
+    const vc = vp.verifiableCredential[0]
+    const isVerified = await verifyPresentation({
+        presentation: vp,
+        challenge,
+        issuerDid: vc.issuer,
+        holderDid: vc.credentialSubject.id
+    }) as any;
+    console.log(isVerified)
+    if (isVerified.verified) {
+        return true
+    } else {
+        return false
+    }
+}
+
 const login = async (req: Request, res: Response) => {
     try {
         const challengeExtractedFromChToken = res.locals.data ? res.locals.data.challenge : "";
-        const loginType = req.query.type;
-        let x: IUser = {} as any;
-        let userInDb: IUser = {} as any;
-        let userData: IUser = {} as any;
-        let { username, password, proof, publicKey, domain } = req.body;
+        let { proof } = req.body;
 
-        // Basic authenticatoin
-        if (!loginType) {
-            if (!password || !username) throw new Error('PublicKey or password or username is empty')
-            x = { password, username } as any;
-            const userObj = new User(x)
-            const userindbstr = await userObj.fetch(false)
-            if (!userindbstr) throw new Error(`Invalid user. Please register to login`)
-            userInDb = JSON.parse(userindbstr)
-            if ((userInDb.username != username) && (userInDb.password != password)) throw new Error("Unauthorized: Username or password mismatch")
-            userData = userInDb;
-        }
+        if (!proof) throw new Error('Proof property must be passed in the request')
 
-        // PKI Authentcatoin: Verify the signature
-        if (loginType == 'PKI') {
+        // First check is user exist (make sure to check if he is active too)
+        let userObj = new User({ ...req.body })
+        let userindb = await userObj.fetch({
+            email: userObj.email,
+            publicKey: userObj.publicKey,
+            isActive: "1"
+        })
+        if (!userindb) throw new Error(`User ${userObj.email} does exists or has not been validated his email.`)
 
-            if (!proof || !domain) throw new Error('proof, controller, publicKey, challenge, domain is empty')
-            proof = JSON.parse(proof)
-            logger.debug(`Before verifying the proof, ch = ${challengeExtractedFromChToken}`)
-            const res = await verify({ doc: proof, challenge: challengeExtractedFromChToken, domain })
-            logger.debug(`After verifying the proof, res = ${JSON.stringify(res)}`)
-            if (res.verified == true) {
-                logger.debug('Proof verified')
-                const id = proof['id']
-                delete proof['proof']
-                // TODO:
-                //      verify the did   
-                //      Call http://localhost:5000/api/did/resolve?did=${id} to resolve the did
-                // const res= await fetch(`http://localhost:5000/api/did/resolve/${id}`)
-                // const j = await res.json()
-                // Edit:  this check is not required cause, the sdk will take care of this.
-                //Check if the didDoc matches with the didDoc passed here if not throw error    
-                // if(JSON.stringify(j.message) === JSON.stringify(proof)){
-                const userObj = new User({ ...proof, username: proof['id'], id: proof['id'], fname: proof.name, publicKey: proof['publicKey'][0].id })
-                userData = {
-                    id: userObj.id,
-                    publicKey: userObj.publicKey,
-                    fname: userObj.fname,
-                    username: userObj.username,
-                    email: userObj.email,
-                    isActive: userObj.isActive
-                }
-                // }else{
-                //     throw new Error("Invalid didDoc.")
-                // }
-            } else {
-                logger.debug('Proof could not verified')
-                throw new Error("Unauthorized: Proof can not be verified!")
-            }
-        }
-
-        jwt.sign(
-            userData,
-            jwtSecret,
-            { expiresIn: jwtExpiryInMilli },
-            (err, token) => {
-                if (err) throw new Error(err)
-                res.status(200).send({
-                    status: 200, message: {
-                        m: "Sussfully loggedIn",
-                        jwtToken: token,
-                        user: userData
-                    }, error: null
+        // verify the verifiable presentation
+        logger.debug(`Before verifying the proof, ch = ${challengeExtractedFromChToken}`)
+        if (await verifyVP(JSON.parse(proof), challengeExtractedFromChToken)) {
+            userindb = JSON.parse(userindb)
+            userindb['id'] = userindb['publicKey'] // TODO: handle it with better way:  add another property (i.e. did)in the model (may be) that will help
+            jwt.sign(
+                userindb,
+                jwtSecret,
+                { expiresIn: jwtExpiryInMilli },
+                (err, token) => {
+                    if (err) throw new Error(err)
+                    res.status(200).send({
+                        status: 200, message: {
+                            m: "Sussfully loggedIn",
+                            jwtToken: token,
+                            user: userindb
+                        }, error: null
+                    })
                 })
-            })
+        } else {
+            logger.debug('Proof could not verified')
+            throw new Error("Unauthorized: Proof can not be verified!")
+        }
     } catch (e) {
         res.status(500).send({ status: 500, message: null, error: e.message })
     }
 }
-
-
-/*
-const login_old = async (req: Request, res: Response) => {
-    // try {
-        const challengeExtractedFromChToken = res.locals.data ? res.locals.data.challenge : "";
-        const loginType = req.query.type;
-        let x: IUser = {} as any;
-        let userInDb: IUser = {} as any;
-        let userData: IUser = {} as any;
-        let { username, password, proof, publicKey, domain } = req.body;
-
-        // Fetch VP from
-        
-        // Verifiy VP
-
-        // Get the userdata 
-
-        // Check if this user is registered with us and also if he is active
-        
-
-        // Issue a Authorization token
-
-        if (!proof || !domain) throw new Error('proof, controller, publicKey, challenge, domain is empty')
-        proof = JSON.parse(proof)
-        logger.debug(`Before verifying the proof, ch = ${challengeExtractedFromChToken}`)
-        const res = await verify({ doc: proof, challenge: challengeExtractedFromChToken, domain })
-        logger.debug(`After verifying the proof, res = ${JSON.stringify(res)}`)
-        if (res.verified == false) { 
-            logger.debug('Proof could not verified')
-            throw new Error("Unauthorized: Proof can not be verified!") 
-        } 
-        
-        logger.debug('Proof verified')
-        const id = proof['id']
-        delete proof['proof']
-        const userObj = new User({ ...proof, username: proof['id'], id: proof['id'], fname: proof.name, publicKey: proof['publicKey'][0].id })
-        userData = {
-            id: userObj.id,
-            publicKey: userObj.publicKey,
-            fname: userObj.fname,
-            username: userObj.username,
-            email: userObj.email,
-            isActive: userObj.isActive
-        }
-    
-        
-        jwt.sign(
-            userData,
-            jwtSecret,
-            { expiresIn: jwtExpiryInMilli },
-            (err, token) => {
-                if (err) throw new Error(err)
-                res.status(200).send({
-                    status: 200, message: {
-                        m: "Sussfully loggedIn",
-                        jwtToken: token,
-                        user: userData
-                    }, error: null
-                })
-            })
-    // } catch (e) {
-    //     res.status(500).send({ status: 500, message: null, error: e.message })
-    // }
-}
-*/
 
 
 const recover = (req: Request, res: Response) => {
