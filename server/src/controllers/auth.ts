@@ -48,8 +48,8 @@ const register = async (req: Request, res: Response) => {
         logger.debug(req.body)
         const body: IUser = req.body
         const user = new User({ ...body })
-        // const userindbstr = await user.fetch(false)
-        // if (userindbstr) throw new Error(`User ${user.email} already exists. Please login with Hypersign Credential`)
+        const userindbstr = await user.fetch(false)
+        if (userindbstr) throw new Error(`User ${user.email} already exists. Please login with Hypersign Credential`)
         
         // will use the publicKey field for storing did
         // Generate Verifiable credential for this 
@@ -63,18 +63,14 @@ const register = async (req: Request, res: Response) => {
                 if (err) throw new Error(err)
                 const link = `http://localhost:9000/api/auth/credential?token=${token}`
                 const mailService =  new MailService({...mail});
-                console.log(mailService)
                 let mailTemplate = regMailTemplate;
                 mailTemplate = mailTemplate.replace('@@RECEIVERNAME@@', user.fname)
                 mailTemplate = mailTemplate.replace('@@LINK@@', link)
-                mailTemplate = mailTemplate.replace('@@LINK@@', link)
-                console.log(mailTemplate)
                 try{
                     //TODO: Send email
-                    console.log('Before sending the mail')
+                    logger.debug('Before sending the mail')
                     const info = await mailService.sendEmail(user.email, mailTemplate, "Account Registration | Hypersign Studio")    
-                    console.log('Mail is sent ' + info.messageId)
-                    
+                    logger.debug('Mail is sent ' + info.messageId)
                     res.status(200).send({
                         status: 200,
                         message: info,
