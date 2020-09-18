@@ -24,6 +24,7 @@
 </style>
 <template>
   <div class="home">
+    <loading :active.sync="isLoading" :can-cancel="true" :is-full-page="fullPage"></loading>
     <div class="col-md-4 centeralign">
       <b-card no-body style="padding: 20px">
         <h2>Admin Registration</h2>
@@ -44,7 +45,7 @@
           <div class="form-group">
             <label class="control-label col-sm-3">DID:</label>
             <div class="col-sm-9">
-              <input type="email" class="form-control" v-model="did" />
+              <input type="text" class="form-control" v-model="did" placeholder="did:hs:..."/>
             </div>
           </div>
           <!-- <div class="form-group">
@@ -83,21 +84,27 @@
 <script>
 import fetch from "node-fetch";
 const { sha256hashStr } = require("../utils/hash");
+import Loading from "vue-loading-overlay";
 export default {
   name: "Register",
   components: {},
+  components: {
+    Loading,
+  },
   data() {
     return {
       active: 0,
-      fullName: "vishwas",
-      email: "vishwas@gmail.com",
+      fullName: "",
+      email: "",
       phno: "",
       publicKey: "",
       username: "",
       password: "",
       host: location.hostname,
       keys: {},
-      did: "did:hs:7c9701fd-b2c5-4a90-9712-ea80c93e4e01"
+      did: "",
+      isLoading:  false,
+      fullPage: true
     };
   },
   created() {},
@@ -139,7 +146,10 @@ export default {
     //   link.click();
     // },
     async signup() {
+      this.isLoading = true
       try {
+
+        if(this.email == "" || this.name == "" || this.did == "") throw new Error("All fields are mandatory")
 
         console.log('Inside signup')
 
@@ -165,17 +175,15 @@ export default {
         const j = await resp.json();
         console.log(j)
         if (j.status == 500) {
-          this.notifyErr(j.error);
-          return
+          this.isLoading = false
+          throw new Error(j.error);
         }
-        
-        console.log(j.message)
-
-        alert(
-          "You have been registered. Please click on link in the email to activate your acccount and get HypersignAuth credential for login. You gonna need keys.json as well as HypersignAuth credential to login"
-        );
+        this.isLoading = false
+        alert("An email has been sent to you. Please click on the link to verify and download HypersignAuth credentials."); 
+        this.isLoading = false
         this.$router.push("login");
       } catch (e) {
+        this.isLoading = false
         this.notifyErr(e.message);
       }
     },

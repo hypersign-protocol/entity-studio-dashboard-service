@@ -91,7 +91,7 @@ h5 span {
             </div>
             <div class="col-md-9 floatRight">
               Do not have account?
-              <a href="/register_pki">SignUp</a>
+              <a href="/studio/register">SignUp</a>
             </div>
           </div>
         </b-card>

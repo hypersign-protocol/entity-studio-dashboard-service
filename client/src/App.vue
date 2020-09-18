@@ -17,7 +17,7 @@
         >{{$config.app.decription}}</h6>
         <hr style="opacity: 1.5" />
       </div>
-      <div class="col-md-9 rightAlign marginLeft" v-if="!($router.history.current.name == 'PKIIdLogin')">
+      <div class="col-md-9 rightAlign marginLeft" v-if="!(authRoutes.includes($router.history.current.name))">
         <button @click="goToNextPage(m.name)"  class="btn btn-link" v-for="m in menu" :key="m.name">{{m.name}}</button>
         <hr style="opacity: 1.5" />
       </div>
@@ -75,6 +75,7 @@ margin-right: 12%
 export default {
   data(){
     return {
+      authRoutes:  ['register', 'PKIIdLogin'],
       menu: [
         { 
           name: "Dashboard",  
