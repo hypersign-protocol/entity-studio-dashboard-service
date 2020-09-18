@@ -3,8 +3,9 @@ import { DBService, SchemaType } from './db.service';
 import { getChallange } from 'lds-sdk'
 import { generateCredential, signCredential } from "lds-sdk/dist/vc";
 import { logger, nodeServer } from '../config';
-import { retriveKeys } from '../setup/bootstrapCredential'
-
+import path  from 'path'
+import { retrive } from '../utils/file'
+const filePath = path.join(__dirname + "/../" + "keys.json")
 const SCHEMA_ID = "sch_19d2b59d-14fd-47"
 export class User implements IUser{
     id: string;
@@ -57,7 +58,7 @@ export class User implements IUser{
 
     private async getCredentials() {
         const schemaUrl = `${nodeServer.baseURl}${nodeServer.schemaGetEp}/${SCHEMA_ID}`;
-        const issuerKeys = JSON.parse(await retriveKeys());
+        const issuerKeys = JSON.parse(await retrive(filePath));
 
         const attributesMap = {
             "Name": this.fname,
@@ -100,6 +101,7 @@ export class User implements IUser{
         if(ifPki){
             obj = {username: this.username, password: this.password, publicKey: this.publicKey}
         }else{
+            // obj = {email: this.email, publicKey: this.publicKey}
             obj = {email: this.email}
         }
         let user:IUser = await this.dbSerice.getOne(SchemaType.User, obj);

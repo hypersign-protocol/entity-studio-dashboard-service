@@ -4,6 +4,9 @@ import IUser from '../models/IUser'
 import { logger, jwtSecret, jwtExpiryInMilli } from '../config'
 import jwt from 'jsonwebtoken';
 import { getChallange, verify } from 'lds-sdk'
+import { retrive, store } from '../utils/file'
+import path from 'path'
+import fs from 'fs'
 
 const check = (req: Request, res: Response) => {
     const param = {
@@ -56,13 +59,15 @@ const register = async (req: Request, res: Response) => {
             (err, token) => {
                 if (err) throw new Error(err)
                 const link = `http://localhost:9000/api/auth/credential?token=${token}`
+
+                //TODO: Send email
                 res.status(200).send({
                     status: 200,
                     message: `Hi ${user.fname}, \n\n\
                             Welcome to Hypersign!\n\
                             Please click on this link or scan the QR code to get the Hypersign Auth Credential to be able to \
                             login into websites that supports Hypersign login. This link is only valid till ${jwtExpiryInMilli} millisecond\n\n\
-                            ${link}\n\n\
+                            ${link} \n\n\
                             Thank & Regards,\n\
                             Team Hypersign`,
                     error: null
@@ -76,15 +81,32 @@ const register = async (req: Request, res: Response) => {
 const getCredential = (req, res) => {
     try {
         const token  = req.query.token;
+        console.log(token)
+        if(!token){
+            throw new Error("Token is not passed")
+        }
         jwt.verify(token, jwtSecret, async (err, data) => {
             if (err) res.status(403).send({ status: 403, message: "Unauthorized.", error: null })
             const user = new User({...data })
             const userindbstr = await user.fetch(false)
             if (!userindbstr) throw new Error(`User ${user.email} invalid`)
             const vc = await user.generateCredential();
+            
+            // create temporary dir
+            const vcDir = path.join(__dirname  + "/../" +"temp/")
+            if (!fs.existsSync(vcDir)){
+                fs.mkdirSync(vcDir);
+            }
+
+            // create 
+            const filePath = path.join(vcDir + vc['id'] + ".json");
+            await store(vc, filePath);
             // activate this user
             await user.update();
-            res.status(200).send({ status: 200, message: vc, error: null })
+            
+            // send vc to download.
+            res.download(filePath);
+            // res.status(200).send({ status: 200, message: vc, error: null })
         })
     } catch (e) {
         res.status(500).send({ status: 500, message: null, error: e.message })
@@ -169,6 +191,73 @@ const login = async (req: Request, res: Response) => {
         res.status(500).send({ status: 500, message: null, error: e.message })
     }
 }
+
+
+/*
+const login_old = async (req: Request, res: Response) => {
+    // try {
+        const challengeExtractedFromChToken = res.locals.data ? res.locals.data.challenge : "";
+        const loginType = req.query.type;
+        let x: IUser = {} as any;
+        let userInDb: IUser = {} as any;
+        let userData: IUser = {} as any;
+        let { username, password, proof, publicKey, domain } = req.body;
+
+        // Fetch VP from
+        
+        // Verifiy VP
+
+        // Get the userdata 
+
+        // Check if this user is registered with us and also if he is active
+        
+
+        // Issue a Authorization token
+
+        if (!proof || !domain) throw new Error('proof, controller, publicKey, challenge, domain is empty')
+        proof = JSON.parse(proof)
+        logger.debug(`Before verifying the proof, ch = ${challengeExtractedFromChToken}`)
+        const res = await verify({ doc: proof, challenge: challengeExtractedFromChToken, domain })
+        logger.debug(`After verifying the proof, res = ${JSON.stringify(res)}`)
+        if (res.verified == false) { 
+            logger.debug('Proof could not verified')
+            throw new Error("Unauthorized: Proof can not be verified!") 
+        } 
+        
+        logger.debug('Proof verified')
+        const id = proof['id']
+        delete proof['proof']
+        const userObj = new User({ ...proof, username: proof['id'], id: proof['id'], fname: proof.name, publicKey: proof['publicKey'][0].id })
+        userData = {
+            id: userObj.id,
+            publicKey: userObj.publicKey,
+            fname: userObj.fname,
+            username: userObj.username,
+            email: userObj.email,
+            isActive: userObj.isActive
+        }
+    
+        
+        jwt.sign(
+            userData,
+            jwtSecret,
+            { expiresIn: jwtExpiryInMilli },
+            (err, token) => {
+                if (err) throw new Error(err)
+                res.status(200).send({
+                    status: 200, message: {
+                        m: "Sussfully loggedIn",
+                        jwtToken: token,
+                        user: userData
+                    }, error: null
+                })
+            })
+    // } catch (e) {
+    //     res.status(500).send({ status: 500, message: null, error: e.message })
+    // }
+}
+*/
+
 
 const recover = (req: Request, res: Response) => {
     logger.debug('Recover ap called')

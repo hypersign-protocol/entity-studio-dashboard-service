@@ -1,19 +1,10 @@
 import { nodeServer, logger } from '../config'
 import fetch from 'node-fetch'
 import path from 'path'
-import fs from 'fs'
+import { store, retrive } from '../utils/file'
 
 const keysFileName = "keys.json"
 const filePath = path.join(__dirname + "/../" + keysFileName)
-const storeKeys = (data) => {
-    if (!data) throw new Error("Data undefined")
-    fs.writeFileSync(filePath, JSON.stringify(data))
-}
-
-export const retriveKeys = () => {
-    return fs.readFileSync(filePath, 'utf8')
-}
-
 
 // Register DID
 const registerDid = async (name: string) => {
@@ -25,7 +16,7 @@ const registerDid = async (name: string) => {
     // store keys into file 
     const { keys } = json.message;
     logger.info("Storing keys = " + JSON.stringify(keys))
-    await storeKeys(keys);
+    await store(keys, filePath);
     logger.info("Did registration finished.")
 }
 
@@ -33,7 +24,7 @@ const registerDid = async (name: string) => {
 // Register schema
 const registerSchema = async () => {
     logger.info("Registering schema start....")
-    const keys = JSON.parse(await retriveKeys());
+    const keys = JSON.parse(await retrive(filePath));
     logger.info("Fetched keys = " + JSON.stringify(keys))
     const url = `${nodeServer.baseURl}${nodeServer.schemaCreateEp}`;
     const schemaData = {

@@ -1,9 +1,10 @@
 import { Router, Request, Response } from 'express';
 import authCtrl from '../controllers/auth';
 import verifyAuth from '../middleware/auth'
-import { retriveKeys }  from '../setup/bootstrapCredential'
+import path  from 'path'
+import { retrive } from '../utils/file'
 
-
+const filePath = path.join(__dirname + "/../" + "keys.json")
 const router = Router();
 router.get('/', authCtrl.check)
 router.post('/register', authCtrl.register)
@@ -22,7 +23,7 @@ router.post('/verify', verifyAuth , (req, res) => {
     })
 })
 router.get('/did', async (req, res) => {
-    const keys = JSON.parse(await retriveKeys())
+    const keys = JSON.parse(await retrive(filePath))
     if(!keys){
         res.status(400).send({ status: 400, message: null, error: "Keys are not present. Kindly bootstrape first"})
     }
