@@ -39,12 +39,13 @@ h5 span {
 }
 </style>
 <template>
-  <div class="row" style="margin-left: 17%;">
+  <!-- <div class="row" style="margin-left: 35%;"> -->
+  <div class="row" style="align-content: center;">
     <loading :active.sync="isLoading" :can-cancel="true" :is-full-page="fullPage"></loading>
-    <div class="col-md-7" style="font-size: small;color:grey;">
+    <div class="col-md-7" style="font-size: small;color:grey;" hidden>
       Can we put one big image here?
     </div>
-    <div class="col-md-3" style="font-size: small;color:grey">
+    <div class="col-md-3" style="font-size: small;color:grey;margin-left: 34%;">
       <form action="#" style="padding:6px">
         <b-card no-body style="padding: 40px">
           <div class="row">
