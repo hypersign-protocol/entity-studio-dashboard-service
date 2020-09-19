@@ -20,7 +20,7 @@ export default {
     name: "Info",
     props: ['message'],
     mounted(){
-        console.log("The prop contain following message: " + this.message)
+        //console.log("The prop contain following message: " + this.message)
     }
 }
 

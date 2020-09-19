@@ -250,14 +250,14 @@ export default {
       }
     },
     onSchemaOptionChange(event) {
-      console.log(event);
+      // console.log(event);
       this.attributes = [];
       this.issueCredAttributes = [];
       this.selected = null;
       this.credentialName = "";
     },
     OnSchemaSelectDropDownChange(event) {
-      console.log(event);
+      // console.log(event);
       if (event) {
         this.issueCredAttributes = [];
         const id = this.issueCredAttributes.length;
@@ -288,16 +288,16 @@ export default {
       );
     },
     onfileLoadSuccess (evt){
-        console.log('Inside callbacl')
+        // console.log('Inside callbacl')
           const fileJSON = JSON.parse(evt.target.result);
           if (!fileJSON) this.notifyErr("Incorrect file");
           const typeArr = fileJSON["type"]
           if(typeArr.find(x => x == 'VerifiableCredential')){
-            console.log('Inside callbacl: vc')
+            // console.log('Inside callbacl: vc')
             localStorage.removeItem('credential')
             localStorage.setItem("credential", JSON.stringify(fileJSON));  
           }else if(typeArr.find(x => x == 'VerifiablePresentation')){
-            console.log('Inside callbacl: vp')
+            // console.log('Inside callbacl: vp')
             localStorage.removeItem('presentation')
             localStorage.setItem("presentation", JSON.stringify(fileJSON));  
           }else{
@@ -305,7 +305,7 @@ export default {
           }
     },
     readFile(file, cb){
-      console.log('Inside reaffileDs')
+      // console.log('Inside reaffileDs')
       const reader = new FileReader();
       reader.onload = cb
       reader.readAsText(file);
@@ -355,7 +355,7 @@ export default {
       try{
       const vp = JSON.parse(localStorage.getItem("presentation"));
       if(!vp) throw new Error('Please select verifiable presentation file')
-      console.log(vp)
+      // console.log(vp)
       const vc = vp.verifiableCredential[0]
       this.presentationDetails = {}
       this.presentationDetails.credentialType = {
@@ -394,7 +394,7 @@ export default {
             issuerDid: vc.issuer, 
             holderDid: vc.credentialSubject.id
           });
-        console.log(isVerified)
+        // console.log(isVerified)
         if(isVerified.verified){
           this.notifySuccess("Presentation verified")
         }else{
