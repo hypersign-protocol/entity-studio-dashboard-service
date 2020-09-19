@@ -141,7 +141,7 @@ color: #888b8f;
               <th>
                 <div class="custom-control custom-checkbox">
                   <input type="checkbox" class="custom-control-input" :id="row.id" />
-                  <label class="custom-control-label" :for="row.id">{{row.id}}</label>
+                  <label class="custom-control-label" :for="row.id"><a :href="`${$config.nodeServer.BASE_URL}${$config.nodeServer.SCHEMA_GET_EP}/`+row.id" target="_blank">{{row.id}}</a></label>
                 </div>
               </th>
               <td>{{row.credentialName}}</td>

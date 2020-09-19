@@ -14,7 +14,8 @@ module.exports = {
         NETWORK_STATUS_EP: process.env.VUE_APP_NODE_SERVER_NETWORK_STATUS_EP || "network/info",
         SCHEMA_LIST_EP: process.env.VUE_APP_NODE_SERVER_SCHEMA_LIST_EP || "api/schema/list",
         SCHEMA_GET_EP: process.env.VUE_APP_NODE_SERVER_SCHEMA_GET_EP || "api/schema/get",
-        SCHEMA_CREATE_EP: process.env.VUE_APP_NODE_SERVER_SCHEMA_CREATE_EP || "api/schema/create"
+        SCHEMA_CREATE_EP: process.env.VUE_APP_NODE_SERVER_SCHEMA_CREATE_EP || "api/schema/create",
+        DID_RESOLVE_EP: process.env.VUE_APP_NODE_SERVER_DID_RERSOLVE_EP || "api/did/resolve/"
     },
     explorer: {
         BASE_URL: process.env.VUE_APP_EXPLORER_BASE_URL || "http://localhost:5001/",

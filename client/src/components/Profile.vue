@@ -85,7 +85,7 @@
             </div>
             <div class="col-md-8" style="flex-wrap: wrap; padding:20px">
               <p>DID</p>
-              <p class="fVal">{{user.id}}</p>
+              <p class="fVal"><a :href="`${$config.nodeServer.BASE_URL}${$config.nodeServer.DID_RESOLVE_EP}`+user.id" target="_blank">{{user.id}}</a></p>
               <p>Email</p>
               <p class="fVal">{{user.email}}</p>
               <p v-if="user.phoneNumber">Phone Number: {{user.phoneNumber}}</p>
@@ -140,7 +140,7 @@ export default {
             .catch((e) => alert(`Error: ${e.message}`));
     },
     pollData(){
-      let url = `http://localhost:5000/api/schema/list`;
+      let url = `${this.$config.nodeServer.BASE_URL}${this.$config.nodeServer.SCHEMA_LIST_EP}`;
       let options = {}
       this.fetchData(url).then(data => {
         if (data && data.length > 0) {
@@ -151,7 +151,7 @@ export default {
         }
       })
 
-      url = "http://localhost:9000/api/credential/list"
+      url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_LIST_EP}`;
       options  = {
           method: "GET",
           headers: {'x-auth-token': this.authToken}
