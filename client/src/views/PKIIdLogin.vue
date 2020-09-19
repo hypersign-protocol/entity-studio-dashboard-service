@@ -57,7 +57,7 @@ h5 span {
                 <label>Scan the QR code using Hypersign App in your mobile phone to authenticate!</label>
               </div>
               <div class="form-group">
-              <h5><span>OR</span></h5>
+              <h5><span>Or</span></h5>
               </div>
               <div class="form-group">
                 <label class="floatLeft">Upload keys.json:</label>
@@ -93,7 +93,7 @@ h5 span {
               >Login</button>
             </div>
             <div class="col-md-9 floatRight">
-              Do not have account?
+              Do not have an account?
               <a href="/studio/register">SignUp</a>
             </div>
           </div>

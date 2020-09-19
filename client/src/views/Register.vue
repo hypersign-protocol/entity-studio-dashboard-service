@@ -34,15 +34,15 @@
             <form action="#" class="col-md-12">
               <div class="form-group">
                 <label class="floatLeft">Name:</label>
-                <input type="text" class="form-control" v-model="fullName" />
+                <input type="text" class="form-control" v-model="fullName" placeholder="Enter name"/>
               </div>
               <div class="form-group">
                 <label class="floatLeft">Email:</label>
-                <input type="email" class="form-control" v-model="email" />
+                <input type="email" class="form-control" v-model="email" placeholder="Enter email" />
               </div>
               <div class="form-group">
-                <label class="floatLeft">Hypersign DID:</label>
-                <input type="text" class="form-control" v-model="did" placeholder="did:hs:..."/>
+                <label class="floatLeft">Hypersign DID (<a :href="`${$config.explorer.BASE_URL}${$config.explorer.NEW_DID_EP}`" target="_blank">Get a DID</a>):</label>
+                <input type="text" class="form-control" v-model="did" placeholder="Enter DID (did:hs:...)"/>
               </div>
             </form>
           </div>
