@@ -45,9 +45,11 @@ h5 span {
     <div class="col-md-7" style="font-size: small;color:grey;" hidden>
       Can we put one big image here?
     </div>
-    <div class="col-md-3" style="font-size: small;color:grey;margin-left: 34%;">
+    <div class="col-md-3" style="font-size: small;color:grey;margin-left: 36%;">
       <form action="#" style="padding:6px">
         <b-card no-body style="padding: 40px">
+          <h4>Login</h4>
+        <hr/>
           <div class="row">
             <form action="#" class="col-md-12">
               <div class="form-group">
