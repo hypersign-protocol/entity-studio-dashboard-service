@@ -51,6 +51,11 @@
   color: gray;
   word-wrap: break-word;
 }
+
+.card{
+  border-radius: 10px;
+}
+
 </style>
 
 

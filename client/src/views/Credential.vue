@@ -27,6 +27,11 @@
   background: aliceblue;
   padding: 0px;
 }
+
+.card{
+  border-radius: 10px;
+}
+
 </style>
 <template>
   <div class="home marginLeft marginRight">
@@ -90,8 +95,8 @@
     </div>
     <div class="row" style="margin-top: 2%;">
       <div class="col-md-12">
-        <table class="table">
-          <thead>
+        <table class="table table-bordered" style="background:#FFFF">
+          <thead class="thead-light">
             <tr>
               <th>id</th>
               <th>schemaId</th>

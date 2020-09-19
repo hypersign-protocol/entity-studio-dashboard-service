@@ -23,6 +23,10 @@
   float: right;
 }
 
+.card{
+  border-radius: 10px;
+}
+
 .card-header {
   background: aliceblue;
   padding: 0px;

@@ -47,6 +47,10 @@ color: #888b8f;
 }
 
 
+.card{
+  border-radius: 10px;
+}
+
 </style>
 <template>
   <div class="home marginLeft marginRight">
@@ -125,8 +129,8 @@ color: #888b8f;
     </div>
     <div class="row" style="margin-top: 2%;">
       <div class="col-md-12">        
-        <table class="table">
-          <thead>
+        <table class="table table-bordered" style="background:#FFFF">
+          <thead class="thead-light">
             <tr>
               <th>id</th>
               <th>credentialName</th>

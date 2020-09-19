@@ -26,12 +26,24 @@
   text-align: end;
 }
 
+.card-radius{
+  border-radius: 10px;
+}
+
 
 .logo-style {
     width: 144px;
     /* height: 40px; */
     margin-top: 9px;
     margin-left: 5px;
+}
+
+#app {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  min-height: 100vh;
+  background: #F6F6F687;
 }
 </style>
 <template>
