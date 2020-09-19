@@ -1,10 +1,9 @@
-import { nodeServer, logger } from '../config'
+import { nodeServer, logger, bootstrapConfig } from '../config'
 import fetch from 'node-fetch'
 import path from 'path'
 import { store, retrive } from '../utils/file'
 
-const keysFileName = "keys.json"
-const filePath = path.join(__dirname + "/../" + keysFileName)
+const  {keysfilePath, schemafilePath} =  bootstrapConfig;
 
 // Register DID
 const registerDid = async (name: string) => {
@@ -16,7 +15,7 @@ const registerDid = async (name: string) => {
     // store keys into file 
     const { keys } = json.message;
     logger.info("Storing keys = " + JSON.stringify(keys))
-    await store(keys, filePath);
+    await store(keys, keysfilePath);
     logger.info("Did registration finished.")
 }
 
@@ -24,7 +23,7 @@ const registerDid = async (name: string) => {
 // Register schema
 const registerSchema = async () => {
     logger.info("Registering schema start....")
-    const keys = JSON.parse(await retrive(filePath));
+    const keys = JSON.parse(await retrive(keysfilePath));
     logger.info("Fetched keys = " + JSON.stringify(keys))
     const url = `${nodeServer.baseURl}${nodeServer.schemaCreateEp}`;
     const schemaData = {
@@ -43,8 +42,10 @@ const registerSchema = async () => {
     });
     const j = await resp.json();
     if (j.status === 200) {
+        logger.info("Schema = " + JSON.stringify(j.message))
+        await store(j.message, schemafilePath);
+        logger.info("Schema registration finished at = " +  schemafilePath)
         return
-        // logger.info(`${schemaData.name} has been successfully created.`)
     } else {
         throw new Error(j.error);
     }

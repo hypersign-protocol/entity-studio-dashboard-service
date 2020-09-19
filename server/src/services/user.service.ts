@@ -2,11 +2,10 @@ import IUser  from '../models/IUser';
 import { DBService, SchemaType } from './db.service';
 import { getChallange } from 'lds-sdk'
 import { generateCredential, signCredential } from "lds-sdk/dist/vc";
-import { logger, nodeServer } from '../config';
+import { logger, nodeServer, bootstrapConfig } from '../config';
 import path  from 'path'
 import { retrive } from '../utils/file'
-const filePath = path.join(__dirname + "/../" + "keys.json")
-const SCHEMA_ID = "sch_19d2b59d-14fd-47"
+const  {keysfilePath, schemafilePath} =  bootstrapConfig;
 export class User implements IUser{
     id: string;
     fname: string;
@@ -57,9 +56,12 @@ export class User implements IUser{
     }
 
     private async getCredentials() {
-        const schemaUrl = `${nodeServer.baseURl}${nodeServer.schemaGetEp}/${SCHEMA_ID}`;
-        const issuerKeys = JSON.parse(await retrive(filePath));
+        const SCHEMA = JSON.parse(await retrive(schemafilePath));
+        const schemaUrl = `${nodeServer.baseURl}${nodeServer.schemaGetEp}/${SCHEMA.id}`;
+        const issuerKeys = JSON.parse(await retrive(keysfilePath));
 
+        // TODO: need to do this in better way..more dynamic way.
+        // make use of SCHEMA.attributes
         const attributesMap = {
             "Name": this.fname,
             " Email": this.email

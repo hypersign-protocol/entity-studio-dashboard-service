@@ -24,6 +24,10 @@ logger.setLevel(process.env.LOG_LEVEL || 'info')
 const port = process.env.PORT || 5000
 const host = process.env.HOST || "localhost";
 
+const bootstrapConfig = {
+    keysfilePath : path.join(__dirname + 'keys.json'),
+    schemafilePath : path.join(__dirname + 'schema.json')
+}
 
 // DATABASE
 // Ref: https://www.sqlitetutorial.net/sqlite-nodejs/
@@ -71,5 +75,6 @@ export  {
     jwtSecret,
     jwtExpiryInMilli,
     nodeServer,
-    mail
+    mail,
+    bootstrapConfig
 }
