@@ -48,18 +48,6 @@
               <input type="text" class="form-control" v-model="did" placeholder="did:hs:..."/>
             </div>
           </div>
-          <!-- <div class="form-group">
-              <label class="control-label col-sm-3">Username:</label>
-              <div class="col-sm-9">
-                <input type="text" class="form-control" v-model="username" />
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label col-sm-3">Password:</label>
-              <div class="col-sm-9">
-                <input type="password" class="form-control" v-model="password" />
-              </div>
-          </div>-->
         </form>
         <hr />
         <form>
@@ -129,37 +117,11 @@ export default {
         text: msg,
       });
     },
-    // async registerDid(){
-    //   const url = `${this.$config.nodeServer.BASE_URL}${this.$config.nodeServer.DID_CREATE_EP}?name=${name}`;
-    //   const resp = await fetch(url);
-    //   const json = await resp.json();
-    //   // store keys into file
-    //   const { keys } = json.message;
-    //   this.keys = keys;
-    // },
-    // forceFileDownload(data, fileName) {
-    //   const url = window.URL.createObjectURL(new Blob([data]));
-    //   const link = document.createElement("a");
-    //   link.href = url;
-    //   link.setAttribute("download", fileName);
-    //   document.body.appendChild(link);
-    //   link.click();
-    // },
     async signup() {
       this.isLoading = true
       try {
-
         if(this.email == "" || this.name == "" || this.did == "") throw new Error("All fields are mandatory")
-
         console.log('Inside signup')
-
-        // console.log('Before registering did')
-        // await this.registerDid();
-        // console.log('After registering did')
-
-        // if (!this.keys || this.keys == {})
-        //   throw new Error("Could not register did");
-
         const userData = {
           fname: this.fullName,
           email: this.email,
