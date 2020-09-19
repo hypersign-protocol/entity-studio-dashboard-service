@@ -333,7 +333,7 @@ export default {
       this.isLoading = true
       try{
         const vc = JSON.parse(localStorage.getItem("credential"));
-        if(!vc) throw new Error('VC is null')
+        if(!vc) throw new Error('Please select verifiable credential file')
         const vp_unsigned = await generatePresentation(vc, this.user.id);
         const vp_signed = await signPresentation(vp_unsigned, this.user.id, this.user.privateKey, "test_challenge")
         this.signedVerifiablePresentation = vp_signed;
@@ -347,8 +347,10 @@ export default {
       }
     },
     viewPresentation(){
+        this.isLoading = true
+      try{
       const vp = JSON.parse(localStorage.getItem("presentation"));
-      if(!vp) this.notifyErr("VP is null")
+      if(!vp) throw new Error('Please select verifiable presentation file')
       console.log(vp)
       const vc = vp.verifiableCredential[0]
       this.presentationDetails = {}
@@ -361,9 +363,10 @@ export default {
       this.presentationDetails.issuanceDate = vc.issuanceDate
       this.presentationDetails.expirationDate = vc.expirationDate
       this.presentationDetails.claim = vc.credentialSubject
-      // this.presentationDetails.claim = JSON.stringify(vc.credentialSubject, null, 2)
-      // this.presentationDetails = JSON.stringify(this.presentationDetails, null, 2)
-      console.log(this.presentationDetails)
+      }catch(e){
+        this.isLoading = false
+        this.notifyErr(e.message)
+      }
     },
     clear(){
       this.presentationDetails = "",
@@ -378,7 +381,7 @@ export default {
       this.isLoading = true
       try{
         const vp = JSON.parse(localStorage.getItem("presentation"));
-        if(!vp) throw new Error('vp is null')
+        if(!vp) throw new Error('Please select verifiable presentation file')
         const vc = vp.verifiableCredential[0]
         const isVerified = await verifyPresentation(
           {

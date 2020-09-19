@@ -314,6 +314,9 @@ export default {
     async issueCredential() { 
       try{
         this.isLoading = true
+        if(this.holderDid == "") throw new Error("Please enter the holder did")
+        if(this.selected == null) throw new Error("Please select a schema")
+
       // generateAttributeMap
       const attributeMap = await this.generateAttributeMap();
 

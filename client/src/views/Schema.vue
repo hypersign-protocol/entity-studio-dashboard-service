@@ -302,7 +302,7 @@ export default {
       if (this.credentialName == "")
         return this.notifyErr("Error: SchemaName can not be blank");
       if (this.attributes.length == 0)
-        return this.notifyErr("Error: Atleast one attribute is requreeid");
+        return this.notifyErr("Error: Atleast one attribute is required");
       const url = `${this.$config.nodeServer.BASE_URL}${this.$config.nodeServer.SCHEMA_CREATE_EP}`;
       const schemaData = {
         name: this.credentialName,

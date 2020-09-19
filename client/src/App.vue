@@ -4,6 +4,12 @@
   padding-top: 1.5%;
   padding-left: 25px;
 }
+
+.selectedButton{
+  border-bottom: 1px solid #8080809e;
+  font-weight: bold;
+}
+
 </style>
 <template>
   <div id="app">
@@ -18,7 +24,7 @@
         <hr style="opacity: 1.5" />
       </div>
       <div class="col-md-9 rightAlign marginLeft" v-if="!(authRoutes.includes($router.history.current.name))">
-        <button @click="goToNextPage(m.name)"  class="btn btn-link" v-for="m in menu" :key="m.name">{{m.name}}</button>
+        <button @click="goToNextPage(m.name)" class="btn btn-link btn-sm" v-for="m in menu" :key="m.name">{{m.name}}</button>
         <hr style="opacity: 1.5" />
       </div>
     </div>
