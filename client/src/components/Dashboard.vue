@@ -107,7 +107,7 @@ export default {
     .then(res => res.json())
     .then(json => {
       this.networkStatus = { ...json }
-      console.log(this.networkStatus)
+      //console.log(this.networkStatus)
     })
     .catch(e => alert(`Error: ${e.message}`))
   },

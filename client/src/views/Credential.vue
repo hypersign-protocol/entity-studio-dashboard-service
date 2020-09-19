@@ -163,7 +163,7 @@ export default {
   created() {
     const usrStr = localStorage.getItem("user");
     this.user = JSON.parse(usrStr);
-    console.log(this.user)
+    //console.log(this.user)
     this.getList('SCHEMA')
     this.getList('CREDENTIAL')
   },
@@ -245,14 +245,14 @@ export default {
       }
     },
     onSchemaOptionChange(event) {
-      console.log(event);
+      //console.log(event);
       this.attributes = [];
       this.issueCredAttributes = [];
       this.selected = null;
       this.credentialName = "";
     },
     OnSchemaSelectDropDownChange(event) {
-      console.log(event);
+      //console.log(event);
       if (event) {
         this.issueCredAttributes = [];
         const id = this.issueCredAttributes.length;

@@ -124,9 +124,9 @@ export default {
   },
   created() {
     const usrStr = localStorage.getItem("user");
-    console.log(usrStr);
+    //console.log(usrStr);
     this.user = { ...JSON.parse(usrStr) };
-    console.log(this.user);
+    //console.log(this.user);
     this.userKeys = Object.keys(this.user);
     this.pollData()
   },

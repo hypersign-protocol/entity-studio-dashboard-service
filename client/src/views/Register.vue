@@ -166,7 +166,7 @@ export default {
       this.isLoading = true
       try {
         if(this.email == "" || this.name == "" || this.did == "") throw new Error("All fields are mandatory")
-        console.log('Inside signup')
+        //console.log('Inside signup')
         const userData = {
           fname: this.fullName,
           email: this.email,
@@ -180,7 +180,7 @@ export default {
         });
 
         const j = await resp.json();
-        console.log(j)
+        //console.log(j)
         if (j.status == 500) {
           this.isLoading = false
           throw new Error(j.error);

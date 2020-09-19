@@ -136,11 +136,11 @@ export default {
   },
   created() {
     const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.AUTH_CHALLENGE_EP}`;
-    console.log(url);
+    //console.log(url);
     fetch(url)
       .then((res) => res.json())
       .then((json) => {
-        console.log(json);
+        //console.log(json);
         if (json.status == 200) {
           this.challenge = json.message;
         }
@@ -179,12 +179,12 @@ export default {
     async generatePresentation() {  
       // try{
         const keys = JSON.parse(localStorage.getItem("keys"));
-        console.log(keys)
+        //console.log(keys)
         this.user.privateKey = keys.privateKeyBase58
         this.user.id = keys.publicKey.id
         this.user.did = this.user.id.split('#')[0]
         const vc = JSON.parse(localStorage.getItem("credential"));
-        console.log(vc)
+        //console.log(vc)
         this.user.name = vc['credentialSubject']['Name']
         this.user.email = vc['credentialSubject'][' Email']
         if(!vc) throw new Error('VC is null')
@@ -216,7 +216,7 @@ export default {
       link.click();
     },
     readFile(file, cb){
-      console.log('Inside reaffileDs')
+      //console.log('Inside reaffileDs')
       const reader = new FileReader();
       reader.onload = cb
       reader.readAsText(file);
@@ -226,15 +226,15 @@ export default {
       this.readFile(file, this.onfileLoadSuccess)
     },
     onfileLoadSuccess (evt){
-        console.log('Inside callback')
+        //console.log('Inside callback')
         const fileJSON = JSON.parse(evt.target.result);
         if (!fileJSON) this.notifyErr("Incorrect file");
         if(fileJSON["type"] && fileJSON["type"].find(x => x == 'VerifiableCredential')){
-          console.log('Inside callback: vc')
+          //console.log('Inside callback: vc')
           localStorage.removeItem('credential')
           localStorage.setItem("credential", JSON.stringify(fileJSON));  
         }else if(fileJSON['privateKeyBase58']){
-          console.log('Inside callback: keys')
+          //console.log('Inside callback: keys')
           localStorage.removeItem('keys')
           localStorage.setItem("keys", JSON.stringify(fileJSON));  
         }else{
@@ -273,7 +273,7 @@ export default {
               return this.notifyErr(`Error:  ${j.error}`);
             }
 
-            console.log(j.message);
+            //console.log(j.message);
 
             localStorage.setItem("authToken", j.message.jwtToken);
             j.message.user["privateKey"] = this.user.privateKey;
