@@ -98,7 +98,10 @@ const getCredential = (req, res) => {
         jwt.verify(token, jwtSecret, async (err, data) => {
             if (err) res.status(403).send({ status: 403, message: "Unauthorized.", error: null })
             const user = new User({ ...data })
-            const userindbstr = await user.fetch(false)
+            const userindbstr = await user.fetch({
+                email: user.email,
+                publicKey: user.publicKey
+            })
             if (!userindbstr) throw new Error(`User ${user.email} invalid`)
             const vc = await user.generateCredential();
 
