@@ -129,7 +129,6 @@ export default {
       verifiablePresentation: "",
       fullPage: true,
       isLoading: false,
-      isCredentialIssued: false,
       privateKey:
         "3isrtEJ4gt1ZHkdUYYph1WFAtzfqAL5WM6Hh1NC2hmWnDfBypXjt5oUFdAqQdiess2vqqQ3iF6x4fDVuvLw454sn",
       did: "did:hs:892325a4-75c9-465c-882b-91e3ca5143c3",
@@ -178,8 +177,7 @@ export default {
       this.$router.push(`${id}`);
     },
     async generatePresentation() {  
-      this.isLoading = true
-      try{
+      // try{
         const keys = JSON.parse(localStorage.getItem("keys"));
         console.log(keys)
         this.user.privateKey = keys.privateKeyBase58
@@ -191,17 +189,16 @@ export default {
         this.user.email = vc['credentialSubject'][' Email']
         if(!vc) throw new Error('VC is null')
         const vp_unsigned = await generatePresentation(vc, this.user.id);
+        this.notifySuccess("Presentation generated")
         const vp_signed = await signPresentation(vp_unsigned, this.user.id, this.user.privateKey, this.challenge.challenge)
+        this.notifySuccess("Presentation signed")
         this.verifiablePresentation = JSON.stringify(vp_signed)
-        this.isLoading = false
-        this.isCredentialIssued = true;
-        this.notifySuccess("Presentation generated and sigend")
+        
         localStorage.removeItem('credential')
         localStorage.removeItem('keys')
-      }catch(e){
-        this.isLoading = false
-        this.notifyErr(e.message)
-      }
+      // }catch(e){
+      //   this.notifyErr(e.message)
+      // }
     },
     async downloadPresentation() {
       await this.generatePresentation()

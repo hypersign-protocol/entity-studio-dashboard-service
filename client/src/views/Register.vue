@@ -25,8 +25,53 @@
 <template>
   <div class="home">
     <loading :active.sync="isLoading" :can-cancel="true" :is-full-page="fullPage"></loading>
-    <div class="col-md-4 centeralign">
-      <b-card no-body style="padding: 20px">
+  <div class="col-md-3" style="font-size: small;color:grey;margin-left: 34%;">
+      <form action="#" style="padding:6px">
+        <b-card no-body style="padding: 40px">
+          <div class="row">
+            <form action="#" class="col-md-12">
+              <div class="form-group">
+                <label class="floatLeft">Full Name:</label>
+                <input type="text" class="form-control" v-model="fullName" />
+              </div>
+              <div class="form-group">
+                <label class="floatLeft">Email:</label>
+                <input type="email" class="form-control" v-model="email" />
+              </div>
+              <div class="form-group">
+                <label class="floatLeft">Hypersign DID:</label>
+                <input type="text" class="form-control" v-model="did" placeholder="did:hs:..."/>
+              </div>
+            </form>
+          </div>
+          <div class="row">
+            <div class="col-sm-3" hidden>
+              <button
+                type="button"
+                data-toggle="modal"
+                @click="downloadPresentation()"
+                class="btn btn-primary btn-sm floatLeft"
+              >View Proof</button>
+            </div>
+            <div class="col-sm-3">
+              <button
+                type="button"
+                data-toggle="modal"
+                @click="signup()"
+                class="btn btn-primary"
+              >Signup</button>
+            </div>
+            <div class="col-md-9 floatRight">
+              Back to
+              <a href="/studio/login">Login</a>
+            </div>
+          </div>
+        </b-card>
+      </form>
+    </div>
+
+    <div class="col-md-4">
+      <!-- <b-card no-body style="padding: 20px">
         <h2>Admin Registration</h2>
         <hr />
         <form action="#" class="form-horizontal form-inline">
@@ -64,7 +109,7 @@
             </div>
           </div>
         </form>
-      </b-card>
+      </b-card> -->
     </div>
   </div>
 </template>

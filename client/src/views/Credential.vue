@@ -47,7 +47,7 @@
                 <div class="col-md-6">
                   <form style="max-height:300px; overflow:auto; padding: 5px">
                     <div class="form-group">
-                      <input type="text" class="form-control" placeholder="Issued To (did)" v-model="holderDid"/>
+                      <input type="text" class="form-control" placeholder="Issued To (did:hs:...)" v-model="holderDid"/>
                     </div>
                     <div class="form-group">
                       <b-form-select
@@ -157,7 +157,7 @@ export default {
       schemaList: [],
       fullPage: true,
       isLoading: false,
-      holderDid: "did:hs:8b915133-cb8b-4151-9a63-1b91f702297f"
+      holderDid: ""
     };
   },
   created() {

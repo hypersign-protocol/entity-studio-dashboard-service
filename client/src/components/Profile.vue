@@ -86,10 +86,11 @@
             <div class="col-md-8" style="flex-wrap: wrap; padding:20px">
               <p>DID</p>
               <p class="fVal">{{user.id}}</p>
-              <p v-if="user.email">Email: {{user.email}}</p>
+              <p>Email</p>
+              <p class="fVal">{{user.email}}</p>
               <p v-if="user.phoneNumber">Phone Number: {{user.phoneNumber}}</p>
-              <p>PUBLIC KEY</p>
-              <p class="fVal">{{user.publicKey}}</p>
+              <!-- <p>PUBLIC KEY</p>
+              <p class="fVal">{{user.publicKey}}</p> -->
             </div>
           </div>
         </div>
