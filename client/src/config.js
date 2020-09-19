@@ -23,6 +23,7 @@ module.exports = {
     },
     app: {
         name: process.env.VUE_APP_TITLE || "Hypersign Studio",
-        decription: process.env.VUE_APP_DESC || "A portal to issue and verify credentials on Hypersign Identity network!"
+        decription: process.env.VUE_APP_DESC || "A portal to issue and verify credentials on Hypersign Identity network!",
+        version: process.env.VUE_APP_VERSION || "v1.0"
     }   
 }
