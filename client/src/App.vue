@@ -45,6 +45,15 @@
   min-height: 100vh;
   background: #F6F6F687;
 }
+
+.subtitle{
+  padding-left: 10px;
+  color: gray;
+  font-size: larger;
+  margin-top: auto;
+}
+
+
 </style>
 <template>
   <div id="app">
@@ -53,7 +62,7 @@
         <!-- <h5 class="leftAlign">{{$config.app.name}}</h5>  -->
         <div class="form-group form-inline">
           <img class="logo-style" src="https://hypermine.in/hypersign/wp-content/uploads/2020/01/Banner_logo2.png"> 
-          <!-- <h3> | Studio</h3>   -->
+          <h4 class="subtitle"> <span style="opacity:0.4">|</span> {{$config.app.name}} ({{$config.app.version}})</h4>  
         </div>
       </div>
         <div class="col-md-8 rightAlign" style="padding-top:12px" v-if="!(authRoutes.includes($router.history.current.name))">
