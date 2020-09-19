@@ -19,7 +19,7 @@
   float: left;
 }
 .floatRight {
-  float: right;
+  text-align: end;
 }
 .title {
   color: grey;
@@ -76,14 +76,14 @@ h5 span {
             </form>
           </div>
           <div class="row">
-            <div class="col-sm-3" hidden>
+            <!-- <div class="col-sm-3" hidden>
               <button
                 type="button"
                 data-toggle="modal"
                 @click="downloadPresentation()"
                 class="btn btn-primary btn-sm floatLeft"
               >View Proof</button>
-            </div>
+            </div> -->
             <div class="col-sm-3">
               <button
                 type="button"

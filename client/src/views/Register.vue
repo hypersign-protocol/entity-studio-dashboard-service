@@ -19,7 +19,7 @@
   float: left;
 }
 .floatRight {
-  float: right;
+  text-align: end;
 }
 </style>
 <template>
