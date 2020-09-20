@@ -65,7 +65,7 @@
             </div>
             <div class="col-md-9 floatRight">
               Back to
-              <a href="/studio/login">Login</a>
+              <a @click="push('login')" style="color:blue; cursor: pointer;">Login</a>
             </div>
           </div>
         </b-card>
@@ -102,6 +102,9 @@ export default {
   },
   created() {},
   methods: {
+    push(path){
+      this.$router.push(path)
+    },
     gotosubpage: (id) => {
       this.$router.push(`${id}`);
     },

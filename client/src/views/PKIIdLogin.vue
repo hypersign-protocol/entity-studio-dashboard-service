@@ -94,7 +94,7 @@ h5 span {
             </div>
             <div class="col-md-9 floatRight">
               Do not have an account?
-              <a href="/studio/register">SignUp</a>
+              <a @click="push('register')" style="color:blue; cursor: pointer;">SignUp</a>
             </div>
           </div>
         </b-card>
@@ -153,6 +153,9 @@ export default {
     this.clean();
   },
   methods: {
+    push(path){
+      this.$router.push(path)
+    },
     clean() {
       localStorage.removeItem("authToken");
       localStorage.removeItem("user");
