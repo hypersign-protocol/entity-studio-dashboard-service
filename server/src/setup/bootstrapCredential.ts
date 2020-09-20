@@ -12,6 +12,7 @@ const registerDid = async (name: string) => {
     // Call create api of core and get keys.json
     const resp = await fetch(url);
     const json = await resp.json();
+    if(json && json.status != 200) throw new Error(json.error);
     // store keys into file 
     const { keys } = json.message;
     logger.info("Storing keys = " + JSON.stringify(keys))

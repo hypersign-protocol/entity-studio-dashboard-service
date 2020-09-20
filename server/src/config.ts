@@ -25,8 +25,8 @@ const port = process.env.PORT || 5000
 const host = process.env.HOST || "localhost";
 
 const bootstrapConfig = {
-    keysfilePath : path.join(__dirname + 'keys.json'),
-    schemafilePath : path.join(__dirname + 'schema.json')
+    keysfilePath : path.join(__dirname + '/keys.json'),
+    schemafilePath : path.join(__dirname + '/schema.json')
 }
 
 // DATABASE

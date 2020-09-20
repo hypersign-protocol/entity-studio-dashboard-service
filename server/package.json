@@ -5,7 +5,8 @@
   "main": "dist/index",
   "typings": "dist/index",
   "scripts": {
-    "setup": "npm run build && npm run setEnv && npm run start -- --newdb && npm run setUI",
+    "setup": "npm run build && npm run newdb && npm run bootstrap",
+    "newdb": "npm run start -- --newdb",
     "setup-noenv": "npm run build && npm run start -- --newdb && npm run setUI",
     "setEnv": "cp .env.staging .env",
     "setUI": "mkdir -p public && mkdir -p dist/public && cp -R ../client/dist/* public && cp -R public/* dist/public",
