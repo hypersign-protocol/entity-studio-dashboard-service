@@ -41,7 +41,7 @@
                 <input type="email" class="form-control" v-model="email" placeholder="Enter email" />
               </div>
               <div class="form-group">
-                <label class="floatLeft">Hypersign DID (<a :href="`${$config.explorer.BASE_URL}${$config.explorer.NEW_DID_EP}`" target="_blank">Get a DID</a>):</label>
+                <label class="floatLeft">Hypersign DID (<a :href="`${$config.explorer.BASE_URL}`" target="_blank">Get a DID</a>):</label>
                 <input type="text" class="form-control" v-model="did" placeholder="Enter DID (did:hs:...)"/>
               </div>
             </form>
