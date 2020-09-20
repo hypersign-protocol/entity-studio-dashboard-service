@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import PKIIdLogin from './views/PKIIdLogin.vue'
 import Register from './views/Register.vue'
+import config from './config'
 // import AppDetails from './views/AppDetails.vue'
 // import IssueCredential from './views/IssueCredential.vue'
 import Credential from './views/Credential.vue'
@@ -97,7 +98,8 @@ router.beforeEach((to, from, next) => {
   if(to.matched.some(record => record.meta.requiresAuth)){
     const authToken = localStorage.getItem('authToken')
     if(authToken){
-      const url = `http://${location.hostname}:5000/api/auth/verify`
+      const url = `${config.studioServer.BASE_URL}api/auth/verify`
+      console.log(url)
       fetch(url,{
         headers: {
           'x-auth-token': authToken
