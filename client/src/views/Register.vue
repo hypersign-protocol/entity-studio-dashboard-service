@@ -135,7 +135,7 @@ export default {
           email: this.email,
           publicKey: this.did,
         };
-        const url = `http://${this.host}:9000/api/auth/register`;
+        const url = `${this.$config.studioServer.BASE_URL}api/auth/register`;
         const resp = await fetch(url, {
           body: JSON.stringify(userData),
           method: "POST",

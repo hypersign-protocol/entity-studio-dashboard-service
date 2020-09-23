@@ -3,8 +3,7 @@ import { User } from '../services/user.service';
 import IUser from '../models/IUser'
 import { logger, jwtSecret, jwtExpiryInMilli, mail, port, host } from '../config'
 import jwt from 'jsonwebtoken';
-import { getChallange, verify } from 'lds-sdk'
-import { verifyPresentation } from "lds-sdk/dist/vc";
+import { hypersignSDK } from '../config';
 import { retrive, store } from '../utils/file'
 import path from 'path'
 import fs from 'fs'
@@ -130,7 +129,7 @@ const getCredential = (req, res) => {
 async function verifyVP(vp, challenge) {
     if (!vp) throw new Error('vp is null')
     const vc = vp.verifiableCredential[0]
-    const isVerified = await verifyPresentation({
+    const isVerified = await hypersignSDK.credential.verifyPresentation({
         presentation: vp,
         challenge,
         issuerDid: vc.issuer,
@@ -196,7 +195,7 @@ const recover = (req: Request, res: Response) => {
 
 const getNewChallenge = (req: Request, res: Response) => {
     console.log('In the challenge api')
-    const challenge = getChallange();
+    const challenge = hypersignSDK.did.getChallange();
     jwt.sign(
         { challenge },
         jwtSecret,

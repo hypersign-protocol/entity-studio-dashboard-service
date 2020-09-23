@@ -168,7 +168,6 @@ color: #888b8f;
 
 <script>
 import fetch from "node-fetch";
-import { generateCredential, signCredential } from "lds-sdk/dist/vc";
 import QrcodeVue from "qrcode.vue";
 import Info from '@/components/Info.vue'
 export default {

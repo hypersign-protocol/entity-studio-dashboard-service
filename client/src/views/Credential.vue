@@ -127,7 +127,7 @@
 
 <script>
 import fetch from "node-fetch";
-import { generateCredential, signCredential } from "lds-sdk/dist/vc";
+import { hypersignSDK } from '../config'
 import QrcodeVue from "qrcode.vue";
 import Info from '@/components/Info.vue'
 export default {
@@ -299,7 +299,7 @@ export default {
 
     getCredentials(attributesMap) {
       const schemaUrl = `${this.$config.nodeServer.BASE_URL}${this.$config.nodeServer.SCHEMA_GET_EP}/${this.selected}`;
-      return generateCredential(schemaUrl, {
+      return hypersignSDK.credential.generateCredential(schemaUrl, {
         subjectDid: this.holderDid,
         issuerDid: this.user.publicKey,
         expirationDate: new Date().toISOString(),
@@ -310,7 +310,7 @@ export default {
     },
 
     signCredentials(credential) {
-      return signCredential(credential, this.user.publicKey, this.user.privateKey).then(
+      return hypersignSDK.credential.signCredential(credential, this.user.publicKey, this.user.privateKey).then(
         (signedCredential) => {
           return signedCredential;
         }

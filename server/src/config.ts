@@ -2,6 +2,8 @@ import env from 'dotenv'
 import sqlite from 'sqlite3';
 import path from 'path';
 import fs from 'fs'
+import hsdk from 'lds-sdk'
+
 const log = require('simple-node-logger');
 
 
@@ -66,6 +68,13 @@ const mail = {
    name: process.env.MAIL_NAME || "Hypermine Admin",
 }
 
+
+const options = { nodeUrl: `${nodeServer.baseURl}`,  didScheme:  "did:hs"}
+const hypersignSDK = {
+    did: hsdk.did(options),
+    credential: hsdk.credential(options)
+}
+
 export  {
     port,
     host,
@@ -76,5 +85,6 @@ export  {
     jwtExpiryInMilli,
     nodeServer,
     mail,
-    bootstrapConfig
+    bootstrapConfig,
+    hypersignSDK
 }

@@ -88,7 +88,7 @@
 
 <script>
 import QrcodeVue from "qrcode.vue";
-import { sign } from "lds-sdk";
+import {hypersignSDK} from '../../config'
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
 const {sha256hashStr} = require("../utils/hash");
@@ -165,7 +165,7 @@ export default {
       // this.userData = JSON.parse(localStorage.getItem("userData"));
       // console.log(this.userData);
       if(this.did != "" && this.privateKey !=""){
-        const p = await sign({
+        const p = await hypersignSDK.did.sign({
           did: this.did,
           privateKeyBase58: this.privateKey,
           challenge: this.challenge.challenge,

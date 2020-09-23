@@ -1,7 +1,9 @@
-const env  = require('dotenv')
+const env = require('dotenv')
+const hsdk = require('lds-sdk')
+
 env.config();
 
-module.exports = {
+const config = {
     studioServer: {
         BASE_URL: process.env.VUE_APP_STUDIO_SERVER_BASE_URL || "http://localhost:9000/",
         CRED_LIST_EP: process.env.VUE_APP_STUDIO_SERVER_CRED_LIST_EP || "api/credential/list",
@@ -25,5 +27,16 @@ module.exports = {
         name: process.env.VUE_APP_TITLE || "Hypersign Studio",
         decription: process.env.VUE_APP_DESC || "A portal to issue and verify credentials on Hypersign Identity network!",
         version: process.env.VUE_APP_VERSION || "v1.0"
-    }   
+    },
+
 }
+// const options = { nodeUrl: config.nodeServer.BASE_URL, didScheme: "did:hs" }
+const options = { nodeUrl: "http://localhost:5000",  didScheme:  "did:v2:hs"}
+console.log(options)
+const hypersignSDK = {
+    did: hsdk.did(options),
+    credential: hsdk.credential(options)
+}
+config['hypersignSDK'] = hypersignSDK
+
+module.exports = config

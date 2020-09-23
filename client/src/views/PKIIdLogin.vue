@@ -105,9 +105,8 @@ h5 span {
 
 <script>
 import QrcodeVue from "qrcode.vue";
-import { sign } from "lds-sdk";
+import { hypersignSDK } from '../config';
 import Loading from "vue-loading-overlay";
-import {  generatePresentation, signPresentation } from "lds-sdk/dist/vc";
 import "vue-loading-overlay/dist/vue-loading.css";
 const { sha256hashStr } = require("../utils/hash");
 export default {
@@ -193,9 +192,9 @@ export default {
         this.user.name = vc['credentialSubject']['Name']
         this.user.email = vc['credentialSubject'][' Email']
         if(!vc) throw new Error('VC is null')
-        const vp_unsigned = await generatePresentation(vc, this.user.id);
+        const vp_unsigned = await hypersignSDK.credential.generatePresentation(vc, this.user.id);
         this.notifySuccess("Presentation generated")
-        const vp_signed = await signPresentation(vp_unsigned, this.user.id, this.user.privateKey, this.challenge.challenge)
+        const vp_signed = await hypersignSDK.credential.signPresentation(vp_unsigned, this.user.id, this.user.privateKey, this.challenge.challenge)
         this.notifySuccess("Presentation signed")
         this.verifiablePresentation = JSON.stringify(vp_signed)
         
@@ -254,7 +253,7 @@ export default {
           "Content-Type": "application/json",
         };
         
-        url = `http://${this.host}:9000/api/auth/login_pki?type=PKI`;
+        url = `${this.$config.studioServer.BASE_URL}api/auth/login_pki?type=PKI`;
         headers["x-auth-token"] = this.challenge.JWTChallenge;
         await this.generatePresentation();
         
@@ -266,6 +265,9 @@ export default {
           challenge: this.challenge ? this.challenge.challenge : "",
           domain: this.domain,
         };
+
+        console.log(url)
+        console.log('.............before fetch')
         fetch(url, {
           body: JSON.stringify(userData),
           method: "POST",
@@ -292,6 +294,7 @@ export default {
             }
           });
       } catch (e) {
+        console.log(e)
         this.clean();
         this.isLoading = false;
         this.notifyErr(`Error: ${e.message}`);

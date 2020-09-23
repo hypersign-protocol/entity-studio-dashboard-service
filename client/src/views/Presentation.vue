@@ -148,7 +148,7 @@
 
 <script>
 import fetch from "node-fetch";
-import { generateCredential, signCredential, generatePresentation, signPresentation, verifyPresentation } from "lds-sdk/dist/vc";
+import { hypersignSDK } from '../config'
 import QrcodeVue from "qrcode.vue";
 import Info from '@/components/Info.vue'
 export default {
@@ -316,7 +316,7 @@ export default {
     },
     getCredentials(attributesMap) {
       const schemaUrl = `${this.$config.nodeServer.BASE_URL}${this.$config.nodeServer.SCHEMA_GET_EP}${this.selected}`;
-      return generateCredential(schemaUrl, {
+      return hypersignSDK.credential.generateCredential(schemaUrl, {
         subjectDid: this.holderDid,
         issuerDid: this.user.publicKey,
         expirationDate: new Date().toISOString(),
@@ -327,7 +327,7 @@ export default {
     },
 
     signCredentials(credential) {
-      return signCredential(credential, this.user.publicKey, this.user.privateKey).then(
+      return hypersignSDK.credential.signCredential(credential, this.user.publicKey, this.user.privateKey).then(
         (signedCredential) => {
           return signedCredential;
         }
@@ -338,8 +338,8 @@ export default {
       try{
         const vc = JSON.parse(localStorage.getItem("credential"));
         if(!vc) throw new Error('Please select verifiable credential file')
-        const vp_unsigned = await generatePresentation(vc, this.user.id);
-        const vp_signed = await signPresentation(vp_unsigned, this.user.id, this.user.privateKey, "test_challenge")
+        const vp_unsigned = await hypersignSDK.credential.generatePresentation(vc, this.user.id);
+        const vp_signed = await hypersignSDK.credential.signPresentation(vp_unsigned, this.user.id, this.user.privateKey, "test_challenge")
         this.signedVerifiablePresentation = vp_signed;
         this.isLoading = false
         this.isCredentialIssued = true;
@@ -387,7 +387,7 @@ export default {
         const vp = JSON.parse(localStorage.getItem("presentation"));
         if(!vp) throw new Error('Please select verifiable presentation file')
         const vc = vp.verifiableCredential[0]
-        const isVerified = await verifyPresentation(
+        const isVerified = await hypersignSDK.credential.verifyPresentation(
           {
             presentation: vp, 
             challenge: "test_challenge", 

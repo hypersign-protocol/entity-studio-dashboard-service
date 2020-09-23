@@ -1,7 +1,7 @@
 import IUser  from '../models/IUser';
 import { DBService, SchemaType } from './db.service';
-import { getChallange } from 'lds-sdk'
-import { generateCredential, signCredential } from "lds-sdk/dist/vc";
+import { hypersignSDK } from '../config';
+
 import { logger, nodeServer, bootstrapConfig } from '../config';
 import path  from 'path'
 import { retrive } from '../utils/file'
@@ -45,7 +45,7 @@ export class User implements IUser{
     }
 
     private getId(){
-        const uuid = this.prefix + getChallange()
+        const uuid = this.prefix + hypersignSDK.did.getChallange()
         return uuid.substring(0, 20)
     }
     async create(){
@@ -66,14 +66,14 @@ export class User implements IUser{
             "Name": this.fname,
             " Email": this.email
         }
-        const credential = await generateCredential(schemaUrl, {
+        const credential = await hypersignSDK.credential.generateCredential(schemaUrl, {
           subjectDid: this.publicKey,
           issuerDid: issuerKeys.publicKey.id,
           expirationDate: new Date().toISOString(),
           attributesMap,
         })
 
-        const signedCredential = await signCredential(credential, issuerKeys.publicKey.id, issuerKeys.privateKeyBase58)
+        const signedCredential = await hypersignSDK.credential.signCredential(credential, issuerKeys.publicKey.id, issuerKeys.privateKeyBase58)
         return signedCredential
     }
 

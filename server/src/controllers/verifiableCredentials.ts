@@ -1,9 +1,6 @@
 import {Request, Response} from 'express'
 import { VerifiableCredentials } from '../services/vc.service';
 import IVerifiableCredential from '../models/IVerifiableCredentials';
-import jwt from 'jsonwebtoken';
-import { logger, jwtSecret, jwtExpiryInMilli } from '../config';
-import { getChallange } from 'lds-sdk'
 
 const issueCredential = async (req: Request, res: Response) => {
     try{

@@ -134,7 +134,7 @@ color: #888b8f;
 
 <script>
 import fetch from "node-fetch";
-import { generateCredential, signCredential } from "lds-sdk/dist/vc";
+import {hypersignSDK} from '../config';
 import QrcodeVue from "qrcode.vue";
 export default {
   name: "IssueCredential",
@@ -309,7 +309,7 @@ export default {
 
     getCredentials (attributesMap){
       const schemaUrl = `http://localhost:5000/api/schema/get/${this.selected}`
-        return generateCredential(schemaUrl, {
+        return hypersignSDK.credential.generateCredential(schemaUrl, {
             subjectDid: this.subjectDid,
             issuerDid: this.credentials.publicKey.id,
             expirationDate: new Date().toISOString(),
@@ -320,7 +320,7 @@ export default {
     },
 
     signCredentials(credential){
-      return signCredential(credential, this.credentials)
+      return hypersignSDK.credential.signCredential(credential, this.credentials)
       .then(signedCredential => {
         return signedCredential
       })
