@@ -3,7 +3,7 @@
 ### Building the image (Development Env)
 
 ```bash
-docker build -f Dockerfile-dev -t hypersignprotocol/studio-client .
+docker build -f Dockerfile-prod -t hypersignprotocol/studio-client:test .
 ```
 * This will build the container for dev env.
 

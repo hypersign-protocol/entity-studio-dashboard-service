@@ -30,7 +30,7 @@ docker pull hypersignprotocol/studio-server:<tag>
 #### Building the image
 
 ```bash
-docker build -t hypersignprotocol/studio-server .
+docker build -t hypersignprotocol/studio-server:test .
 ```
 
 #### Running the container
