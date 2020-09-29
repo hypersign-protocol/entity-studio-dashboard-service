@@ -30,7 +30,7 @@ const registerSchema = async () => {
     const schemaData = {
         name: "HypersignAuthCredential",
         owner: keys.publicKey.id.split('#')[0],
-        attributes: ["Name", " Email"],
+        attributes: ["Name", "Email"],
         description: "Hypersign Authentication Credential",
     };
     let headers = {

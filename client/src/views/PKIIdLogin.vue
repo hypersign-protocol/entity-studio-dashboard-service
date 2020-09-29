@@ -188,9 +188,10 @@ export default {
         this.user.id = keys.publicKey.id
         this.user.did = this.user.id.split('#')[0]
         const vc = JSON.parse(localStorage.getItem("credential"));
-        //console.log(vc)
+        // console.log(vc)
         this.user.name = vc['credentialSubject']['Name']
-        this.user.email = vc['credentialSubject'][' Email']
+        this.user.email = vc['credentialSubject']['Email']
+        // console.log(this.user)
         if(!vc) throw new Error('VC is null')
         const vp_unsigned = await hypersignSDK.credential.generatePresentation(vc, this.user.id);
         this.notifySuccess("Presentation generated")
