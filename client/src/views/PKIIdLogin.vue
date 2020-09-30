@@ -105,7 +105,8 @@ h5 span {
 
 <script>
 import QrcodeVue from "qrcode.vue";
-import { hypersignSDK } from '../config';
+import conf from '../config';
+const { hypersignSDK } = conf;
 import Loading from "vue-loading-overlay";
 import "vue-loading-overlay/dist/vue-loading.css";
 const { sha256hashStr } = require("../utils/hash");
@@ -188,14 +189,20 @@ export default {
         this.user.id = keys.publicKey.id
         this.user.did = this.user.id.split('#')[0]
         const vc = JSON.parse(localStorage.getItem("credential"));
-        // console.log(vc)
         this.user.name = vc['credentialSubject']['Name']
         this.user.email = vc['credentialSubject']['Email']
         // console.log(this.user)
         if(!vc) throw new Error('VC is null')
+        //console.log(vc)
+        //console.log("Before generating presentation ....")
         const vp_unsigned = await hypersignSDK.credential.generatePresentation(vc, this.user.id);
+        //console.log("After generating presentation ....")
+        //console.log(vp_unsigned)
         this.notifySuccess("Presentation generated")
+        //console.log("Before signing presentation ....")
         const vp_signed = await hypersignSDK.credential.signPresentation(vp_unsigned, this.user.id, this.user.privateKey, this.challenge.challenge)
+        //console.log(vp_signed)
+        //console.log("After signing presentation ....")
         this.notifySuccess("Presentation signed")
         this.verifiablePresentation = JSON.stringify(vp_signed)
         
@@ -267,7 +274,7 @@ export default {
           domain: this.domain,
         };
 
-        console.log(url)
+        // console.log(url)
         console.log('.............before fetch')
         fetch(url, {
           body: JSON.stringify(userData),
