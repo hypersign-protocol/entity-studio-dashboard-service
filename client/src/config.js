@@ -19,7 +19,7 @@ const config = {
     },
     explorer: {
         BASE_URL: EnvProvider.value('EXPLORER_BASE_URL'),
-        NEW_DID_EP: EnvProvider.value('EXPLORER_NEW_DID_EP') || "explorer/newdid"
+        NEW_DID_EP: EnvProvider.value('EXPLORER_NEW_DID_EP') || "newdid"
     },
     app: {
         name: EnvProvider.value('TITLE') || "Hypersign Studio",
