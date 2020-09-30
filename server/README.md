@@ -30,7 +30,7 @@ docker pull hypersignprotocol/studio-server:<tag>
 #### Building the image
 
 ```bash
-docker build -t hypersignprotocol/studio-server:test .
+docker build -t hypersignprotocol/studio-server:v1.0 .
 ```
 
 #### Running the container
@@ -44,7 +44,7 @@ docker run \
     --env LOG_LEVEL="debug" \
     --env DATABASE_FILEPATH="../db/studio-server.db" \
     --env JWT_SECRET="my\$ecreEtKeY@123" \
-    -p 9000:9000 hypersignprotocol/studio-server
+    -p 9000:9000 hypersignprotocol/studio-server:v1.0
 ```
 
 

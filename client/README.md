@@ -40,13 +40,13 @@ docker build -t hypersignprotocol/studio-client:test .
 ### Pull
 
 ```bash
-docker pull hypersignprotocol/studio-client:test
+docker pull hypersignprotocol/studio-client:v1.0
 ```
 
 ### Run
 
 ```bash
-docker run -it -p 9001:80 hypersignprotocol/studio-client:test
+docker run -it -p 9001:80 hypersignprotocol/studio-client:v1.0
 ```
 
 ### Enviroments Vars
@@ -64,7 +64,7 @@ docker run -it \
 --env VUE_APP_STUDIO_SERVER_BASE_URL=http://studio:9000/ \
 --env VUE_APP_NODE_SERVER_BASE_URL=http://node:5000/ \
 --env VUE_APP_EXPLORER_BASE_URL=http://explorer:5001/ \
--p 9001:80 hypersignprotocol/studio-client:test
+-p 9001:80 hypersignprotocol/studio-client:v1.0
 ```
 
 Note: If you do not pass `--env` options then all envs are taken from `.env` file.
