@@ -18,20 +18,16 @@ const router =  new Router({
   mode: 'history',
   routes: [
     {
-      path: '/',
-      redirect: '/login'
-    },
-    {
       path: '/studio',
-      redirect: '/login'
+      redirect: '/studio/login'
     },
     {
-      path: '/login',
+      path: '/studio/login',
       name: 'PKIIdLogin',
       component: PKIIdLogin
     },
     {
-      path: '/dashboard',
+      path: '/studio/dashboard',
       name: 'dashboard',
       component: Dashboard,
       meta: {
@@ -39,7 +35,7 @@ const router =  new Router({
       } 
     },
     {
-      path: '/register',
+      path: '/studio/register',
       name: 'register',
       component: Register
     },
@@ -52,7 +48,7 @@ const router =  new Router({
     //   } 
     // },
     {
-      path: '/schema',
+      path: '/studio/schema',
       name: 'schema',
       component: Schema,
       meta: {
@@ -68,7 +64,7 @@ const router =  new Router({
     //   } 
     // },
     {
-      path: '/credential',
+      path: '/studio/credential',
       name: 'credential',
       component: Credential,
       meta: {
@@ -76,7 +72,7 @@ const router =  new Router({
       } 
     },
     {
-      path: '/presentation',
+      path: '/studio/presentation',
       name: 'presentation',
       component: Presentation,
       meta: {
@@ -109,7 +105,7 @@ router.beforeEach((to, from, next) => {
       .then(json => {
         if(json.status == 403){
           next({
-            path: '/login',
+            path: '/studio/login',
             params: { nextUrl:  to.fullPath}
           })  
         }else{
@@ -118,12 +114,15 @@ router.beforeEach((to, from, next) => {
       })
       .catch((e)=> {
         next({
-          path: '/login',
+          path: '/studio/login',
           params: { nextUrl:  to.fullPath}
         })
       })
     }else{
-      next()
+      next({
+        path: '/studio/login',
+        params: { nextUrl:  to.fullPath}
+      })
     }
   }else{
     next()

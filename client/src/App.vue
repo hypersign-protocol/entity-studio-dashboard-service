@@ -142,22 +142,22 @@ export default {
       menu: [
         { 
           name: "Dashboard",  
-          path: "/dashboard",
+          path: "/studio/dashboard",
           isShow: true,
         },
         { 
           name: "Schema",  
-          path: "/schema",
+          path: "/studio/schema",
           isShow: true,
         },
         { 
           name: "Credentials",  
-          path: "/credential",
+          path: "/studio/credential",
           isShow: true,
         },
         { 
           name: "Presentation",  
-          path: "/presentation",
+          path: "/studio/presentation",
           isShow: true,
         },
         {
