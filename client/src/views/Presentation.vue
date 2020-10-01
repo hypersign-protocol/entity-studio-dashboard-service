@@ -148,7 +148,8 @@
 
 <script>
 import fetch from "node-fetch";
-import { hypersignSDK } from '../config'
+import conf from '../config';
+const { hypersignSDK } = conf;
 import QrcodeVue from "qrcode.vue";
 import Info from '@/components/Info.vue'
 export default {

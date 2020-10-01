@@ -64,7 +64,7 @@ export class User implements IUser{
         // make use of SCHEMA.attributes
         const attributesMap = {
             "Name": this.fname,
-            " Email": this.email
+            "Email": this.email
         }
         const credential = await hypersignSDK.credential.generateCredential(schemaUrl, {
           subjectDid: this.publicKey,

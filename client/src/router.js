@@ -18,7 +18,7 @@ const router =  new Router({
   mode: 'history',
   routes: [
     {
-      path: '/',
+      path: '/login',
       redirect: '/studio/login'
     },
     {
@@ -123,7 +123,10 @@ router.beforeEach((to, from, next) => {
         })
       })
     }else{
-      next()
+      next({
+        path: '/studio/login',
+        params: { nextUrl:  to.fullPath}
+      })
     }
   }else{
     next()

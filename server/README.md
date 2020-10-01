@@ -30,7 +30,7 @@ docker pull hypersignprotocol/studio-server:<tag>
 #### Building the image
 
 ```bash
-docker build -t hypersignprotocol/studio-server:test .
+docker build -t hypersignprotocol/studio-server:v1.0 .
 ```
 
 #### Running the container
@@ -44,7 +44,14 @@ docker run \
     --env LOG_LEVEL="debug" \
     --env DATABASE_FILEPATH="../db/studio-server.db" \
     --env JWT_SECRET="my\$ecreEtKeY@123" \
-    -p 9000:9000 hypersignprotocol/studio-server
+    --env NODE_SERVER_BASE_URL="http://core:5000/"  \
+    --env NODE_SERVER_DID_CREATE_EP="api/did/create_tmp"  \
+    --env MAIL_HOST=<mail host>  \
+    --env MAIL_PORT=<mail port>  \
+    --env MAIL_USERNAME=<mail emailid>  \
+    --env MAIL_PASSWORD=<mail port>  \
+    --env MAIL_NAME=Hypersign Admin  \
+    -p 9000:9000 hypersignprotocol/studio-server:v1.0
 ```
 
 

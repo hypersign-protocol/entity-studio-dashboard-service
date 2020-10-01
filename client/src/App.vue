@@ -162,7 +162,7 @@ export default {
         },
         {
           name: "Logout",
-          path: "/studio/login",
+          path: "/login",
           isShow: false,
         },        
       ]
