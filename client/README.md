@@ -34,7 +34,7 @@ Make sure you have `.env.staging` file.
 ### Build
 
 ```bash
-docker build -t hypersignprotocol/studio-client:test .
+docker build -t hypersignprotocol/studio-client:v1.0 .
 ```
 
 ### Pull
@@ -59,6 +59,7 @@ docker run -it -p 9001:80 hypersignprotocol/studio-client:v1.0
 
 ```bash
 docker run -it \
+--env NODE_ENV="production" \
 --env VUE_APP_TITLE="Studio" \
 --env VUE_APP_VERSION="v1.0" \
 --env VUE_APP_STUDIO_SERVER_BASE_URL=http://studio:9000/ \

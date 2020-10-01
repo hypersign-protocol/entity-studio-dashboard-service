@@ -18,6 +18,10 @@ const router =  new Router({
   mode: 'history',
   routes: [
     {
+      path: '/login',
+      redirect: '/studio/login'
+    },
+    {
       path: '/studio',
       redirect: '/studio/login'
     },
