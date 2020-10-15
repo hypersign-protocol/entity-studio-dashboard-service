@@ -64,6 +64,11 @@ const register = async (req: Request, res: Response) => {
         // Generate Verifiable credential for this 
         const createdU = await user.create();
         const userData = JSON.parse(createdU);
+
+        Object.keys(userData).forEach(k => {
+            if(userData[k] == undefined || userData[k] == null || userData[k] == "") delete userData[k]
+        })
+
         jwt.sign(
             userData,
             jwtSecret,
