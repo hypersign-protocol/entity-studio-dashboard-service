@@ -9,6 +9,9 @@ import path from 'path'
 import fs from 'fs'
 import regMailTemplate from '../mailTemplates/registration';
 import { MailService } from '../services/mail.service'
+import QRCode from 'qrcode';
+
+const TEMP_CREDENTIAL_DIR = path.join(__dirname + "/../" + "temp/")
 
 const check = (req: Request, res: Response) => {
     const param = {
@@ -41,6 +44,10 @@ const register_old = async (req: Request, res: Response) => {
     }
 }
 
+const generateVCQRcode = async (data) => {
+    return await QRCode.toDataURL(data);
+}   
+
 const register = async (req: Request, res: Response) => {
     try {
         console.log(req.body)
@@ -63,11 +70,17 @@ const register = async (req: Request, res: Response) => {
             { expiresIn: jwtExpiryInMilli },
             async (err, token) => {
                 if (err) throw new Error(err)
-                const link = `http://${host}:${port}/api/auth/credential?token=${token}`
+                let link = `http://${host}:${port}/api/auth/credential?token=${token}`
                 const mailService = new MailService({ ...mail });
                 let mailTemplate = regMailTemplate;
                 mailTemplate = mailTemplate.replace('@@RECEIVERNAME@@', user.fname)
                 mailTemplate = mailTemplate.replace('@@LINK@@', link)
+
+                // Send link as QR as well
+                link = `${link}&fromQR=true`;
+                const QRUrl = await generateVCQRcode(link);
+                mailTemplate = mailTemplate.replace("@@QRURL@@", QRUrl);
+
                 try {
                     //TODO: Send email
                     logger.debug('Before sending the mail')
@@ -90,6 +103,7 @@ const register = async (req: Request, res: Response) => {
 const getCredential = (req, res) => {
     try {
         const token = req.query.token;
+        const fromQR = req.query.fromQR;
         console.log(token)
         if (!token) {
             throw new Error("Token is not passed")
@@ -105,7 +119,7 @@ const getCredential = (req, res) => {
             const vc = await user.generateCredential();
 
             // create temporary dir
-            const vcDir = path.join(__dirname + "/../" + "temp/")
+            const vcDir = TEMP_CREDENTIAL_DIR
             if (!fs.existsSync(vcDir)) {
                 fs.mkdirSync(vcDir);
             }
@@ -117,8 +131,11 @@ const getCredential = (req, res) => {
             await user.update();
 
             // send vc to download.
-            res.download(filePath);
-            // res.status(200).send({ status: 200, message: vc, error: null })
+            if(fromQR){
+                res.status(200).send({ status: 200, message: vc, error: null })
+            }else{
+                res.download(filePath);
+            }
         })
     } catch (e) {
         res.status(500).send({ status: 500, message: null, error: e.message })
