@@ -332,7 +332,7 @@ const verifyChallenge = async (req: Request, res: Response) => {
         if(now > expTime) throw new Error("Challenge has expired. Rescan the new challenge.")
             
 
-        if (await verifyVP(vpObj, "test_challenge")) {
+        if (await verifyVP(vpObj, challenge)) {
             userindb = JSON.parse(userindb)
             userindb['id'] = userindb['publicKey'] // TODO: handle it with better way:  add another property (i.e. did)in the model (may be) that will help
             jwt.sign(
