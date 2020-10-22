@@ -24,7 +24,7 @@ export class Challenge implements IChallenge{
         this.tabId = tabId,
         this.vp = vp;
         this.dbSerice = new DBService();
-        this.prefix = 'ssn_';
+        this.prefix = 'ch_';
     }
 
     toString(user: IChallenge){
@@ -41,29 +41,6 @@ export class Challenge implements IChallenge{
         this.createdAt = Date.now().toString();
         this.expireAt = (parseInt(this.createdAt) + new Date(challengeExpTime * 60 * 1000).getTime()).toString();
         this.isVerified = "false";
-        const newUser:IChallenge = await this.dbSerice.add<IChallenge>(SchemaType.Challenge, this);
-        return this.toString(newUser)
-    }
-
-    async fetch(obj = {}){    
-        if(Object.keys(obj).length === 0){
-            obj = {
-                challenge: this.challenge
-            }
-        }
-        let user:IChallenge = await this.dbSerice.getOne(SchemaType.Challenge, obj);
-        return user
-    }
-
-    async update(obj = {}){
-        if(Object.keys(obj).length === 0){
-            obj = {
-                isVerified: "true"
-            }
-        }
-        return await this.dbSerice.update(SchemaType.Challenge, obj, {
-            challenge: this.challenge,
-        })
     }
 
 }

@@ -21,12 +21,10 @@ export default  async function setupDb(){
         await dropTable(SchemaType.User)
         await dropTable(SchemaType.Application)
         await dropTable(SchemaType.VerifiableCredential)
-        await dropTable(SchemaType.Challenge)
         
         await createTable(SchemaType.User) 
         await createTable(SchemaType.Application) 
         await createTable(SchemaType.VerifiableCredential) 
-        await createTable(SchemaType.Challenge) 
     }
     
     catch(e){

@@ -15,6 +15,8 @@ import IChallenge from '../models/IChallenge';
 
 const TEMP_CREDENTIAL_DIR = path.join(__dirname + "/../" + "temp/")
 
+const ChallengeStore = new Map<string, Challenge>();
+
 const check = (req: Request, res: Response) => {
     const param = {
         chJWT: "chJWT",
@@ -244,9 +246,9 @@ const getChallenge = async (req: Request, res: Response) => {
         // browser, tabId, 
         const body: IChallenge = req.body
         const user = new Challenge({ ...body })
-        const createdS = await user.create();
-        const sessionData: IChallenge = JSON.parse(createdS);
-        const challenge =  sessionData.challenge;
+        await user.create();
+        const challenge =  user.challenge;
+        ChallengeStore[user.challenge] = user;
         jwt.sign(
             { challenge },
             jwtSecret,
@@ -283,15 +285,16 @@ const pollChallenge = async (req: Request, res: Response) => {
         if (!challenge || challenge ==" ")  res.status(400).send({ status: 400, message: "", error: "challenge is null or empty"})    
 
         const ch = { challenge } as IChallenge;
-        const user = new Challenge({ ...ch });
-        const chInDb: IChallenge = await user.fetch();
-
+        
+        const chInDb = ChallengeStore[ch.challenge]
+        
         if(!chInDb) res.status(404).send({status: 404, message: null, error: "Challenge not found"}); 
     
         const now = Date.now();
         const expTime = new Date(parseInt(chInDb.expireAt)).getTime();
         if(now > expTime){
             // since the challenge expired
+            delete ChallengeStore[ch.challenge]
             // delete this row and stop polling.
             res.status(200).send({ status: 200, message: {
                 status: false,
@@ -304,6 +307,7 @@ const pollChallenge = async (req: Request, res: Response) => {
         }else{
             const jwtVp = chInDb.vp
             jwt.verify(jwtVp, jwtSecret, (err, data) => {
+                delete ChallengeStore[ch.challenge]
                 res.status(200).send({ status: 200, message: {
                     status: true,
                     m: "Sussfully loggedIn",
@@ -327,7 +331,6 @@ const verifyChallenge = async (req: Request, res: Response) => {
         const vpObj = JSON.parse(vp);
         const subject = vpObj['verifiableCredential'][0]['credentialSubject'];
 
-    
         // First check is user exist (make sure to check if he is active too)
         let userObj = new User({ } as IUser)
         let userindb = await userObj.fetch({
@@ -338,9 +341,7 @@ const verifyChallenge = async (req: Request, res: Response) => {
         if (!userindb) throw new Error(`User ${subject['id']} does exists or has not been varified`)
 
         // Check if challege is expired.
-        const ch = { challenge } as IChallenge;
-        const challengeObj = new Challenge({ ...ch })
-        const chIndb:IChallenge  = await challengeObj.fetch()
+        const chIndb:IChallenge = ChallengeStore[challenge]
 
         if(!chIndb) res.status(404).send({status: 404, message: null, error: "Challenge not found"}); 
 
@@ -361,7 +362,9 @@ const verifyChallenge = async (req: Request, res: Response) => {
                     // token
                     // update the jwt in vp col
                     // update the isVerified=true in db
-                    challengeObj.update({ isVerified: "true", vp: token })
+                    chIndb.isVerified = "true";
+                    chIndb.vp = token;
+                    ChallengeStore[challenge] = chIndb;
                     res.status(200).send({ status: 200, message: "Success", error: null});
                 })
         }else{

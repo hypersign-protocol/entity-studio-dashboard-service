@@ -7,15 +7,13 @@ const FieldMap = Object.freeze({
     User: ["id","fname","lname","phoneNumber","username","password","email","publicKey","privateKey","hash","birthdate","jobTitle", "isActive"],
     Application: ["id","appId","appSecret","isActive", "name", "userId"],
     VerifiableCredential: ["id",    "subject",    "issuer",    "schemaId",    "dataHash"],
-    Challenge: ["id","challenge","browser","createdAt","expireAt","isVerified","tabId","vp"]
 })
 
     
 export enum SchemaType {
     User,
     Application,
-    VerifiableCredential,
-    Challenge
+    VerifiableCredential
 }
 
 enum QueryType{
@@ -52,8 +50,7 @@ export class DBService{
         switch(type){
             case SchemaType.User: keysOfModel = FieldMap.User; break;
             case SchemaType.Application: keysOfModel = FieldMap.Application; break;
-            case SchemaType.VerifiableCredential: keysOfModel = FieldMap.VerifiableCredential; break;
-            case SchemaType.Challenge: keysOfModel = FieldMap.Challenge; break;
+            case SchemaType.VerifiableCredential: keysOfModel = FieldMap.VerifiableCredential; break;            
         }
         return keysOfModel
     }
