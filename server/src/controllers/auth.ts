@@ -246,13 +246,29 @@ const getChallenge = async (req: Request, res: Response) => {
         const user = new Challenge({ ...body })
         const createdS = await user.create();
         const sessionData: IChallenge = JSON.parse(createdS);
+        const challenge =  sessionData.challenge;
+        jwt.sign(
+            { challenge },
+            jwtSecret,
+            { expiresIn: jwtExpiryInMilli },
+            (err, token) => {
+                if (err) throw new Error(err)
         res.status(200).send({
             status: 200, message: {
-                challenge: sessionData.challenge,
-                pollChallengeApi: `/api/auth/pollchallenge?challenge=${sessionData.challenge}`,
+                        JWTChallenge: token,
+                        challenge,
+                        pollChallengeApi: `/api/auth/pollchallenge?challenge=${challenge}`,
                 verifyChallengeApi: "/api/auth/verifychallenge"
             }, error: null
         })
+            })
+        // res.status(200).send({
+        //     status: 200, message: {
+        //         challenge: sessionData.challenge,
+        //         pollChallengeApi: `/api/auth/pollchallenge?challenge=${sessionData.challenge}`,
+        //         verifyChallengeApi: "/api/auth/verifychallenge"
+        //     }, error: null
+        // })
 
     }catch(e){
         res.status(500).send({ status: 500, message: null, error: e.message })
@@ -289,6 +305,7 @@ const pollChallenge = async (req: Request, res: Response) => {
             const jwtVp = chInDb.vp
             jwt.verify(jwtVp, jwtSecret, (err, data) => {
                 res.status(200).send({ status: 200, message: {
+                    status: true,
                     m: "Sussfully loggedIn",
                     jwtToken: jwtVp,
                     user: data
