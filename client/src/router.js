@@ -35,7 +35,7 @@ const router =  new Router({
       name: 'dashboard',
       component: Dashboard,
       meta: {
-        requiresAuth: true
+        requiresAuth: false
       } 
     },
     {
@@ -56,8 +56,8 @@ const router =  new Router({
       name: 'schema',
       component: Schema,
       meta: {
-        requiresAuth: true
-      } 
+        requiresAuth: false
+           } 
     },
     // {
     //   path: '/studio/apps/:appId',
@@ -72,7 +72,7 @@ const router =  new Router({
       name: 'credential',
       component: Credential,
       meta: {
-        requiresAuth: true
+        requiresAuth: false
       } 
     },
     {
@@ -80,7 +80,7 @@ const router =  new Router({
       name: 'presentation',
       component: Presentation,
       meta: {
-        requiresAuth: true
+        requiresAuth: false
       } 
     },
     // {

@@ -28,11 +28,16 @@ const config = {
     },
 
 }
+const websocketUrl="ws://localhost:9000/"
+const webWalletAddress="https://wallet-stage.hypersign.id"
+
 const options = { nodeUrl: config.nodeServer.BASE_URL, didScheme: "did:hs" }
 const hypersignSDK = {
     did: hsdk.did(options),
     credential: hsdk.credential(options)
 }
+config['appName']='Studio'
 config['hypersignSDK'] = hypersignSDK
-
+config['websocketUrl']=websocketUrl
+config['webWalletAddress']=webWalletAddress
 export default config

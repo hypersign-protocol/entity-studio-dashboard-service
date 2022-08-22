@@ -71,7 +71,7 @@
         </div>
         <div class="col-md-5">
           <div class="card">
-            <div class="card-body tile">{{credentialCount}}</div>
+            <div class="card-body tile">{{ credentialCount}}</div>
             <div class="card-header">Issued Credentials</div>
           </div>
         </div>
@@ -133,7 +133,7 @@ export default {
     this.user = { ...JSON.parse(usrStr) };
     //console.log(this.user);
     this.userKeys = Object.keys(this.user);
-    this.pollData()
+    //this.pollData()
   },
   methods: {
     fetchData(url,options){

@@ -61,7 +61,7 @@
       <div class="col-md-4">        
         <!-- <h5 class="leftAlign">{{$config.app.name}}</h5>  -->
         <div class="form-group form-inline">
-          <img class="logo-style" src="https://hypermine.in/hypersign/wp-content/uploads/2020/01/Banner_logo2.png"> 
+          <img class="logo-style" src="https://thumb.tildacdn.com/tild3065-3765-4865-b331-393637653931/-/resize/150x/-/format/webp/hypersign_Yellow.png"> 
           <h4 class="subtitle"> <span style="opacity:0.4">|</span> {{$config.app.name}} ({{$config.app.version}})</h4>  
         </div>
       </div>
@@ -168,6 +168,14 @@ export default {
       ]
     }
   },
+  created(){
+    const user = {
+      name: "Vishwas",
+      id: "did:hs:ranndomid",
+      email: "vishwas@rnadom.com"
+    }
+    localStorage.setItem('user', JSON.stringify(user))
+  }, 
   methods: {
     logout(){
       localStorage.removeItem('authToken')

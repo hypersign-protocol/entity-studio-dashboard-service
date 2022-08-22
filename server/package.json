@@ -26,6 +26,8 @@
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "hid-hd-wallet": "git+https://github.com/hypersign-protocol/hid-hd-wallet.git#ssi-integration",
+    "hypersign-auth-node-sdk": "^5.0.1",
     "jsonwebtoken": "^8.5.1",
     "lds-sdk": "^4.0.1",
     "node-fetch": "^2.6.1",
