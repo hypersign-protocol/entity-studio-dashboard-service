@@ -18,12 +18,18 @@ const router =  new Router({
   mode: 'history',
   routes: [
     {
+      path: '/',
+      redirect: '/studio',
+      requiresAuth:true,
+    },
+    {
       path: '/login',
       redirect: '/studio/login'
     },
     {
       path: '/studio',
-      redirect: '/studio/dashboard'
+      redirect: '/studio/dashboard',
+      requiresAuth:true
     },
     {
       path: '/studio/login',
@@ -119,6 +125,7 @@ router.beforeEach((to, from, next) => {
         }
       })
       .catch((e)=> {
+        console.log(e);
         next({
           path: '/studio/login',
           params: { nextUrl:  to.fullPath}

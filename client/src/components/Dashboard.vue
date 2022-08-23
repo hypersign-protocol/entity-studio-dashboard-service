@@ -66,15 +66,15 @@ word-wrap: break-word
       <div class="col-md-6" style="margin-left:40%">
           <div class="card">
               <div class="card-header">
-                Network Details <span class="dot" v-if="networkStatus.status == 'LIVE'"></span>
+                Network Details <span class="dot" v-if="networkStatus.result.listening === true"></span>
               </div>
               <div class="card-body leftAlign">
                 <p >NETWORK
-                </p><p class="fVal">Hypersign Staging Network</p>  
+                </p><p class="fVal">{{ (networkStatus.result.peers[0].node_info.network).toUpperCase() + '  NETWORK'}}</p>  
                 <p>NODE URL
-                </p><p class="fVal"><a :href="networkStatus.nodeUrl" target="_blank">{{networkStatus.nodeUrl}}</a></p>  
+                </p><p class="fVal"><a :href="networkStatus.nodeUrl" target="_blank">{{this.$config.nodeServer.BASE_URL}}</a></p>  
                 <p>EXPLORER URL
-                </p><p class="fVal"><a :href="networkStatus.explorerUrl" target="_blank">{{networkStatus.explorerUrl}}</a></p> 
+                </p><p class="fVal"><a :href="networkStatus.explorerUrl" target="_blank">{{this.$config.explorer.BASE_URL}}</a></p> 
                 <p>DID COUNT
                 </p><p class="fVal">{{networkStatus.didCount}}</p>  
                 <p>SCHEMA COUNT
@@ -96,24 +96,31 @@ export default {
     return {
       active: 0,
       networkStatus: {
+        result:{
+          listening:'false',
+          listeners:[],
+          n_peers:'',
+          peers:[{}]
+        },
         status: "DOWN",
         nodeUrl: "",
-        explorerUrl: "",
+        explorerUrl: this.$config.explorer.BASE_URL,
         schemaCount: "0",
         didCount: "0"
       },
     };
   },
-  created() {
+  async created() {
     const url = `${this.$config.nodeServer.BASE_URL}${this.$config.nodeServer.NETWORK_STATUS_EP}`;
-    fetch(url)
+   await fetch(url)
     .then(res => res.json())
     .then(json => {
       this.networkStatus = { ...json }
-      //console.log(this.networkStatus)
+      console.log(this.networkStatus.result.peers[0])
     })
     .catch(e => alert(`Error: ${e.message}`))
   },
+  
   methods: {
     gotosubpage: id => {
       this.$router.push(`${id}`);

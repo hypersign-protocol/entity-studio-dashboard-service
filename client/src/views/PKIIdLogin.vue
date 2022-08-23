@@ -89,11 +89,10 @@ h5 span {
                 <h5><span>Or</span></h5>
               </div>
               <div class="mb-2 primary">
-                <a v-if="this.value != ''" class="btn btn-hypersign  button-theme" :style="buttonThemeCss" href="#"
- @click.prevent="openWallet()">
+                <a v-if="this.value != ''" class="btn btn-hypersign  button-theme" :style="buttonThemeCss" href="#" @click.prevent="openWallet()" >
                   <div style="font-size: smaller; padding: 10px;">
                     Click To Login
-                  </div>
+                  </div></a>
               </div>
               <!-- <div class="form-group">
                 <label class="floatLeft">Upload keys.json:</label>
