@@ -23,7 +23,7 @@ const router =  new Router({
     },
     {
       path: '/studio',
-      redirect: '/studio/login'
+      redirect: '/studio/dashboard'
     },
     {
       path: '/studio/login',
@@ -35,7 +35,7 @@ const router =  new Router({
       name: 'dashboard',
       component: Dashboard,
       meta: {
-        requiresAuth: false
+        requiresAuth: true
       } 
     },
     {
@@ -56,7 +56,7 @@ const router =  new Router({
       name: 'schema',
       component: Schema,
       meta: {
-        requiresAuth: false
+        requiresAuth: true
            } 
     },
     // {
@@ -72,7 +72,7 @@ const router =  new Router({
       name: 'credential',
       component: Credential,
       meta: {
-        requiresAuth: false
+        requiresAuth: true
       } 
     },
     {
@@ -80,7 +80,7 @@ const router =  new Router({
       name: 'presentation',
       component: Presentation,
       meta: {
-        requiresAuth: false
+        requiresAuth: true
       } 
     },
     // {
@@ -98,13 +98,13 @@ router.beforeEach((to, from, next) => {
   if(to.matched.some(record => record.meta.requiresAuth)){
     const authToken = localStorage.getItem('authToken')
     if(authToken){
-      const url = `${config.studioServer.BASE_URL}api/auth/verify`
+      const url = `${config.studioServer.BASE_URL}protected`
       console.log(url)
       fetch(url,{
         headers: {
-          'x-auth-token': authToken
-        },
-        method: 'POST'
+          Authorization: `Bearer ${authToken}`,
+      },
+      method: "POST",
       }).then(res => res.json())
       .then(json => {
         if(json.status == 403){
@@ -113,6 +113,8 @@ router.beforeEach((to, from, next) => {
             params: { nextUrl:  to.fullPath}
           })  
         }else{
+          localStorage.setItem("user", JSON.stringify(json.message));
+          console.log(json);
           next()
         }
       })

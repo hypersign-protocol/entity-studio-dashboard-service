@@ -169,12 +169,8 @@ export default {
     }
   },
   created(){
-    const user = {
-      name: "Vishwas",
-      id: "did:hs:ranndomid",
-      email: "vishwas@rnadom.com"
-    }
-    localStorage.setItem('user', JSON.stringify(user))
+   
+    // localStorage.getItem('user')
   }, 
   methods: {
     logout(){

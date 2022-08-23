@@ -211,9 +211,13 @@ export default {
         console.log(_this.qr_data);
       } else if (messageData.op == "end") {
         _this.connection.close();
-        const authorizationToken = messageData.data.token;
-        // console.log(authorizationToken);
+      
+        const authorizationToken = messageData.data.hypersign.data.accessToken
+        const refreshToken=messageData.data.hypersign.data.refreshToken
         localStorage.setItem("authToken", authorizationToken);
+        localStorage.setItem("refreshToken",refreshToken)
+
+
         if (localStorage.getItem("authToken") != null) {
           if (this.walletWindow) {
             this.walletWindow.close();
@@ -222,14 +226,15 @@ export default {
             _this.$router.push(_this.$route.params.nextUrl);
           } else {
             // console.log(_this.$router);
-            window.location.href =
-              window.location.origin + "/dashboard";
-            // _this.$router.push("dashboard");
+            // window.location.href =
+            //   window.location.origin + "/dashboard";
+             _this.$router.push("dashboard");
           }
         }
       } else if (messageData.op == "reload") {
         // console.log("Timeout for clientId: " + messageData.data.clientId)
         _this.QRRefresh = true;
+        _this.qr_data=null
         _this.connection.close(4001, messageData.data.clientId);
       }
     };

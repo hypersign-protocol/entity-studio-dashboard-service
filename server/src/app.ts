@@ -3,9 +3,9 @@ import cors from 'cors';
 const HIDWallet = require('hid-hd-wallet');
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-const authRoutes = require('./routes/routes')
+import   {walletAuthRoutes}  from './routes/walletAuth'
 import { port, logger } from './config';
-// import authRoutes from './routes/auth';
+ import authRoutes from './routes/auth';
 import blogRoutes from './routes/blog';
 import appRoutes from './routes/app';
 import vcRoutes from './routes/verifiableCredentials'
@@ -22,7 +22,7 @@ export default function app() {
         hidNodeRestUrl: 'https://jagrat.hypersign.id/node1/rest/',
     };
 
-    const whitelistedUrls = ["http://localhost:9000", "*", "https://wallet-stage.hypersign.id"]
+    const whitelistedUrls = ["http://localhost:9000", "http://localhost:9001", "https://wallet-stage.hypersign.id"]
 
     function corsOptionsDelegate(req, callback) {
         let corsOptions;
@@ -62,18 +62,8 @@ export default function app() {
         app.use('/api/credential', vcRoutes)
         app.get('/', (req, res) => { res.json("helllo") })
 
-        app.use(authRoutes(hypersign))
-        app.post('/hs/api/v2/auth', hypersign.authenticate.bind(hypersign), (req, res) => {
-            try {
-                const { user } = req.body.hypersign.data;
-                console.log(req.body.hypersign.data)
-                    // Do something with the user data.
-                    // The hsUserData contains userdata and authorizationToken
-                res.status(200).send({ status: 200, message: "Success", error: null });
-            } catch (e) {
-                res.status(500).send({ status: 500, message: null, error: e.message });
-            }
-        })
+        app.use(walletAuthRoutes(hypersign))
+     
     
 
         server.listen(port, () => logger.info(`The server is running on port ${port}`));
