@@ -25,7 +25,7 @@ logger.setLevel(process.env.LOG_LEVEL || 'info')
 
 const port = process.env.PORT || 5000
 const host = process.env.HOST || "localhost";
-
+const WALLET_WEBHOOK=process.env.WALLET_WEB_HOOK
 const bootstrapConfig = {
     keysfilePath : path.join(__dirname + '/keys.json'),
     schemafilePath : path.join(__dirname + '/schema.json')
@@ -59,7 +59,11 @@ const nodeServer = {
     schemaCreateEp: process.env.NODE_SERVER_SCHEMA_CREATE_EP || "api/schema/create",
     schemaGetEp: process.env.NODE_SERVER_SCHEMA_GET_EP || "api/schema/get"
 }
-
+const dbConnUrl =
+  process.env.DB_URL && process.env.DB_URL != ''
+    ? process.env.DB_URL
+    : 'mongodb://admin:admin@cluster0-shard-00-00.jg0ef.mongodb.net:27017,cluster0-shard-00-01.jg0ef.mongodb.net:27017,cluster0-shard-00-02.jg0ef.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-n72avn-shard-0&authSource=admin&retryWrites=true&w=majority';
+// DID Related:
 const mail = {
    host: process.env.MAIL_HOST || "smtp.gmail.com",
    port: process.env.MAIL_PORT || 465 ,
@@ -86,5 +90,6 @@ export  {
     nodeServer,
     mail,
     bootstrapConfig,
-    hypersignSDK
+    hypersignSDK,dbConnUrl,
+    WALLET_WEBHOOK
 }

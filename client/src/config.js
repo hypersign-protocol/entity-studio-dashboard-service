@@ -4,7 +4,9 @@ const hsdk = require('lds-sdk')
 const config = {
     studioServer: {
         BASE_URL: EnvProvider.value('STUDIO_SERVER_BASE_URL'),
+        SAVE_SCHEMA_EP: EnvProvider.value('STUDIO_SERVER_SAVE_SCHEMA')||"api/v1/schema/issue",
         CRED_LIST_EP: EnvProvider.value('STUDIO_SERVER_CRED_LIST_EP') || "api/credential/list",
+        SCHEMA_LIST_EP:EnvProvider.value('SCHEMA_LIST_EP')|| 'api/v1/schema/get',
         CRED_ISSUE_EP: EnvProvider.value('STUDIO_SERVER_CRED_ISSUE_EP') || "api/credential/issue",
         AUTH_CHALLENGE_EP: EnvProvider.value('STUDIO_SERVER_AUTH_CHALLENGE_EP') || "api/auth/challenge",
         AUTH_LOGIN_EP: EnvProvider.value('STUDIO_SERVER_AUTH_LOGIN_EP') || "api/auth/login"

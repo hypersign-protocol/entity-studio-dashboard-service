@@ -3,16 +3,27 @@ import cors from 'cors';
 const HIDWallet = require('hid-hd-wallet');
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import   {walletAuthRoutes}  from './routes/walletAuth'
+import { walletAuthRoutes } from './routes/walletAuth'
 import { port, logger } from './config';
- import authRoutes from './routes/auth';
+import authRoutes from './routes/auth';
 import blogRoutes from './routes/blog';
 import appRoutes from './routes/app';
 import vcRoutes from './routes/verifiableCredentials'
+
+import db from './dbConn';
 import path from 'path'
 import http from 'http'
+import { schemaRoutes } from './routes/schemaRoutes';
 const HypersignAuth = require('hypersign-auth-node-sdk')
 export default function app() {
+    db.openConnection()
+        .then(e => {
+            logger.info(e);
+
+        }).catch(e => {
+            logger.info(e);
+
+        })
     const app = express();
     let hypersign
     const server = http.createServer(app)
@@ -22,7 +33,7 @@ export default function app() {
         hidNodeRestUrl: 'https://jagrat.hypersign.id/node1/rest/',
     };
 
-    const whitelistedUrls = ["http://localhost:9000", "http://localhost:9001", "https://wallet-stage.hypersign.id"]
+    const whitelistedUrls = ["http://localhost:9000", "http://localhost:9001", "https://wallet-stage.hypersign.id" ,"undefined" , "*" ,"http://localhost:4999"]
 
     function corsOptionsDelegate(req, callback) {
         let corsOptions;
@@ -36,15 +47,15 @@ export default function app() {
         callback(null, corsOptions) // callback expects two parameters: error and options
     }
 
-   
+
 
 
 
     const hidWalletInstance = new HIDWallet(walletOptions);
-    hidWalletInstance.generateWallet({ mnemonic }).then(async () => {        
+    hidWalletInstance.generateWallet({ mnemonic }).then(async () => {
         hypersign = new HypersignAuth(server, hidWalletInstance.offlineSigner)
-        console.log( hypersign.authenticate)
-          await hypersign.init();
+        console.log(hypersign.authenticate)
+        await hypersign.init();
         console.log('Hypersign Auth service has been initialized')
 
 
@@ -53,21 +64,27 @@ export default function app() {
         app.use(cookieParser());
         app.use(express.json());
         app.use(express.static('public'));
-
+      
 
 
         app.use('/api/app', appRoutes)
         app.use('/api/auth', authRoutes)
         app.use('/api/blog', blogRoutes)
         app.use('/api/credential', vcRoutes)
-        app.get('/', (req, res) => { res.json("helllo") })
+        app.use('/api/v1/schema', schemaRoutes(hypersign))
 
         app.use(walletAuthRoutes(hypersign))
-     
-    
+
+
 
         server.listen(port, () => logger.info(`The server is running on port ${port}`));
+        process.on('SIGINT', function () {
+            db.closeConnection().then(() => {
+                logger.info('Process (SIGINT) :: Mongoose default connection disconnected through app termination');
+                process.exit(1);
+            });
 
+        });
 
 
     })

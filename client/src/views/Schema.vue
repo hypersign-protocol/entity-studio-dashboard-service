@@ -89,10 +89,19 @@ color: #888b8f;
                       class="form-control"
                     ></textarea>
                   </div>
+                   <div class="form-group form-inline">
+                    <label style="margin-right: 3%">Additional Properties</label>
+                    <input
+                    size="100px"
+                      v-model="additionalProperties"
+                     type="checkbox"
+                    />
+                  </div>
                 </div>
                 <div class="col-md-6">
+                  <div class="col-md-6">
                   <div class="form-group form-inline">
-                    <label style="margin-right: 5%">Add attribute:</label>
+                    <label style="margin-right: 5%">Name</label>
                     <input
                       type="text"
                       class="form-control"
@@ -100,16 +109,48 @@ color: #888b8f;
                       v-model="attributeName"
                       placeholder="Enter attribute name"
                     />
+                    </div>
+                    <div class="form-group form-inline">
+                    <label style="margin-right: 5%">Type</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      size="30"
+                      v-model="attributeTypes"
+                      placeholder="Enter attribute Type (eg. String)"
+                    />
+                    </div>
+                    <div class="form-group form-inline">
+                    <label style="margin-right: 5%">Format</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      size="30"
+                      v-model="attributeFormat"
+                      placeholder="Enter attribute Format (eg email)"
+                    />
+                    </div>
+                     <div class="form-group form-inline">
+                    <label style="margin-right: 5%">Required</label>
+                    <input
+                      type="checkbox"
+                      class="form-control"
+                      size="200px"
+                      v-model="attributeRequired"
+                    
+                    />
+                  </div>
+                  
                     <a
                       class="btn btn-primary"
-                      style="margin-left: 2%; border-radius:30px; color:white"
+                      style="margin-left: 5%; border-radius:30px; color:white"
                       v-on:click="addBlankAttrBox()"
-                    >+</a>
+                    >Add +</a>
                   </div>
                   <div class="form-group" style="min-height:150px;max-height:150px;overflow: auto">
-                    <div v-for="attr in attributes" :key="attr">
+                    <div v-for="attr in attributes" :key="attr.type">
                       <div class="sm-tiles">
-                        {{attr}}
+                        {{attr.name}}
                         <span>x</span>
                       </div>
                     </div>
@@ -133,10 +174,10 @@ color: #888b8f;
           <thead class="thead-light">
             <tr>
               <th>id</th>
-              <th>credentialName</th>
+              <th>Schema Name</th>
               <th>attributes</th>
-              <th>version</th>
-              <th>owner</th>
+              <th>status</th>
+              <th>author</th>
             </tr>
           </thead>
 
@@ -144,20 +185,22 @@ color: #888b8f;
             <tr v-for="row in schemaList" :key="row">
               <th>
                 <div class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" :id="row.id" />
+                  <input type="checkbox" class="custom-control-input" :id="row._id" />
                   <label class="custom-control-label" :for="row.id"><a :href="`${$config.nodeServer.BASE_URL}${$config.nodeServer.SCHEMA_GET_EP}/`+row.id" target="_blank">{{row.id}}</a></label>
                 </div>
               </th>
-              <td>{{row.credentialName}}</td>
+              <td>{{}}</td>
               <!-- <td>{{row.attributes}}</td> -->
               <td
                 style="word-wrap: break-word;min-width: 200px;max-width: 200px;"
-              >{{row.attributes}}</td>
-              <td>{{row.version}}</td>
-              <td>{{row.owner}}</td>
+              >{{row.schemaData.fields}}</td>
+              <td>{{row.status}}</td>
+              <td>{{row.schemaData.author}}</td>
             </tr>
           </tbody>
         </table>
+        <button  @click="fetchSchemasPrev()" class="btn btn-outline-warning btn-sm">Prev</button> 
+        <button class="btn btn-outline-warning btn-sm"  @click="fetchSchemasNext()"  > Next </button>
         <!-- </div> -->
         <!-- </div> -->
       </div>
@@ -179,10 +222,15 @@ export default {
       active: 0,
       host: location.hostname,
       user: {},
+      page:1,
       prevRoute: null,
       attributeName: "",
+      attributeTypes:"",
+      attributeFormat:"",
+      attributeRequired:false,
       attributes: [],
       issueCredAttributes: [],
+      additionalProperties:false,
       showSchema: true,
       radioSelected: "create",
       credentialName: "",
@@ -202,13 +250,25 @@ export default {
       schemaList: [],
       credentialDescription: "",
       fullPage: true,
-      isLoading: false
+      isLoading: false,
+      
+      QrData: { 
+      "QRType": "ISSUE_SCHEMA",
+       "serviceEndpoint": "", 
+       "schemaId": "", 
+       "appDid": "", 
+       "appName": "Hypersign Studio", 
+       "challenge": "", 
+       "provider": "" ,
+        "data" :""
+       }
     };
   },
   created() {
+   
     const usrStr = localStorage.getItem("user");
     this.user = JSON.parse(usrStr);
-    this.fetchSchemas();
+    // this.fetchSchemasPrev();
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -232,16 +292,52 @@ export default {
           text: msg
         });
     },
-    fetchSchemas() {
-      const url = `${this.$config.nodeServer.BASE_URL}${this.$config.nodeServer.SCHEMA_LIST_EP}`;
-      fetch(url)
+    fetchSchemasPrev() {
+     this.page-=1;
+     if(this.page<1){
+this.page=1;
+     }
+      const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.SCHEMA_LIST_EP}?page=${this.page}&limit=10`;
+       let headers = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${this.authToken}`
+      };
+      fetch(url,{
+        headers,
+       
+      })
+        .then((res) => res.json())
+        .then((j) => {
+          console.log(j);
+          if (j.status != 200) throw new Error(j.error);
+          this.schemaList = j.schemaList;
+          if (this.schemaList && this.schemaList.length > 0) {
+            this.schemaList = this.schemaList.filter(
+              (x) => x.schemaData.author === this.user.id
+            );
+          }
+        })
+        .catch((e) => this.notifyErr(`Error: ${e.message}`));
+    },
+    
+    fetchSchemasNext() {
+     this.page+=1;
+      const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.SCHEMA_LIST_EP}?page=${this.page}&limit=10`;
+       let headers = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${this.authToken}`
+      };
+      fetch(url,{
+        headers,
+       
+      })
         .then((res) => res.json())
         .then((j) => {
           if (j.status != 200) throw new Error(j.error);
-          this.schemaList = j.message;
+          this.schemaList = j.schemaList;
           if (this.schemaList && this.schemaList.length > 0) {
             this.schemaList = this.schemaList.filter(
-              (x) => x.owner === this.user.id
+              (x) => x.schemaData.author === this.user.id
             );
           }
         })
@@ -260,76 +356,112 @@ export default {
       this.$router.push(`${id}`);
     },
     addBlankAttrBox() {
-      if (this.attributeName != " ") {
-        this.attributes.push(this.attributeName);
-        this.attributeName = " ";
+      console.log(this.attributeName , this.attributeTypes);
+      if (this.attributeName !==""  && this.attributeTypes!=="" ) {
+        let obj = {
+          name: this.attributeName,
+          type: this.attributeTypes,
+          format: this.attributeFormat,
+          isRequired: this.attributeRequired
+
+        }
+        console.log(obj);
+        this.attributes.push(obj)
+        this.attributeName ="";
+        this.attributeTypes="";
+        this.attributeFormat="";
+        this.attributeRequired=false;
+      }else{
+        this.notifyErr("Name or Type Cannot be blank")
       }
     },
-    onSchemaOptionChange(event) {
-      this.attributes = [];
-      this.issueCredAttributes = [];
-      this.selected = null;
-      this.credentialName = "";
-    },
-    OnSchemaSelectDropDownChange(event) {
-      if (event) {
-        this.issueCredAttributes = [];
-        this.schemaMap[event].forEach((e) => {
-          this.issueCredAttributes.push({
-            type: "text",
-            name: e,
-            value: "",
-          });
-        });
-      } else {
-        this.issueCredAttributes = [];
+    // onSchemaOptionChange(event) {
+    //   this.attributes = [];
+    //   this.issueCredAttributes = [];
+    //   this.selected = null;
+    //   this.credentialName = "";
+    // },
+    // OnSchemaSelectDropDownChange(event) {
+    //   if (event) {
+    //     this.issueCredAttributes = [];
+    //     this.schemaMap[event].forEach((e) => {
+    //       this.issueCredAttributes.push({
+    //         type: "text",
+    //         name: e,
+    //         value: "",
+    //       });
+    //     });
+    //   } else {
+    //     this.issueCredAttributes = [];
+    //   }
+    // },
+    // forceFileDownload(data, fileName) {
+    //   const url = window.URL.createObjectURL(new Blob([data]));
+    //   const link = document.createElement("a");
+    //   link.href = url;
+    //   link.setAttribute("download", fileName);
+    //   document.body.appendChild(link);
+    //   link.click();
+    // },
+    // downloadCredentials() {
+    //   this.forceFileDownload(
+    //     JSON.stringify(this.signedVerifiableCredential),
+    //     "vc.json"
+    //   );
+    // },
+     openWallet(url) {
+      if (url != "") {
+        this.walletWindow = window.open(
+          `${url}`,
+          "popUpWindow",
+          `height=800,width=400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes`
+        );
       }
     },
-    forceFileDownload(data, fileName) {
-      const url = window.URL.createObjectURL(new Blob([data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", fileName);
-      document.body.appendChild(link);
-      link.click();
-    },
-    downloadCredentials() {
-      this.forceFileDownload(
-        JSON.stringify(this.signedVerifiableCredential),
-        "vc.json"
-      );
-    },
-    createSchema() {
-        
+    createSchema() {        
       this.isLoading = true
       if (this.credentialName == "")
         return this.notifyErr("Error: SchemaName can not be blank");
       if (this.attributes.length == 0)
         return this.notifyErr("Error: Atleast one attribute is required");
-      const url = `${this.$config.nodeServer.BASE_URL}${this.$config.nodeServer.SCHEMA_CREATE_EP}`;
+      const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.SAVE_SCHEMA_EP}`;
       const schemaData = {
         name: this.credentialName,
-        owner: this.user.id,
-        attributes: this.attributes,
+        author: this.user.id,
+        fields: this.attributes,
         description: this.credentialDescription,
+        additionalProperties: this.additionalProperties,
       };
+      this.QrData.data=schemaData
+      const URLString=JSON.stringify(this.QrData)
+            // const urlEncoded= encodeURI(URLString)
+      const URL=`https://wallet-stage.hypersign.id/deeplink?url=${URLString}`
+      console.log(URL);
       let headers = {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${this.authToken}`
       };
+    //  this.openWallet(URL)
       fetch(url, {
         method: "POST",
-        body: JSON.stringify(schemaData),
+        body: JSON.stringify( { QR_DATA:this.QrData}),
         headers,
       })
         .then((res) => res.json())
         .then((j) => {
+         const {QR_DATA}=j
           if (j.status === 200) {
             this.notifySuccess("Credential successfull created");
-            this.credentialName = j.message.credentialName;
+            this.credentialName = 'Schema'
+
             this.schemaList.push({
-              ...j.message,
+             ...(j.schema)
             });
-            this.schemaMap[j.message.id] = this.attributes;
+            console.log(QR_DATA);
+                  const URL=`https://wallet-stage.hypersign.id/deeplink?url=${JSON.stringify(QR_DATA)}`
+
+            this.openWallet(URL)
+            console.log(URL);
             this.isLoading = false
           } else {
             this.isLoading = false
