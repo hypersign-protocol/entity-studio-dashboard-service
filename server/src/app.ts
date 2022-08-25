@@ -8,8 +8,7 @@ import { port, logger } from './config';
 import authRoutes from './routes/auth';
 import blogRoutes from './routes/blog';
 import appRoutes from './routes/app';
-import vcRoutes from './routes/verifiableCredentials'
-
+import { credentialRoutes } from './routes/verifiableCredentials';
 import db from './dbConn';
 import path from 'path'
 import http from 'http'
@@ -70,7 +69,7 @@ export default function app() {
         app.use('/api/app', appRoutes)
         app.use('/api/auth', authRoutes)
         app.use('/api/blog', blogRoutes)
-        app.use('/api/credential', vcRoutes)
+        app.use('/api/v1/credential', credentialRoutes(hypersign))
         app.use('/api/v1/schema', schemaRoutes(hypersign))
 
         app.use(walletAuthRoutes(hypersign))

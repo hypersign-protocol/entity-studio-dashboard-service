@@ -1,18 +1,19 @@
 import EnvProvider from 'jvjr-docker-env'
 const hsdk = require('lds-sdk')
-
 const config = {
     studioServer: {
         BASE_URL: EnvProvider.value('STUDIO_SERVER_BASE_URL'),
         SAVE_SCHEMA_EP: EnvProvider.value('STUDIO_SERVER_SAVE_SCHEMA')||"api/v1/schema/issue",
         CRED_LIST_EP: EnvProvider.value('STUDIO_SERVER_CRED_LIST_EP') || "api/credential/list",
         SCHEMA_LIST_EP:EnvProvider.value('SCHEMA_LIST_EP')|| 'api/v1/schema/get',
-        CRED_ISSUE_EP: EnvProvider.value('STUDIO_SERVER_CRED_ISSUE_EP') || "api/credential/issue",
+        CRED_ISSUE_EP: EnvProvider.value('STUDIO_SERVER_CRED_ISSUE_EP') || "api/v1/credential/issue",
         AUTH_CHALLENGE_EP: EnvProvider.value('STUDIO_SERVER_AUTH_CHALLENGE_EP') || "api/auth/challenge",
         AUTH_LOGIN_EP: EnvProvider.value('STUDIO_SERVER_AUTH_LOGIN_EP') || "api/auth/login"
     },
     nodeServer: {
-        BASE_URL: EnvProvider.value('NODE_SERVER_BASE_URL'),
+        BASE_URL: EnvProvider.value('NODE_SERVER_BASE_URL') ,
+        BASE_URL_REST: EnvProvider.value('NODE_SERVER_BASE_URL_REST') || 'https://jagrat.hypersign.id/node1/rest/',
+        SCHEMA_GET_REST:EnvProvider.value('SCHEMA_GET_EP_REST') || 'hypersign-protocol/hidnode/ssi/schema/',
         NETWORK_STATUS_EP: EnvProvider.value('NODE_SERVER_NETWORK_STATUS_EP') || "net_info",
         SCHEMA_LIST_EP: EnvProvider.value('NODE_SERVER_SCHEMA_LIST_EP') || "api/schema/list",
         SCHEMA_GET_EP: EnvProvider.value('NODE_SERVER_SCHEMA_GET_EP') || "api/schema/get",

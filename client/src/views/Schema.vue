@@ -173,9 +173,9 @@ color: #888b8f;
         <table class="table table-bordered" style="background:#FFFF">
           <thead class="thead-light">
             <tr>
-              <th>id</th>
-              <th>Schema Name</th>
-              <th>attributes</th>
+              <th>id</th>  
+
+             <th>Txn Hash</th>
               <th>status</th>
               <th>author</th>
             </tr>
@@ -185,17 +185,18 @@ color: #888b8f;
             <tr v-for="row in schemaList" :key="row">
               <th>
                 <div class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" :id="row._id" />
-                  <label class="custom-control-label" :for="row.id"><a :href="`${$config.nodeServer.BASE_URL}${$config.nodeServer.SCHEMA_GET_EP}/`+row.id" target="_blank">{{row.id}}</a></label>
+                  <input  class="custom-control-input" :id="row._id" />
+                  <label class="custom-control-label" :for="row.id"><a :href="`${$config.nodeServer.BASE_URL_REST}${$config.nodeServer.SCHEMA_GET_REST}${row.schemaId}:`" target="_blank">{{row.schemaId}}</a></label>
                 </div>
               </th>
-              <td>{{}}</td>
+            
               <!-- <td>{{row.attributes}}</td> -->
               <td
                 style="word-wrap: break-word;min-width: 200px;max-width: 200px;"
-              >{{row.schemaData.fields}}</td>
+              >{{row.transactionHash}}</td>
               <td>{{row.status}}</td>
-              <td>{{row.schemaData.author}}</td>
+              <td>{{row.did}}</td>
+            
             </tr>
           </tbody>
         </table>
@@ -268,7 +269,7 @@ export default {
    
     const usrStr = localStorage.getItem("user");
     this.user = JSON.parse(usrStr);
-    // this.fetchSchemasPrev();
+     this.fetchSchemasPrev();
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -313,7 +314,7 @@ this.page=1;
           this.schemaList = j.schemaList;
           if (this.schemaList && this.schemaList.length > 0) {
             this.schemaList = this.schemaList.filter(
-              (x) => x.schemaData.author === this.user.id
+              (x) => x.did === this.user.id
             );
           }
         })
@@ -337,7 +338,7 @@ this.page=1;
           this.schemaList = j.schemaList;
           if (this.schemaList && this.schemaList.length > 0) {
             this.schemaList = this.schemaList.filter(
-              (x) => x.schemaData.author === this.user.id
+              (x) => x.did === this.user.id
             );
           }
         })

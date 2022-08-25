@@ -26,6 +26,7 @@ logger.setLevel(process.env.LOG_LEVEL || 'info')
 const port = process.env.PORT || 5000
 const host = process.env.HOST || "localhost";
 const WALLET_WEBHOOK=process.env.WALLET_WEB_HOOK
+const WALLET_WEB_HOOK_CREAD= process.env.WALLET_WEB_HOOK_CREAD;
 const bootstrapConfig = {
     keysfilePath : path.join(__dirname + '/keys.json'),
     schemafilePath : path.join(__dirname + '/schema.json')
@@ -91,5 +92,5 @@ export  {
     mail,
     bootstrapConfig,
     hypersignSDK,dbConnUrl,
-    WALLET_WEBHOOK
+    WALLET_WEBHOOK,WALLET_WEB_HOOK_CREAD
 }
