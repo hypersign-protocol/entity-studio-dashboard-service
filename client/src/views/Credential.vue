@@ -91,9 +91,10 @@
             <tr>
               <th>id</th>
               <th>schemaId</th>
-              <th>issuer</th>
-              <th>subject</th>
-              <th>dataHash</th>
+             
+              <th>subjectDid</th>
+              <th>expirationDate</th>
+              <th>Issue</th>
             </tr>
           </thead>
           <tbody>
@@ -101,13 +102,14 @@
               <th scope="row">
                 <div class="custom-control custom-checkbox">
                   <input type="checkbox" class="custom-control-input" :id="row.id" />
-                  <label class="custom-control-label" :for="row.id">{{ row.id }}</label>
+                  <label class="custom-control-label" :for="row.id"><a :href="`${row.vc_id}:`"  >{{ row.vc.id }}</a></label>
                 </div>
               </th>
               <td>{{ row.schemaId }}</td>
-              <td>{{ row.issuer }}</td>
-              <td>{{ row.subject }}</td>
-              <td>{{ row.dataHash }}</td>
+             
+              <td>{{ row.subjectDid }}</td>
+              <td>{{ row.vc.expirationDate}}</td>
+              <td><a href="#">ISSUE</a></td>
             </tr>
           </tbody>
         </table>
@@ -222,9 +224,12 @@ export default {
         }
       } else {
         url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_LIST_EP}`;
-        options = {
+         options = {
           method: "GET",
-          headers: { 'x-auth-token': this.authToken }
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${this.authToken}`
+          }
         }
       }
 
@@ -261,7 +266,7 @@ export default {
           });
         }
       } else {
-        this.vcList = j.message.list;
+        this.vcList = j.credList;
       }
     },
     fetchData(url, option) {

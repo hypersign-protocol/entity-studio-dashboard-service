@@ -6,14 +6,24 @@ export interface ICreadSchema extends Document {
     schemaId:string;
     createdAt: Date;
     status: string;
+    vc:JSON;
+    vc_id:string;
    
 }
 
 export const creadSchema = new Schema({
+    vc_id:{
+        type:String,
+        required:false,
+    },
     issuerDid: { type: String, required: true },
     subjectDid: { type: String, required: true },
     transactionHash:{
         type: String, required:false,
+    },
+    vc:{
+        type:JSON,
+        required:false,
     },
     schemaId:{
         type: String, required:true,

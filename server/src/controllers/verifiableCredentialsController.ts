@@ -5,7 +5,12 @@ import { WALLET_WEB_HOOK_CREAD } from '../config'
 const setCredentialStatus = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const id = req.params.id
+console.log(req.body);
+const { issuerDid, subjectDid, schemaId }=req.body.vc
 
+const credObj= await creadSchema.findOneAndUpdate({_id:id},{ vc:req.body.vc, vc_id:req.body.vc.credentialStatus.id, issuerDid, subjectDid, schemaId})
+
+res.json({msg:"success"})
     } catch (error) {
 
     }
@@ -50,19 +55,16 @@ const issueCredential = async (req: Request, res: Response, next: NextFunction) 
 //     }
 // }
 
-const getCredentialList = async (req: Request, res: Response) => {
-    console.log(res.locals.data);
-    // const { name } = req.body;
-    const { id } = res.locals.data;
-    if (!id) throw new Error('UserId is required!');
-    const appObj = new VerifiableCredentials({ issuer: id });
-    const list = await appObj.fetch()
-    res.status(200).send({
-        status: 200, message: {
-            count: list.length,
-            list
-        }, error: null
+const getCredentialList = async (req: Request, res: Response,next:NextFunction) => {
+  try {
+    const {hypersign}=req.body
+    const credList = await creadSchema.find({issuerDid:hypersign.data.id}).sort({ createdAt: -1 })
+    res.json({
+        credList,status:200
     })
+  } catch (error) {
+    
+  }
 }
 
 export {
