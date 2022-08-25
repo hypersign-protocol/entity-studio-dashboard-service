@@ -52,7 +52,7 @@ try {
 const {transactionHash,schemaId,author}=req.body
 const id=req.params.id
 
-const schema= await Schema.findOneAndUpdate({_id:id},{transactionHash,schemaId,did:author}).exec()
+const schema= await Schema.findOneAndUpdate({_id:id},{transactionHash,schemaId,did:author,status:'Registered'}).exec()
 console.log(schema);
 res.json({"msg":"Success"})
 } catch (error) {
