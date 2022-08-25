@@ -435,7 +435,7 @@ this.page=1;
       this.QrData.data=schemaData
       const URLString=JSON.stringify(this.QrData)
             // const urlEncoded= encodeURI(URLString)
-      const URL=`https://wallet-stage.hypersign.id/deeplink?url=${URLString}`
+      const URL=`${this.$config.webWalletAddress}/deeplink?url=${URLString}`
       console.log(URL);
       let headers = {
         "Content-Type": "application/json",
@@ -458,7 +458,7 @@ this.page=1;
              ...(j.schema)
             });
             console.log(QR_DATA);
-                  const URL=`https://wallet-stage.hypersign.id/deeplink?url=${JSON.stringify(QR_DATA)}`
+                  const URL=`${this.$config.webWalletAddress}/deeplink?url=${JSON.stringify(QR_DATA)}`
 
             this.openWallet(URL)
             console.log(URL);

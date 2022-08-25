@@ -49,7 +49,7 @@ const setStatusSchema = async (req: Request, res: Response, next: NextFunction) 
 try {
     
 
-const {transactionHash,schemaId,author}=req.body.result
+const {transactionHash,schemaId,author}=req.body
 const id=req.params.id
 
 const schema= await Schema.findOneAndUpdate({_id:id},{transactionHash,schemaId,did:author,status:'Registered'}).exec()

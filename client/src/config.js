@@ -31,8 +31,8 @@ const config = {
 
 }
 const websocketUrl=  EnvProvider.value('STUDIO_SERVER_BASE_WS') ||  'ws://localhost:9000' // 'wss://stage.hypermine.in/studioserverws/'
-// const webWalletAddress="https://wallet-stage.hypersign.id"
-const webWalletAddress="http://localhost:4999/chrome/popup/popup#/"
+ //const webWalletAddress="https://wallet-stage.hypersign.id"
+const webWalletAddress="http://localhost:4999/chrome/popup/popup#"
 const options = { nodeUrl: config.nodeServer.BASE_URL, didScheme: "did:hs" }
 const hypersignSDK = {
     did: hsdk.did(options),
