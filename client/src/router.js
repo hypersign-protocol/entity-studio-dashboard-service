@@ -15,7 +15,7 @@ import Schema from './views/Schema.vue'
 Vue.use(Router)
 
 const router =  new Router({
-  mode: 'history',
+  mode: 'hash',
   routes: [
     {
       path: '/',
