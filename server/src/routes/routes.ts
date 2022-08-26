@@ -12,7 +12,7 @@ const authRoutes = (hypersign) => {
                 // The hsUserData contains userdata and authorizationToken
             res.status(200).send({ status: 200, message: "Success", error: null });
         } catch (e) {
-            res.status(500).send({ status: 500, message: null, error: e.message });
+            res.status(500).send({ status: 500, message: null, error: e });
         }
     })
 
@@ -27,7 +27,7 @@ const authRoutes = (hypersign) => {
             // validated his email.
             res.status(200).send({ status: 200, message: req.body.hypersign.data, error: null });
         } catch (e) {
-            res.status(500).send({ status: 500, message: null, error: e.message });
+            res.status(500).send({ status: 500, message: null, error: e });
         }
     })
 
@@ -42,7 +42,7 @@ const authRoutes = (hypersign) => {
             console.log(hypersign)
             res.status(200).send({...data });
         } catch (e) {
-            res.status(500).send({ status: 500, message: null, error: e.message });
+            res.status(500).send({ status: 500, message: null, error: e });
         }
     })
 
@@ -56,7 +56,7 @@ const authRoutes = (hypersign) => {
                 // Do whatever you want to do with it
             res.status(200).send({ status: 200, message: user, error: null });
         } catch (e) {
-            res.status(500).send(e.message)
+            res.status(500).send(e)
         }
     })
 
