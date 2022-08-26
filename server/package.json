@@ -11,8 +11,8 @@
     "setEnv": "cp .env.staging .env",
     "setUI": "mkdir -p public && mkdir -p dist/public && cp -R ../client/dist/* public && cp -R public/* dist/public",
     "start": "node dist/index.js",
-    "dev": "nodemon src/index.ts",
-    "build": "tsc -p .",
+    "dev": "ts-node .",
+    "build": "rimraf ./dist && tsc -p . && mkdir ./dist/temp",
     "bootstrap": "npm run start -- --bootstrap",
     "test": "mocha -r ts-node/register src/tests/**/*.test.ts"
   },
@@ -44,6 +44,6 @@
     "@types/node": "^14.0.23",
     "nodemon": "^2.0.4",
     "ts-node": "^8.10.2",
-    "typescript": "^3.4.0"
+    "typescript": "^4.8.2"
   }
 }

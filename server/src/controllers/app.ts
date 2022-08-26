@@ -15,7 +15,7 @@ const registerApp = async (req: Request, res: Response) => {
         const createdAppInDb: IApplication = JSON.parse(await appObj.create())
         res.status(200).send({ status: 200, message: createdAppInDb, error: null})
     }catch(e){
-        res.status(500).send({ status: 500, message: null, error: e.message})
+        res.status(500).send({ status: 500, message: null, error: e})
     }
 }
 
@@ -43,7 +43,7 @@ const validateApp = async (req: Request, res: Response) => {
             throw new Error('Unauthorized application')
         }
     }catch(e){
-        res.status(500).send({ status: 500, message: null, error: e.message})
+        res.status(500).send({ status: 500, message: null, error: e})
     }
 }
 
@@ -83,7 +83,7 @@ const login = (req: Request, res: Response) => {
                 }, error: null})
         })
     }catch(e){
-        res.status(500).send({ status: 500, message: null, error: e.message})
+        res.status(500).send({ status: 500, message: null, error: e})
     }
 }
 

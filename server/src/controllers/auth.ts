@@ -37,7 +37,7 @@ const register_old = async (req: Request, res: Response) => {
         const createdU = await user.create();
         res.status(200).send({ status: 200, message: createdU, error: null })
     } catch (e) {
-        res.status(500).send({ status: 500, message: null, error: e.message })
+        res.status(500).send({ status: 500, message: null, error: e })
     }
 }
 
@@ -83,7 +83,7 @@ const register = async (req: Request, res: Response) => {
                 }
             })
     } catch (e) {
-        res.status(500).send({ status: 500, message: null, error: e.message })
+        res.status(500).send({ status: 500, message: null, error: e })
     }
 }
 
@@ -121,7 +121,7 @@ const getCredential = (req, res) => {
             // res.status(200).send({ status: 200, message: vc, error: null })
         })
     } catch (e) {
-        res.status(500).send({ status: 500, message: null, error: e.message })
+        res.status(500).send({ status: 500, message: null, error: e })
     }
 
 }
@@ -183,7 +183,7 @@ const login = async (req: Request, res: Response) => {
             throw new Error("Unauthorized: Proof can not be verified!")
         }
     } catch (e) {
-        res.status(500).send({ status: 500, message: null, error: e.message })
+        res.status(500).send({ status: 500, message: null, error: e })
     }
 }
 
