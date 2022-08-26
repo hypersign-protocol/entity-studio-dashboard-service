@@ -1,22 +1,27 @@
 import { Request, Response, NextFunction } from 'express'
-import { VerifiableCredentials } from '../services/vc.service';
+import { jwtExpiryInMilli, jwtSecret, pathToIssueCred, studioServerBaseUrl, logger } from '../config';
+import jwt from 'jsonwebtoken'
 import creadSchema from '../models/CreadSchema';
 import { WALLET_WEB_HOOK_CREAD } from '../config'
 const setCredentialStatus = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        logger.info("==========CredController ::setCredentialStatus Starts ================")
         const id = req.params.id
-console.log(req.body);
-const { issuerDid, subjectDid, schemaId }=req.body.vc
+        const { issuerDid, subjectDid, schemaId } = req.body.vc
 
-const credObj= await creadSchema.findOneAndUpdate({_id:id},{ vc:req.body.vc, vc_id:req.body.vc.credentialStatus.id, issuerDid, subjectDid, schemaId})
+        const credObj = await creadSchema.findOneAndUpdate({ _id: id }, { vc: req.body.vc, vc_id: req.body.vc.credentialStatus.id, issuerDid, subjectDid, schemaId })
+        logger.info("==========CredController ::setCredentialStatus Ends ================")
 
-res.json({msg:"success"})
+        res.json({ msg: "success" })
     } catch (error) {
+        logger.error("==========CredController ::setCredentialStatus Starts ================")
 
+        res.json(error)
     }
 }
 const issueCredential = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        logger.info("==========CredController ::issueCredential Starts ================")
 
         const { QR_DATA, hypersign } = req.body
         const { issuerDid, subjectDid, schemaId } = QR_DATA.data
@@ -24,16 +29,18 @@ const issueCredential = async (req: Request, res: Response, next: NextFunction) 
 
         const creadObj = await creadSchema.create({ issuerDid, subjectDid, schemaId, createdAt: new Date() })
 
-        QR_DATA.data.expirationDate=new Date ('12/12/2027')
+        QR_DATA.data.expirationDate = new Date('12/12/2027')
         QR_DATA.serviceEndpoint = `${WALLET_WEB_HOOK_CREAD}/${creadObj._id}`;
-        console.log(QR_DATA);
 
 
 
+        logger.info("==========CredController ::issueCredential Ends ================")
 
         res.json({ QR_DATA, status: 200 })
 
     } catch (error) {
+        logger.error("==========CredController ::issueCredential Ends ================")
+
         res.json(error)
     }
 }
@@ -55,20 +62,90 @@ const issueCredential = async (req: Request, res: Response, next: NextFunction) 
 //     }
 // }
 
-const getCredentialList = async (req: Request, res: Response,next:NextFunction) => {
-  try {
-    const {hypersign}=req.body
-    const credList = await creadSchema.find({issuerDid:hypersign.data.id}).sort({ createdAt: -1 })
-    res.json({
-        credList,status:200
-    })
-  } catch (error) {
-    
-  }
+const getCredentialList = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        logger.info("==========CredController ::getCredentialList Starts ================")
+
+        const { hypersign } = req.body
+        const credList = await creadSchema.find({ issuerDid: hypersign.data.id }).sort({ createdAt: -1 })
+        logger.info("==========CredController ::getCredentialList Ends ================")
+
+        res.json({
+            credList, status: 200
+        })
+    } catch (error) {
+
+    }
 }
 
+const accepctCredential = async (req: Request, res: Response, next: NextFunction) => {
+
+    try {
+        logger.info("==========CredController ::accepctCredential Starts ================")
+
+        const dbRowId = req.body.id
+
+        const data = {
+            id: dbRowId
+        }
+
+
+        const issuedJWTToken = await jwt.sign(data, jwtSecret, { expiresIn: jwtExpiryInMilli })
+
+
+        const link = `${studioServerBaseUrl}${pathToIssueCred}?token=${issuedJWTToken}`
+
+        const QRData = JSON.stringify({
+            QRType: 'ISSUE_CRED',
+            url: link // This url user will eventually call from the wallet to fetch vc from studio server
+        });
+
+
+
+
+        const deeplink = `${studioServerBaseUrl}deeplink.html?deeplink=hypersign:deeplink?url=${QRData}`
+
+        logger.info("==========CredController ::accepctCredential Ends ================")
+
+        res.json({ url: deeplink })
+
+    } catch (error) {
+        logger.Error("==========CredController ::accepctCredential Ends ================")
+
+        res.status(500).json({ error })
+    }
+
+}
+
+const accpctWalletCredential = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        logger.info("==========CredController ::accpctWalletCredential Starts ================")
+
+        let vc_data;
+        const { token, did } = req.query
+        if (token) {
+            jwt.verify(token, jwtSecret, async (err, data) => {
+                if (err) res.status(403).send({ status: 403, message: "Unauthorized.", error: null })
+
+                const dbId = data.id
+                vc_data = await creadSchema.findOne({ _id: dbId })
+                res.json(vc_data.vc)
+
+                logger.info("==========CredController ::accpctWalletCredential Ends ================")
+
+            })
+        }
+
+
+
+    } catch (error) {
+        logger.error("==========CredController ::accpctWalletCredential Ends ================")
+
+        res.status(500).json(error)
+    }
+}
 export {
     issueCredential,
     getCredentialList,
-    setCredentialStatus
+    setCredentialStatus, accepctCredential, accpctWalletCredential
 }

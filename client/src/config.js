@@ -3,6 +3,7 @@ const hsdk = require('lds-sdk')
 const config = {
     studioServer: {
         BASE_URL: EnvProvider.value('STUDIO_SERVER_BASE_URL'),
+        ACCPCT_CRED_EP: EnvProvider.value('ACCPCT_CRED_EP')|| "api/v1/credential/accepct",
         SAVE_SCHEMA_EP: EnvProvider.value('STUDIO_SERVER_SAVE_SCHEMA')||"api/v1/schema/issue",
         CRED_LIST_EP: EnvProvider.value('STUDIO_SERVER_CRED_LIST_EP') || "api/v1/credential/list",
         SCHEMA_LIST_EP:EnvProvider.value('SCHEMA_LIST_EP')|| 'api/v1/schema/get',

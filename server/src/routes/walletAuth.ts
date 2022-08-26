@@ -53,7 +53,6 @@ export const walletAuthRoutes = (hypersign) => {
     router.post('/protected', hypersign.authorize.bind(hypersign), (req, res) => {
         try {
             const user = req.body.hypersign.data;
-            console.log(user)
                 // Do whatever you want to do with it
             res.status(200).send({ status: 200, message: user, error: null });
         } catch (e) {

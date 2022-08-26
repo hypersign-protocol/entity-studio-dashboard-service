@@ -36,7 +36,6 @@ export default function app() {
 
     function corsOptionsDelegate(req, callback) {
         let corsOptions;
-        console.log(req.header('Origin'));
 
         if (whitelistedUrls.indexOf(req.header('Origin')) !== -1) {
             corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
@@ -53,10 +52,8 @@ export default function app() {
     const hidWalletInstance = new HIDWallet(walletOptions);
     hidWalletInstance.generateWallet({ mnemonic }).then(async () => {
         hypersign = new HypersignAuth(server, hidWalletInstance.offlineSigner)
-        console.log(hypersign.authenticate)
         await hypersign.init();
-        console.log('Hypersign Auth service has been initialized')
-
+        app.use(express.static('public'))
 
         app.use(express.json());
         app.use(cors(corsOptionsDelegate));
@@ -64,7 +61,7 @@ export default function app() {
         app.use(express.json());
         app.use(express.static('public'));
       
-
+       
 
         app.use('/api/app', appRoutes)
         app.use('/api/auth', authRoutes)

@@ -61,7 +61,8 @@
                     </div>
                     <div class="form-group" v-for="attr in issueCredAttributes" :key="attr.name">
                       <label>{{ attr.name }}</label>
-                      <input type="text" v-model="attr.value" class="form-control" placeholder="Enter attribute value"  />
+                      <input type="text" v-model="attr.value" class="form-control"
+                        placeholder="Enter attribute value" />
                     </div>
                   </form>
                   <hr />
@@ -91,10 +92,10 @@
             <tr>
               <th>id</th>
               <th>schemaId</th>
-             
+
               <th>subjectDid</th>
               <th>expirationDate</th>
-              <th>Issue</th>
+              
             </tr>
           </thead>
           <tbody>
@@ -102,14 +103,16 @@
               <th scope="row">
                 <div class="custom-control custom-checkbox">
                   <input type="checkbox" class="custom-control-input" :id="row.id" />
-                  <label class="custom-control-label" :for="row.id"><a :href="`${row.vc_id}:`"  >{{ row.vc.id }}</a></label>
+                  <label class="custom-control-label" :for="row.id"><a :href="`${row.vc_id}:`">{{ row.vc.id
+                  }}</a></label>
                 </div>
               </th>
               <td>{{ row.schemaId }}</td>
-             
+
               <td>{{ row.subjectDid }}</td>
-              <td>{{ row.vc.expirationDate}}</td>
-              <td><a href="#">ISSUE</a></td>
+              <td>{{ row.vc.expirationDate }}</td>
+              <td> <button type="button" class="btn btn-primary" @click="generateCred(`${row._id}`)"> Link </button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -159,16 +162,16 @@ export default {
       isLoading: false,
       holderDid: "",
       schema_page: 1,
-       QrData: { 
-      "QRType": "ISSUE_CREDENTIAL",
-       "serviceEndpoint": "", 
-       "schemaId": "", 
-       "appDid": "", 
-       "appName": "Hypersign Studio", 
-       "challenge": "", 
-       "provider": "" ,
-        "data" :""
-       }
+      QrData: {
+        "QRType": "ISSUE_CREDENTIAL",
+        "serviceEndpoint": "",
+        "schemaId": "",
+        "appDid": "",
+        "appName": "Hypersign Studio",
+        "challenge": "",
+        "provider": "",
+        "data": ""
+      }
     };
   },
   created() {
@@ -184,7 +187,34 @@ export default {
     });
   },
   methods: {
-     openWallet(url) {
+async  generateCred(id) {
+
+      const body = {
+        id
+      }
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body)
+      }
+      const URL = this.$config.studioServer.BASE_URL + this.$config.studioServer.ACCPCT_CRED_EP
+      console.log(URL);
+      const res= await fetch(URL, options)
+    const resp=await res.json()
+    console.log(resp);
+     const url= `${this.$config.webWalletAddress}/deeplink?url=${resp}`
+     console.log(resp.url);
+     this.notifySuccess("Cred Generated Successfully")
+     setTimeout(()=>{
+alert(`Send this url to the credential owner \n ${resp.url}`)
+     },1000)
+    //  
+    //  this.openWallet(url)
+    }
+    ,
+    openWallet(url) {
       if (url != "") {
         this.walletWindow = window.open(
           `${url}`,
@@ -224,7 +254,7 @@ export default {
         }
       } else {
         url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_LIST_EP}`;
-         options = {
+        options = {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -245,24 +275,24 @@ export default {
           schemaList.forEach(async s => {
             if (s.did != this.user.id) return
             console.log(s);
-            if(s.status==="Registered"){
-           let schemaGetURL=`${this.$config.nodeServer.BASE_URL_REST}${this.$config.nodeServer.SCHEMA_GET_REST}${s.schemaId}:`
-           console.log(schemaGetURL);
-           const res= await  fetch(schemaGetURL)
-           const data=await res.json()
-          //  console.log(data.schema[0].schema.properties);
-            this.schemaMap[s.schemaId] = JSON.parse(data.schema[0].schema.properties)
-            if(data.schema[0].schema.required.length>0){
-              data.schema[0].schema.required.forEach(e=>{
-                this.schemaMap[s.schemaId][e].required=true
+            if (s.status === "Registered") {
+              let schemaGetURL = `${this.$config.nodeServer.BASE_URL_REST}${this.$config.nodeServer.SCHEMA_GET_REST}${s.schemaId}:`
+              console.log(schemaGetURL);
+              const res = await fetch(schemaGetURL)
+              const data = await res.json()
+              //  console.log(data.schema[0].schema.properties);
+              this.schemaMap[s.schemaId] = JSON.parse(data.schema[0].schema.properties)
+              if (data.schema[0].schema.required.length > 0) {
+                data.schema[0].schema.required.forEach(e => {
+                  this.schemaMap[s.schemaId][e].required = true
+                })
+              }
+
+              this.selectOptions.push({
+                value: s.schemaId,
+                text: `${s.schemaId} | ${s.status}`
               })
             }
-           
-            this.selectOptions.push({
-              value: s.schemaId,
-              text: `${s.schemaId} | ${s.status}`
-            })
-          }
           });
         }
       } else {
@@ -299,13 +329,13 @@ export default {
       if (event) {
         this.issueCredAttributes = [];
         const id = this.issueCredAttributes.length;
-        console.log( this.schemaMap[event]);
-       for (const e in this.schemaMap[event]) {
+        console.log(this.schemaMap[event]);
+        for (const e in this.schemaMap[event]) {
           this.issueCredAttributes.push({
             id: id + event,
             type: e.type,
             name: e,
-            required:e.required ===true?true:false,
+            required: e.required === true ? true : false,
             value: "",
           });
         }
@@ -366,15 +396,15 @@ export default {
 
         // generateAttributeMap
         const attributeMap = await this.generateAttributeMap();
-         
+
         // const verifiableCredential = await this.getCredentials(attributeMap);
         // signCredentials
-        
-        const fields=Object.assign({},attributeMap)
-        const schemaId=this.selected
-        const issuerDid=this.user.id
-        const subjectDid=this.holderDid
-        
+
+        const fields = Object.assign({}, attributeMap)
+        const schemaId = this.selected
+        const issuerDid = this.user.id
+        const subjectDid = this.holderDid
+
 
 
 
@@ -383,13 +413,13 @@ export default {
         // );
 
 
-  //       this.signedVerifiableCredential = signedVerifiableCredential;
-  // console.log(signedVerifiableCredential);
+        //       this.signedVerifiableCredential = signedVerifiableCredential;
+        // console.log(signedVerifiableCredential);
         const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_ISSUE_EP}`;
         console.log(url);
         const headers = {
           "Content-Type": "application/json",
-        "Authorization": `Bearer ${this.authToken}`
+          "Authorization": `Bearer ${this.authToken}`
         };
         const creadData = {
           fields,
@@ -397,19 +427,19 @@ export default {
           issuerDid,
           subjectDid
         };
-        this.QrData.data=creadData
+        this.QrData.data = creadData
         fetch(url, {
           method: "POST",
           headers,
-          body: JSON.stringify({QR_DATA:this.QrData }),
-        }).then((res)=>res.json())
-        .then(json=>{
-          console.log(json);
-          const {QR_DATA}=json
-            const URL=`${this.$config.webWalletAddress}/deeplink?url=${JSON.stringify(QR_DATA)}`
-           console.log(URL);
-           this.openWallet(URL)
-        })
+          body: JSON.stringify({ QR_DATA: this.QrData }),
+        }).then((res) => res.json())
+          .then(json => {
+            console.log(json);
+            const { QR_DATA } = json
+            const URL = `${this.$config.webWalletAddress}/deeplink?url=${JSON.stringify(QR_DATA)}`
+            console.log(URL);
+            this.openWallet(URL)
+          })
 
         //   .then((res) => res.json())
         //   .then((j) => {
