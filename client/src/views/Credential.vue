@@ -1,29 +1,9 @@
 <style scoped>
-.addmargin {
-  margin-top: 10px;
-  margin-bottom: 10px;
+.home{
+    margin-left: auto;
+    margin-right: auto;
+    width: 1500px;
 }
-
-.vue-logo-back {
-  background-color: black;
-}
-
-.logo {
-  width: 144px;
-}
-
-.fullbody {
-  width: 100%;
-}
-
-.floatLeft {
-  float: left;
-}
-
-.floatRight {
-  float: right;
-}
-
 .card-header {
   background: aliceblue;
   padding: 0px;
@@ -34,7 +14,7 @@
 }
 </style>
 <template>
-  <div class="home marginLeft marginRight">
+  <div class="home">
     <loading :active.sync="isLoading" :can-cancel="true" :is-full-page="fullPage"></loading>
 
     <div class="row">
@@ -90,32 +70,41 @@
         <table class="table table-bordered" style="background:#FFFF">
           <thead class="thead-light">
             <tr>
-              <th>id</th>
-              <th>schemaId</th>
-
-              <th>subjectDid</th>
-              <th>expirationDate</th>
-              
+              <th>VC Id</th>
+              <th>Schema Id</th>
+              <th>Holder DID</th>
+              <th>Issuance Date</th>
+              <th>Expiration Date</th>
+              <!-- <th>Credential Hash</th> -->
+              <th>Status</th>
+              <th>Status Reason</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="row in vcList" :key="row">
-              <th scope="row">
-                <div class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" :id="row.id" />
-                  <label class="custom-control-label" :for="row.id"><a :href="`${row.vc_id}:`">{{ row.vc.id
-                  }}</a></label>
-                </div>
-              </th>
-              <td>{{ row.schemaId }}</td>
-
+            <tr v-for="row in vcList" :key="row.vc_id">
+              <td>
+                <a :href="`${row.vc_id}:`" target="_blank>">{{ shorten(row.vc.id)
+                  }}</a>
+              </td>
+              <td>
+                <a :href="`${$config.nodeServer.BASE_URL_REST}${$config.nodeServer.SCHEMA_GET_REST}${row.schemaId}:`" target="_blank">{{ shorten(row.schemaId) }}</a>
+              </td>
               <td>{{ row.subjectDid }}</td>
-              <td>{{ row.vc.expirationDate }}</td>
-              <td> <button type="button" class="btn btn-primary" @click="generateCred(`${row._id}`)"> Link </button>
+              <td>{{ row.credStatus.issuanceDate}}</td>
+              <td>{{ row.credStatus.expirationDate }}</td>
+              <!-- <td>{{ row.credStatus ? row.credStatus.credentialHash }}</td> -->
+              <td> {{ row.credStatus.claim.currentStatus }}</td>
+              <td>{{ row.credStatus.claim.statusReason  }}</td>
+              <td> <button type="button" class="btn btn-primary" @click="generateCred(`${row._id}`)">Send</button>
               </td>
             </tr>
           </tbody>
         </table>
+        <hf-pop-up Header="Accept Credential URL"> 
+            <Info message="Copy and send this URL to the credential owner so that they can accept in their wallet" />
+            <p style="max-width: 500px; word-wrap: break-word;">{{ credUrl}}</p>
+        </hf-pop-up>
       </div>
     </div>
   </div>
@@ -125,11 +114,14 @@
 import fetch from "node-fetch";
 import conf from '../config';
 const { hypersignSDK } = conf;
-import QrcodeVue from "qrcode.vue";
 import Info from '@/components/Info.vue'
+import UtilsMixin from '../mixins/utils';
+import HfPopUp from "../components/element/hfPopup.vue"
 export default {
   name: "IssueCredential",
-  components: { QrcodeVue, Info },
+  components: { Info, HfPopUp },
+  computed: {
+  },
   data() {
     return {
       authToken: localStorage.getItem('authToken'),
@@ -157,11 +149,13 @@ export default {
       selectOptions: [{ value: null, text: "Please select a schema" }],
       schemaMap: {},
       vcList: [],
+      vcCredStatusMap: {}, 
       schemaList: [],
       fullPage: true,
       isLoading: false,
       holderDid: "",
       schema_page: 1,
+      credUrl:"",
       QrData: {
         "QRType": "ISSUE_CREDENTIAL",
         "serviceEndpoint": "",
@@ -180,14 +174,40 @@ export default {
     //console.log(this.user)
     this.getList('SCHEMA')
     this.getList('CREDENTIAL')
+
+    
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
       vm.prevRoute = from;
     });
   },
+  computed: {
+
+  },
   methods: {
-async  generateCred(id) {
+    copy() {
+      this.$refs.clone.focus();
+      document.execCommand('copy');
+    },
+    
+    vcStatus(vcId){
+      const url = `https://jagrat.hypersign.id/node1/rest/hypersign-protocol/hidnode/ssi/credential/${vcId}:`
+      return fetch(vcId+':')
+      .then(resp => {
+        return resp.json()
+      }).then(data => {
+        // const { credStatus } = data;
+        // const  { claim } = credStatus
+        // const { currentStatus } = claim;
+        // console.log(claim)
+        // return currentStatus;
+        return data
+      }).catch(e => {
+        Promise.reject(e.message)
+      })
+    },
+    async  generateCred(id) {
 
       const body = {
         id
@@ -200,19 +220,13 @@ async  generateCred(id) {
         body: JSON.stringify(body)
       }
       const URL = this.$config.studioServer.BASE_URL + this.$config.studioServer.ACCPCT_CRED_EP
-      console.log(URL);
-      const res= await fetch(URL, options)
-    const resp=await res.json()
-    console.log(resp);
-     const url= `${this.$config.webWalletAddress}/deeplink?url=${resp}`
-     console.log(resp.url);
-     this.notifySuccess("Cred Generated Successfully")
-     setTimeout(()=>{
-alert(`Send this url to the credential owner \n ${resp.url}`)
-     },1000)
-    //  
-    //  this.openWallet(url)
-    }
+      
+      const res = await fetch(URL, options)
+      const resp =await res.json()
+      this.credUrl = resp.url;
+      this.$root.$emit('modal-show')
+      this.notifySuccess("Cred Url Generated Successfully")
+  }
     ,
     openWallet(url) {
       if (url != "") {
@@ -273,11 +287,10 @@ alert(`Send this url to the credential owner \n ${resp.url}`)
         const schemaList = j.schemaList
         if (schemaList && schemaList.length > 0) {
           schemaList.forEach(async s => {
-            if (s.did != this.user.id) return
-            console.log(s);
+            if (s.did != this.user.id) return            
             if (s.status === "Registered") {
               let schemaGetURL = `${this.$config.nodeServer.BASE_URL_REST}${this.$config.nodeServer.SCHEMA_GET_REST}${s.schemaId}:`
-              console.log(schemaGetURL);
+              // console.log(schemaGetURL);
               const res = await fetch(schemaGetURL)
               const data = await res.json()
               //  console.log(data.schema[0].schema.properties);
@@ -296,17 +309,13 @@ alert(`Send this url to the credential owner \n ${resp.url}`)
           });
         }
       } else {
-        this.vcList = j.credList;
+        const newUpdatedList = await Promise.all (j.credList.map(async (eachVc) => {
+          const x = await this.vcStatus(eachVc.vc_id)
+          Object.assign(eachVc, { ...x})
+          return eachVc
+        }))
+        this.vcList = newUpdatedList;
       }
-    },
-    fetchData(url, option) {
-      fetch(url)
-        .then((res) => res.json())
-        .then((j) => {
-          if (j.status != 200) throw new Error(j.error);
-          return j.message;
-        })
-        .catch((e) => this.notifyErr(`Error: ${e.message}`));
     },
     gotosubpage: (id) => {
       this.$router.push(`${id}`);
@@ -464,6 +473,8 @@ alert(`Send this url to the credential owner \n ${resp.url}`)
       }
     },
   },
+  mixins: [UtilsMixin],
+
 };
 </script>
 

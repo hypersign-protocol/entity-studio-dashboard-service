@@ -1,4 +1,9 @@
 <style scoped>
+.home{
+    margin-left: auto;
+    margin-right: auto;
+    width: 1500px;
+  }
 .addmargin {
   margin-top: 10px;
   margin-bottom: 10px;
@@ -69,24 +74,7 @@ export default {
   },
   created() {
     const usrStr = localStorage.getItem('user')
-    //console.log(usrStr)
     this.user = JSON.parse(usrStr);
-    //console.log(this.user)
-    // this.userKeys = Object.keys(this.user)
-    // const url = `http://${location.hostname}:9000/api/app/list`;
-    // fetch(url,{
-    //     headers: {
-    //       'x-auth-token': this.authToken
-    //     },
-    //     method: 'POST'
-    //   })
-    // .then(res => res.json())
-    // .then(json => {
-    //   if(json.status == 200){
-    //     this.appList = json.message.list
-    //   }
-    // })
-    // .catch(e => this.notifyErr(`${e.message}`))
   },
   methods: {
     notifySuccess(msg){

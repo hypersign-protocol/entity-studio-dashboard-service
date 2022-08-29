@@ -258,8 +258,9 @@ export default {
     },
     openWallet() {
       if (this.value != "") {
+        const link = `${this.$config.webWalletAddress}/deeplink?url=${this.value}`
         this.walletWindow = window.open(
-          `${this.$config.webWalletAddress}/deeplink?url=${this.value}`,
+          link,
           "popUpWindow",
           `height=800,width=400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes`
         );

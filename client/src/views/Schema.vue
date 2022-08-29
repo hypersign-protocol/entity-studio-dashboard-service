@@ -1,4 +1,9 @@
 <style scoped>
+  .home{
+    margin-left: auto;
+    margin-right: auto;
+    width: 1500px;
+  }
 .addmargin {
   margin-top: 10px;
   margin-bottom: 10px;
@@ -53,7 +58,7 @@ color: #888b8f;
 
 </style>
 <template>
-  <div class="home marginLeft marginRight">
+  <div class="home">
     <loading :active.sync="isLoading" 
         :can-cancel="true" 
         :is-full-page="fullPage"></loading>
@@ -173,29 +178,25 @@ color: #888b8f;
         <table class="table table-bordered" style="background:#FFFF">
           <thead class="thead-light">
             <tr>
-              <th>id</th>  
-
-             <th>Txn Hash</th>
-              <th>status</th>
-              <th>author</th>
+              <th>Schema Id</th>  
+              <th>Tx Hash</th>
+              <th>Status</th>
+              <!-- <th>author</th> -->
             </tr>
           </thead>
 
           <tbody>
             <tr v-for="row in schemaList" :key="row">
-              <th>
-                <div class="custom-control custom-checkbox">
-                  <input  class="custom-control-input" :id="row._id" />
-                  <label class="custom-control-label" :for="row.id"><a :href="`${$config.nodeServer.BASE_URL_REST}${$config.nodeServer.SCHEMA_GET_REST}${row.schemaId}:`" target="_blank">{{row.schemaId}}</a></label>
-                </div>
-              </th>
+              <td>
+                <a :href="`${$config.nodeServer.BASE_URL_REST}${$config.nodeServer.SCHEMA_GET_REST}${row.schemaId}:`" target="_blank">{{ shorten(row.schemaId) }}</a>
+              </td>
             
               <!-- <td>{{row.attributes}}</td> -->
               <td
                 style="word-wrap: break-word;min-width: 200px;max-width: 200px;"
-              >{{row.transactionHash}}</td>
+              ><a target="_blank" :href="`${$config.explorer.BASE_URL}txdetails?hash=0x${row.transactionHash}`">0x{{row.transactionHash}}</a></td>
               <td>{{row.status}}</td>
-              <td>{{row.did}}</td>
+              <!-- <td>{{row.did}}</td> -->
             
             </tr>
           </tbody>
@@ -206,6 +207,8 @@ color: #888b8f;
         <!-- </div> -->
       </div>
       <!-- </div> -->
+
+
     </div>
   </div>
 </template>
@@ -214,6 +217,7 @@ color: #888b8f;
 import fetch from "node-fetch";
 import QrcodeVue from "qrcode.vue";
 import Info from '@/components/Info.vue'
+import UtilsMixin from '../mixins/utils';
 export default {
   name: "IssueCredential",
   components: { QrcodeVue, Info },
@@ -471,6 +475,7 @@ this.page=1;
         });
     },
   },
+  mixins: [UtilsMixin],
 };
 </script>
 
