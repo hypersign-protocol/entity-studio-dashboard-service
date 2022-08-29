@@ -19,11 +19,12 @@
 .floatLeft {
   float: left;
 }
+
 .floatRight {
   float: right;
 }
 
-.card{
+.card {
   border-radius: 10px;
 }
 
@@ -34,16 +35,14 @@
 </style>
 <template>
   <div class="home marginLeft marginRight">
-    <loading :active.sync="isLoading" 
-        :can-cancel="true" 
-        :is-full-page="fullPage"></loading>
+    <loading :active.sync="isLoading" :can-cancel="true" :is-full-page="fullPage"></loading>
 
     <div class="row">
       <div class="col-md-12" style="text-align: left">
-        <Info :message="description"/>
+        <Info :message="description" />
         <div class="card">
           <div class="card-header">
-            <b-button v-b-toggle.collapse-1 variant="link">Generate Presentation</b-button>
+            <b-button v-b-toggle.collapse-1 variant="link">Generate Presentation Template</b-button>
           </div>
           <b-collapse id="collapse-1" class="mt-2">
             <div class="card-body">
@@ -51,18 +50,48 @@
                 <div class="col-md-6">
                   <form style="max-height:300px; min-height: 300px; overflow:auto; padding: 5px">
                     <div class="form-group">
-                      <label class="floatLeft">Upload Verifiable Credential (s):</label>
-                      <input ref="vcFile" type="file" class="form-control" placeholder @change="onFileChange" />
+                      <label class="floatLeft">Domain :</label>
+                      <input class="form-control" type="url" v-model="presentationTemplate.domain" />
+
+
                     </div>
-                    <div class="form-group" v-for="attr in issueCredAttributes" :key="attr.name">
-                      <label>{{attr.name}}</label>
-                      <input
-                        text
-                        v-model="attr.value"
-                        class="form-control"
-                        placeholder="Enter attribute value"
-                      />
+                    <div class="form-group">
+                      <label class="floatLeft">Name (optional):</label>
+                      <input class="form-control" type="text" v-model="presentationTemplate.names" />
+
+
                     </div>
+                    <div class="form-group">
+                      <label class="floatLeft">IssuerDid</label>
+                      <input class="form-control" type="text" v-model="presentationTemplate.issuerDid" />
+
+
+                    </div>
+                    <div class="form-group">
+                      <label class="floatLeft">Schema Id :</label>
+                      <input class="form-control" type="text" v-model="presentationTemplate.schemaId" />
+
+
+                    </div>
+                    <div class="form-group">
+                      <label class="floatLeft">Reason :</label>
+                      <input class="form-control" type="text" v-model="presentationTemplate.reason" />
+
+
+                    </div>
+                    <div class="form-group">
+                      <label class="floatLeft">Callback URI</label>
+                      <input class="form-control" type="url" v-model="presentationTemplate.callbackUrl" />
+
+
+                    </div>
+                    <div class="form-group">
+                      <label class="floatLeft ">Required :</label>
+                      <input class="form-control" type="checkbox" v-model="presentationTemplate.required" />
+
+
+                    </div>
+
                   </form>
                   <hr />
                   <button class="btn btn-outline-primary btn-sm" @click="generatePresentation()">Generate</button>
@@ -84,65 +113,43 @@
         </div>
       </div>
     </div>
+    <div class="row" style="margin-top: 2%;">
+      <div class="col-md-12">
+        <table class="table table-bordered" style="background:#FFFF">
+          <thead class="thead-light">
+            <tr>
+              <th>_id </th>
+              <th>Domain</th>
+              <th>Name</th>
+              <th>IssuerDid</th>
+              <th>Schema Id</th>
+              <th>Reason</th>
+              <th>CallbackUrl</th>
+              <!-- <th>author</th> -->
+            </tr>
+          </thead>
 
-    <div class="row" style="margin-top:1%">
-      <div class="col-md-12" style="text-align: left">
-        <div class="card">
-          <div class="card-header">
-            <b-button v-b-toggle.collapse-2 variant="link">Verify Presentation</b-button>
-          </div>
-          <b-collapse id="collapse-2" class="mt-2">
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-6">
-                  <form style="max-height:450px; min-height: 450px; overflow:auto; padding: 5px">
-                    <div class="form-group">
-                      <label class="floatLeft">Upload Verifiable Presentation:</label>
-                      <input ref="vpFile" type="file" class="form-control" placeholder @change="onFileChange" />
-                    </div>
-                  </form>
-                  <div class="form-grop">
-                      <hr />
-                      <button class="btn btn-outline-primary btn-sm" @click="viewPresentation()">View</button>
-                      <button class="btn btn-outline-danger btn-sm" @click="clear()">Clear</button>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                  <form class="card" style="padding: 5px">
-                    <div class="card-header" style="padding:5px"> <a :href="presentationDetails.credentialType.url" target="_blank">{{presentationDetails.credentialType.name}}</a></div>
-                  <div class="form-group" style="max-height:400px; min-height: 400px; overflow:auto; padding: 5px">
-                    <div class="card-body">
-                    <ul class="list-group" style="font-size:smaller">
-                      <li class="list-group-item"><label><b>Issuer  DID:</b> {{presentationDetails.issuerDid}}</label></li>
-                      <li class="list-group-item"><label><b>Subject DID:</b> {{presentationDetails.holderDid}}</label></li>
-                      <li class="list-group-item"><label><b>Issuance Date:</b> {{presentationDetails.issuanceDate}}</label></li>
-                      <li class="list-group-item"><label><b>Expiration Date:</b> {{presentationDetails.expirationDate}}</label></li>
-                      <li class="list-group-item"><b>Claims:</b><a  @click="showClaims()" v-if="presentationDetails.claim" style="color:blue; text-decoration:underline;padding-left:5px">View / Hide claims</a>
-                          <ul class="list-group" v-if="isClaims" style="padding-left:10%; padding-top:2%">
-                          <li class="list-group-item" v-for="(value, key) in presentationDetails.claim">
-                              <b>{{ key }}</b>: {{value}}
-                            </li>
-                          </ul> 
-                      </li>
-                    </ul>
-                    </div>
-                  </div>
-                  <div class="form-group" hidden>
-                    <label class="floatLeft">Presentation Details:</label> 
-                    <textarea class="form-control" v-model="presentationDetails" rows="10" cols="20" hidden></textarea>
-                  </div>
-                  </form>
-                  <div class="form-grop">
-                      <hr />
-                      <button class="btn btn-outline-success btn-sm" @click="verifyPresentation()">Verify</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </b-collapse>
-        </div>
+          <tbody>
+            <tr v-for="row in templateList" :key="row">
+              <td>{{row._id}}</td>
+              <td>{{row.domain}}</td>
+              <td>{{row.name}}</td>
+              <td>{{row.issuerDid.toString()}}</td>
+              <td>{{row.schemaId}}</td>
+              <td>{{row.reason}}</td>
+              <td>{{row.callbackUrl}}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- </div> -->
+        <!-- </div> -->
       </div>
+      <!-- </div> -->
+
+
     </div>
+
   </div>
 </template>
 
@@ -168,6 +175,17 @@ export default {
       to the secruity personal to pass the security check. The passenger will have ability to show \
       just one document (the verifiable presentation) derived from his passport and air ticket to\
       show at the security check.",
+      presentationTemplate: {
+        queryType: 'QueryByExample',
+        domain: '',
+        name: '',
+        issuerDid: '',
+        schemaId: '',
+        reason: '',
+        required: true,
+        callbackUrl: '',
+      },
+      templateList:[],
       active: 0,
       host: location.hostname,
       user: {},
@@ -190,7 +208,7 @@ export default {
       authToken: localStorage.getItem("authToken"),
       selectOptions: [{ value: null, text: "Please select a schema" }],
       schemaMap: {},
-      vcList : [],
+      vcList: [],
       schemaList: [],
       fullPage: true,
       isLoading: false,
@@ -205,6 +223,7 @@ export default {
   created() {
     const usrStr = localStorage.getItem("user");
     this.user = JSON.parse(usrStr);
+    this.fetchTemplates()
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -212,25 +231,44 @@ export default {
     });
   },
   methods: {
-    showClaims(){
-      if(this.isClaims) this.isClaims = false;
+
+    async fetchTemplates() {
+      const url = `${this.$config.studioServer.BASE_URL}api/v1/presentation/template`
+      const headers = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${this.authToken}`
+
+      }
+
+      const res = await fetch(url, {
+        headers
+      }
+
+
+      )
+      const respjson=await res.json()
+     this.templateList=respjson
+
+    },
+    showClaims() {
+      if (this.isClaims) this.isClaims = false;
       else this.isClaims = true;
     },
-    notifySuccess(msg){
+    notifySuccess(msg) {
       this.$notify({
-          group: 'foo',
-          title: 'Information',
-          type: 'success',
-          text: msg
-        });
+        group: 'foo',
+        title: 'Information',
+        type: 'success',
+        text: msg
+      });
     },
-    notifyErr(msg){
+    notifyErr(msg) {
       this.$notify({
-          group: 'foo',
-          title: 'Error',
-          type: 'error',
-          text: msg
-        });
+        group: 'foo',
+        title: 'Error',
+        type: 'error',
+        text: msg
+      });
     },
     fetchData(url, option) {
       fetch(url)
@@ -288,24 +326,24 @@ export default {
         "vp.json"
       );
     },
-    onfileLoadSuccess (evt){
-        // console.log('Inside callbacl')
-          const fileJSON = JSON.parse(evt.target.result);
-          if (!fileJSON) this.notifyErr("Incorrect file");
-          const typeArr = fileJSON["type"]
-          if(typeArr.find(x => x == 'VerifiableCredential')){
-            // console.log('Inside callbacl: vc')
-            localStorage.removeItem('credential')
-            localStorage.setItem("credential", JSON.stringify(fileJSON));  
-          }else if(typeArr.find(x => x == 'VerifiablePresentation')){
-            // console.log('Inside callbacl: vp')
-            localStorage.removeItem('presentation')
-            localStorage.setItem("presentation", JSON.stringify(fileJSON));  
-          }else{
-            this.notifyErr("Invalid file")
-          }
+    onfileLoadSuccess(evt) {
+      // console.log('Inside callbacl')
+      const fileJSON = JSON.parse(evt.target.result);
+      if (!fileJSON) this.notifyErr("Incorrect file");
+      const typeArr = fileJSON["type"]
+      if (typeArr.find(x => x == 'VerifiableCredential')) {
+        // console.log('Inside callbacl: vc')
+        localStorage.removeItem('credential')
+        localStorage.setItem("credential", JSON.stringify(fileJSON));
+      } else if (typeArr.find(x => x == 'VerifiablePresentation')) {
+        // console.log('Inside callbacl: vp')
+        localStorage.removeItem('presentation')
+        localStorage.setItem("presentation", JSON.stringify(fileJSON));
+      } else {
+        this.notifyErr("Invalid file")
+      }
     },
-    readFile(file, cb){
+    readFile(file, cb) {
       // console.log('Inside reaffileDs')
       const reader = new FileReader();
       reader.onload = cb
@@ -334,76 +372,102 @@ export default {
         }
       );
     },
-    async generatePresentation() {  
+    async generatePresentation() {
       this.isLoading = true
-      try{
-        const vc = JSON.parse(localStorage.getItem("credential"));
-        if(!vc) throw new Error('Please select verifiable credential file')
-        const vp_unsigned = await hypersignSDK.credential.generatePresentation(vc, this.user.id);
-        const vp_signed = await hypersignSDK.credential.signPresentation(vp_unsigned, this.user.id, this.user.privateKey, "test_challenge")
-        this.signedVerifiablePresentation = vp_signed;
-        this.isLoading = false
-        this.isCredentialIssued = true;
-        this.notifySuccess("Presentation generated and sigend")
-        localStorage.removeItem('credential')
-      }catch(e){
+      try {
+        const issuerDid = this.presentationTemplate.issuerDid.split(',')
+
+        // const vc = JSON.parse(localStorage.getItem("credential"));
+        // if(!vc) throw new Error('Please select verifiable credential file')
+        // const vp_unsigned = await hypersignSDK.credential.generatePresentation(vc, this.user.id);
+        // const vp_signed = await hypersignSDK.credential.signPresentation(vp_unsigned, this.user.id, this.user.privateKey, "test_challenge")
+        // this.signedVerifiablePresentation = vp_signed;
+        // this.isLoading = false
+        // this.isCredentialIssued = true;
+        // this.notifySuccess("Presentation generated and sigend")
+        // localStorage.removeItem('credential')
+
+        const headers = {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${this.authToken}`
+
+        }
+        const body = {
+          issuerDid,
+          queryType: this.presentationTemplate.queryType,
+          domain: this.presentationTemplate.domain,
+          name: this.presentationTemplate.name,
+          schemaId: this.presentationTemplate.schemaId,
+          reason: this.presentationTemplate.reason,
+          required: this.presentationTemplate.required,
+          callbackUrl: this.presentationTemplate.callbackUrl,
+        }
+        const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.PRESENTATION_TEMPLATE_EP}`
+        const res = await fetch(url, {
+          body: JSON.stringify(body),
+          method: "POST",
+          headers: headers,
+        })
+        console.log(res);
+
+      } catch (e) {
         this.isLoading = false
         this.notifyErr(e.message)
       }
     },
-    viewPresentation(){
-        this.isLoading = true
-      try{
-      const vp = JSON.parse(localStorage.getItem("presentation"));
-      if(!vp) throw new Error('Please select verifiable presentation file')
-      // console.log(vp)
-      const vc = vp.verifiableCredential[0]
-      this.presentationDetails = {}
-      this.presentationDetails.credentialType = {
-        name :vc.type[1],
-        url: vc['@context'][1]['hsscheme']
-      }
-      this.presentationDetails.issuerDid = vc.issuer
-      this.presentationDetails.holderDid = vc.credentialSubject.id
-      this.presentationDetails.issuanceDate = vc.issuanceDate
-      this.presentationDetails.expirationDate = vc.expirationDate
-      this.presentationDetails.claim = vc.credentialSubject
-      }catch(e){
-        this.isLoading = false
-        this.notifyErr(e.message)
-      }
-    },
-    clear(){
-      this.presentationDetails = "",
-      localStorage.removeItem('presentation')
-      localStorage.removeItem('credential')
-      this.$refs.vpFile.value=null;
-      this.$refs.vcFile.value=null;
-      this.signedVerifiablePresentation = {}
-      this.isCredentialIssued =  false
-    },
-    async verifyPresentation() {  
+    viewPresentation() {
       this.isLoading = true
-      try{
+      try {
         const vp = JSON.parse(localStorage.getItem("presentation"));
-        if(!vp) throw new Error('Please select verifiable presentation file')
+        if (!vp) throw new Error('Please select verifiable presentation file')
+        // console.log(vp)
+        const vc = vp.verifiableCredential[0]
+        this.presentationDetails = {}
+        this.presentationDetails.credentialType = {
+          name: vc.type[1],
+          url: vc['@context'][1]['hsscheme']
+        }
+        this.presentationDetails.issuerDid = vc.issuer
+        this.presentationDetails.holderDid = vc.credentialSubject.id
+        this.presentationDetails.issuanceDate = vc.issuanceDate
+        this.presentationDetails.expirationDate = vc.expirationDate
+        this.presentationDetails.claim = vc.credentialSubject
+      } catch (e) {
+        this.isLoading = false
+        this.notifyErr(e.message)
+      }
+    },
+    clear() {
+      this.presentationDetails = "",
+        localStorage.removeItem('presentation')
+      localStorage.removeItem('credential')
+      this.$refs.vpFile.value = null;
+      this.$refs.vcFile.value = null;
+      this.signedVerifiablePresentation = {}
+      this.isCredentialIssued = false
+    },
+    async verifyPresentation() {
+      this.isLoading = true
+      try {
+        const vp = JSON.parse(localStorage.getItem("presentation"));
+        if (!vp) throw new Error('Please select verifiable presentation file')
         const vc = vp.verifiableCredential[0]
         const isVerified = await hypersignSDK.credential.verifyPresentation(
           {
-            presentation: vp, 
-            challenge: "test_challenge", 
-            issuerDid: vc.issuer, 
+            presentation: vp,
+            challenge: "test_challenge",
+            issuerDid: vc.issuer,
             holderDid: vc.credentialSubject.id
           });
         // console.log(isVerified)
-        if(isVerified.verified){
+        if (isVerified.verified) {
           this.notifySuccess("Presentation verified")
-        }else{
+        } else {
           this.notifyErr("Presentation can not verified")
         }
         this.isLoading = false
         this.clear()
-      }catch(e){
+      } catch (e) {
         this.isLoading = false
         this.notifyErr(e.message)
       }

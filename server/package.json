@@ -11,7 +11,7 @@
     "setEnv": "cp .env.staging .env",
     "setUI": "mkdir -p public && mkdir -p dist/public && cp -R ../client/dist/* public && cp -R public/* dist/public",
     "start": "node dist/index.js",
-    "dev": "ts-node .",
+    "dev": "nodemon src/index.ts",
     "build": "rimraf ./dist && tsc -p . && mkdir ./dist/temp",
     "bootstrap": "npm run start -- --bootstrap",
     "test": "mocha -r ts-node/register src/tests/**/*.test.ts"

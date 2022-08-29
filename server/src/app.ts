@@ -4,7 +4,7 @@ const HIDWallet = require('hid-hd-wallet');
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import { walletAuthRoutes } from './routes/walletAuth'
-import { port, logger } from './config';
+import { port, logger, walletOptions, mnemonic } from './config';
 import authRoutes from './routes/auth';
 import blogRoutes from './routes/blog';
 import appRoutes from './routes/app';
@@ -13,6 +13,7 @@ import db from './dbConn';
 import path from 'path'
 import http from 'http'
 import { schemaRoutes } from './routes/schemaRoutes';
+import { presentationRoute } from './routes/presentationRoutes';
 const HypersignAuth = require('hypersign-auth-node-sdk')
 export default function app() {
     db.openConnection()
@@ -26,13 +27,9 @@ export default function app() {
     const app = express();
     let hypersign
     const server = http.createServer(app)
-    const mnemonic = "retreat seek south invite fall eager engage endorse inquiry sample salad evidence express actor hidden fence anchor crowd two now convince convince park bag"
-    const walletOptions = {
-        hidNodeRPCUrl: 'https://jagrat.hypersign.id/node1/rpc/',
-        hidNodeRestUrl: 'https://jagrat.hypersign.id/node1/rest/',
-    };
+   
 
-    const whitelistedUrls = ["http://localhost:9000", "http://localhost:9001", "https://wallet-stage.hypersign.id" ,"undefined" , "*" ,"http://localhost:4999"]
+    const whitelistedUrls = ["http://localhost:9000","http://entity.hypersign.id","https://entity.hypersign.id" ,"http://localhost:9001", "https://wallet-stage.hypersign.id" ,"undefined" , "*" ,"http://localhost:4999"]
 
     function corsOptionsDelegate(req, callback) {
         let corsOptions;
@@ -68,8 +65,9 @@ export default function app() {
         app.use('/api/blog', blogRoutes)
         app.use('/api/v1/credential', credentialRoutes(hypersign))
         app.use('/api/v1/schema', schemaRoutes(hypersign))
+        app.use('/api/v1/presentation', presentationRoute(hypersign))
 
-        app.use(walletAuthRoutes(hypersign))
+        app.use(walletAuthRoutes(hypersign)) 
 
 
 

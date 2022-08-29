@@ -11,7 +11,8 @@ const config = {
         SCHEMA_LIST_EP: process.env.VUE_APP_SCHEMA_LIST_EP || 'api/v1/schema/get',
         CRED_ISSUE_EP: EnvProvider.value('STUDIO_SERVER_CRED_ISSUE_EP') || "api/v1/credential/issue",
         AUTH_CHALLENGE_EP: EnvProvider.value('STUDIO_SERVER_AUTH_CHALLENGE_EP') || "api/auth/challenge",
-        AUTH_LOGIN_EP: EnvProvider.value('STUDIO_SERVER_AUTH_LOGIN_EP') || "api/auth/login"
+        AUTH_LOGIN_EP: EnvProvider.value('STUDIO_SERVER_AUTH_LOGIN_EP') || "api/auth/login",
+        PRESENTATION_TEMPLATE_EP:process.env.VUE_APP_PRESENTATION_TEMPLATE_EP
     },
     nodeServer: {
         BASE_URL: process.env.VUE_APP_NODE_SERVER_BASE_URL,

@@ -71,7 +71,7 @@ h5 span {
           <div class="row">
             <form action="#" class="col-md-12">
               <div class="form-group">
-                <qrcode-vue :value="qr_data" :size="150" level="H"></qrcode-vue>
+                <vue-qr  margin="1" :text="qr_data" :size="250" :logoSrc="src" ></vue-qr>
                 <label style="font-size:small; color:grey; margin-top:1%">Scan QR code using Hypersign Mobile
                   App</label>
                 <div>
@@ -138,7 +138,7 @@ h5 span {
 
 <script>
 import QrcodeVue from "qrcode.vue";
-
+import VueQr from "vue-qr";
 import conf from '../config';
 const { hypersignSDK } = conf;
 import Loading from "vue-loading-overlay";
@@ -150,10 +150,12 @@ export default {
   components: {
     QrcodeVue,
     Loading,
+    VueQr
   },
   data() {
     return {
       qr_data:{},
+      src:require("../assets/icon.png"),
       active: 0,
       username: "",
       password: "",

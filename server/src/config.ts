@@ -79,6 +79,12 @@ const hypersignSDK = {
     did: hsdk.did(options),
     credential: hsdk.credential(options)
 }
+
+const mnemonic = "retreat seek south invite fall eager engage endorse inquiry sample salad evidence express actor hidden fence anchor crowd two now convince convince park bag"
+const walletOptions = {
+    hidNodeRPCUrl: 'https://jagrat.hypersign.id/node1/rpc/',
+    hidNodeRestUrl: 'https://jagrat.hypersign.id/node1/rest/',
+};
 const pathToIssueCred = process.env.PATH_TO_ISSUE_CRED;
 export {
     port,
@@ -94,5 +100,5 @@ export {
     hypersignSDK, dbConnUrl,
     WALLET_WEBHOOK, WALLET_WEB_HOOK_CREAD,
     studioServerBaseUrl,
-    pathToIssueCred
+    pathToIssueCred,mnemonic,walletOptions
 }
