@@ -39,6 +39,33 @@ const verifyPresentation = async (req: Request, res: Response, next: NextFunctio
 const presentationTempalateById=async (req:Request,res:Response,next:NextFunction) => {
     try {
         const {data}=req.body.hypersign
+        // const query_template={
+        //     "domain": "tenant.vii.mattr.global",
+        //     "name": "alumni_credential_request",
+        //     "query": [
+        //       {
+        //         "type": "QueryByExample",
+        //         "credentialQuery": [
+        //           {
+        //             "required": true,
+        //             "reason": "We need you to prove your alumni membership.",
+        //             "example": {
+        //               "@context": [
+        //                 "https://schema.org/"
+        //               ],
+        //               "type": "AlumniCredential",
+        //               "trustedIssuer": [
+        //                 {
+        //                   "required": true,
+        //                   "issuer": "didz6MkjBWPPa1njEKygyr3LR3pRKkqv714vyTkfnUdP6ToFSH5"
+        //                 }
+        //               ]
+        //             }
+        //           }
+        //         ]
+        //       }
+        //     ]
+        //   }
         const id=req.params.id
         const allTemplate= await PresentationTemplateSchema.findOne({templateOwnerDid:data.id ,_id:id})
         res.json(allTemplate)
