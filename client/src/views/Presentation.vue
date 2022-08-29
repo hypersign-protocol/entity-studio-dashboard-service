@@ -118,10 +118,10 @@
         <table class="table table-bordered" style="background:#FFFF">
           <thead class="thead-light">
             <tr>
-              <th>_id </th>
+              <th>Template Id </th>
               <th>Domain</th>
               <th>Name</th>
-              <th>IssuerDid</th>
+              <th>Issuer DID</th>
               <th>Schema Id</th>
               <th>Reason</th>
               <th>CallbackUrl</th>
