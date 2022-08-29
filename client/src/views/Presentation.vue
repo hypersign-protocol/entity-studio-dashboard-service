@@ -135,7 +135,7 @@
               <td>{{row.domain}}</td>
               <td>{{row.name}}</td>
               <td>{{row.issuerDid.toString()}}</td>
-              <td>{{row.schemaId}}</td>
+              <td>{{ shorten(row.schemaId)}}</td>
               <td>{{row.reason}}</td>
               <td>{{row.callbackUrl}}</td>
             </tr>
@@ -155,6 +155,8 @@
 
 <script>
 import fetch from "node-fetch";
+import UtilsMixin from '../mixins/utils';
+
 import conf from '../config';
 const { hypersignSDK } = conf;
 import QrcodeVue from "qrcode.vue";
@@ -473,6 +475,7 @@ export default {
       }
     },
   },
+    mixins: [UtilsMixin],
 };
 </script>
 
