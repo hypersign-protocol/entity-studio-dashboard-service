@@ -116,10 +116,11 @@ import conf from '../config';
 const { hypersignSDK } = conf;
 import Info from '@/components/Info.vue'
 import UtilsMixin from '../mixins/utils';
-import HfPopUp from "../components/element/hfPopup.vue"
+import HfPopUp from "../components/element/hfPopup.vue";
+import Loading from "vue-loading-overlay";
 export default {
   name: "IssueCredential",
-  components: { Info, HfPopUp },
+  components: { Info, HfPopUp, Loading },
   computed: {
   },
   data() {

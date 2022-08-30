@@ -66,7 +66,7 @@ word-wrap: break-word
       <div class="col-md-6" style="margin-left:40%">
           <div class="card">
               <div class="card-header">
-                Network Details <span class="dot" v-if="networkStatus.result.listening === true"></span>
+                NETWORK DETAILS <span class="dot" v-if="networkStatus.result.listening === true"></span>
               </div>
               <div class="card-body leftAlign">
                 <p >NETWORK
@@ -75,10 +75,6 @@ word-wrap: break-word
                 </p><p class="fVal"><a :href="networkStatus.nodeUrl" target="_blank">{{this.$config.nodeServer.BASE_URL}}</a></p>  
                 <p>EXPLORER URL
                 </p><p class="fVal"><a :href="networkStatus.explorerUrl" target="_blank">{{this.$config.explorer.BASE_URL}}</a></p> 
-                <p>DID COUNT
-                </p><p class="fVal">{{networkStatus.didCount}}</p>  
-                <p>SCHEMA COUNT
-                </p><p class="fVal">{{networkStatus.schemaCount}}</p>  
               </div>
             </div> 
         </div>

@@ -135,9 +135,12 @@ margin-right: 12%
 
 
 <script>
+import UtilsMixin from './mixins/utils';
 export default {
   data(){
     return {
+      authToken: localStorage.getItem('authToken'),
+      schema_page: 1,
       authRoutes:  ['register', 'PKIIdLogin'],
       menu: [
         { 
@@ -168,11 +171,68 @@ export default {
       ]
     }
   },
-  created(){
-   
-    // localStorage.getItem('user')
-  }, 
+  async mounted() {
+    console.log('Initiating mounted with schema and credentials');
+    this.getList('SCHEMA')
+    this.getList('CREDENTIAL')
+  },
   methods: {
+    vcStatus(vcId){
+      return fetch(vcId+':')
+      .then(resp => {
+        return resp.json()
+      }).then(data => {
+        return data
+      }).catch(e => {
+        Promise.reject(e.message)
+      })
+    },
+    async getList(type) {
+      let url = "";
+      let options = {}
+      if (type === "SCHEMA") {
+        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.SCHEMA_LIST_EP}?page=${this.schema_page}&limit=10`
+
+        options = {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${this.authToken}`
+          }
+        }
+      } else {
+        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_LIST_EP}`;
+        options = {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${this.authToken}`
+          }
+        }
+      }
+
+      const resp = await fetch(url, options);
+      const j = await resp.json();
+      if (j && j.status == 500) {
+        return this.notifyErr(`Error:  ${j.error}`);
+      }
+      if (type === "SCHEMA") {
+        console.log(j);
+        const schemaList = j.schemaList
+        schemaList.forEach(schema => {
+          this.$store.commit('insertAschema', schema)
+        })
+      } else {
+        const newUpdatedList = await Promise.all (j.credList.map(async (eachVc) => {
+          const x = await this.vcStatus(eachVc.vc_id)
+          Object.assign(eachVc, { ...x})
+          return eachVc
+        }))
+        newUpdatedList.forEach(credential => {
+          this.$store.commit('insertAcredential', credential)
+        })
+      }
+    },
     logout(){
       localStorage.removeItem('authToken')
       localStorage.removeItem('user')
@@ -189,6 +249,7 @@ export default {
         this.$router.push(r.path)
                 }
     }
-  }
+  },
+  mixins: [UtilsMixin]
 }
 </script>

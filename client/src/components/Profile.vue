@@ -66,13 +66,13 @@
         <div class="col-md-5">
           <div class="card">
             <div class="card-body tile">{{schemaCount}}</div>
-            <div class="card-header">Authored Schemas</div>
+            <div class="card-header">AUTHORED SCHEMA</div>
           </div>
         </div>
         <div class="col-md-5">
           <div class="card">
             <div class="card-body tile">{{ credentialCount}}</div>
-            <div class="card-header">Issued Credentials</div>
+            <div class="card-header">ISSUED CREDENTIALS</div>
           </div>
         </div>
       </div>
@@ -135,11 +135,8 @@ export default {
   },
   created() {
     const usrStr = localStorage.getItem("user");
-    //console.log(usrStr);
     this.user = { ...JSON.parse(usrStr) };
-    //console.log(this.user);
     this.userKeys = Object.keys(this.user);
-    //this.pollData()
   },
   methods: {
     fetchData(url,options){

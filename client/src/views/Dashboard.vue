@@ -56,21 +56,14 @@
 <script>
 import Dashboard from '@/components/Dashboard.vue'
 import Profile from '@/components/Profile.vue'
-import UtilsMixin from '../mixins/utils';
-
 export default {
   name: "PanelPage",
-  async mounted() {
-    this.getList('SCHEMA')
-    this.getList('CREDENTIAL')
-  },
   components: { 
     Dashboard,
     Profile
   },
   data() {
     return {
-      page: 1,
       appList: [],
       user: {},
       appName: "",
@@ -82,62 +75,6 @@ export default {
     this.user = JSON.parse(usrStr);
   },
   methods: {
-    vcStatus(vcId){
-      return fetch(vcId+':')
-      .then(resp => {
-        return resp.json()
-      }).then(data => {
-        return data
-      }).catch(e => {
-        Promise.reject(e.message)
-      })
-    },
-    async getList(type) {
-      let url = "";
-      let options = {}
-      if (type === "SCHEMA") {
-        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.SCHEMA_LIST_EP}?page=${this.schema_page}&limit=10`
-
-        options = {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${this.authToken}`
-          }
-        }
-      } else {
-        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_LIST_EP}`;
-        options = {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${this.authToken}`
-          }
-        }
-      }
-
-      const resp = await fetch(url, options);
-      const j = await resp.json();
-      if (j && j.status == 500) {
-        return this.notifyErr(`Error:  ${j.error}`);
-      }
-      if (type === "SCHEMA") {
-        console.log(j);
-        const schemaList = j.schemaList
-        schemaList.forEach(schema => {
-          this.$store.commit('insertAschema', schema)
-        })
-      } else {
-        const newUpdatedList = await Promise.all (j.credList.map(async (eachVc) => {
-          const x = await this.vcStatus(eachVc.vc_id)
-          Object.assign(eachVc, { ...x})
-          return eachVc
-        }))
-        newUpdatedList.forEach(credential => {
-          this.$store.commit('insertAcredential', credential)
-        })
-      }
-    },
     gotosubpage: id => {
       this.$router.push(`${id}`);
     },
@@ -154,6 +91,5 @@ export default {
                 }
     },
   },
-  mixins: [UtilsMixin],
 };
 </script>
