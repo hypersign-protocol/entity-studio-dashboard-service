@@ -6,7 +6,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
     state: {
         schemaList:[],
-        vcList: []
+        vcList: [],
+        templateList: []
     },
     getters: {
         totalSchemas(state){
@@ -42,6 +43,11 @@ export default new Vuex.Store({
             }else{
                 console.log('already exists scheme id =' + payload._id);
                 this.updateAschema(state,payload)
+            }
+        },
+        insertApresentationTemplate(state, payload){
+            if(!state.templateList.find(x => x._id === payload._id)){
+                state.templateList.push(payload);
             }
         },
         // updateAschema(state, payload){

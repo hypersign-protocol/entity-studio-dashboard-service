@@ -175,6 +175,7 @@ export default {
     console.log('Initiating mounted with schema and credentials');
     this.getList('SCHEMA')
     this.getList('CREDENTIAL')
+    this.fetchTemplates();
   },
   methods: {
     vcStatus(vcId){
@@ -185,6 +186,21 @@ export default {
         return data
       }).catch(e => {
         Promise.reject(e.message)
+      })
+    },
+    fetchTemplates() {
+      const url = `${this.$config.studioServer.BASE_URL}api/v1/presentation/template`
+      const headers = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${this.authToken}`
+
+      }
+      fetch(url, {
+        headers
+      }).then(response => response.json()).then(json => {
+        json.forEach(template => {
+          this.$store.commit('insertApresentationTemplate', template)
+        })
       })
     },
     async getList(type) {

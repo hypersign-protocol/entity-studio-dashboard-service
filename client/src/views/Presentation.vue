@@ -1,40 +1,22 @@
 <style scoped>
-.addmargin {
-  margin-top: 10px;
-  margin-bottom: 10px;
+.home{
+    margin-left: auto;
+    margin-right: auto;
+    width: 1500px;
 }
-
-.vue-logo-back {
-  background-color: black;
-}
-
-.logo {
-  width: 144px;
-}
-
-.fullbody {
-  width: 100%;
-}
-
 .floatLeft {
   float: left;
 }
-
-.floatRight {
-  float: right;
-}
-
 .card {
   border-radius: 10px;
 }
-
 .card-header {
   background: aliceblue;
   padding: 0px;
 }
 </style>
 <template>
-  <div class="home marginLeft marginRight">
+  <div class="home">
     <loading :active.sync="isLoading" :can-cancel="true" :is-full-page="fullPage"></loading>
 
     <div class="row">
@@ -164,6 +146,11 @@ import Info from '@/components/Info.vue'
 export default {
   name: "Presentation",
   components: { QrcodeVue, Info },
+  computed:{
+    templateList(){
+      return this.$store.state.templateList;
+    }
+  },
   data() {
     return {
       description: "The subject (or holder) generates verifiable presentation from one or more verifiable \
@@ -187,7 +174,6 @@ export default {
         required: true,
         callbackUrl: '',
       },
-      templateList:[],
       active: 0,
       host: location.hostname,
       user: {},
@@ -233,25 +219,6 @@ export default {
     });
   },
   methods: {
-
-    async fetchTemplates() {
-      const url = `${this.$config.studioServer.BASE_URL}api/v1/presentation/template`
-      const headers = {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${this.authToken}`
-
-      }
-
-      const res = await fetch(url, {
-        headers
-      }
-
-
-      )
-      const respjson=await res.json()
-     this.templateList=respjson
-
-    },
     showClaims() {
       if (this.isClaims) this.isClaims = false;
       else this.isClaims = true;
@@ -290,38 +257,6 @@ export default {
         this.attributeName = " ";
       }
     },
-    onSchemaOptionChange(event) {
-      // console.log(event);
-      this.attributes = [];
-      this.issueCredAttributes = [];
-      this.selected = null;
-      this.credentialName = "";
-    },
-    OnSchemaSelectDropDownChange(event) {
-      // console.log(event);
-      if (event) {
-        this.issueCredAttributes = [];
-        const id = this.issueCredAttributes.length;
-        this.schemaMap[event].forEach((e) => {
-          this.issueCredAttributes.push({
-            id: id + event,
-            type: "text",
-            name: e,
-            value: "",
-          });
-        });
-      } else {
-        this.issueCredAttributes = [];
-      }
-    },
-    forceFileDownload(data, fileName) {
-      const url = window.URL.createObjectURL(new Blob([data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", fileName);
-      document.body.appendChild(link);
-      link.click();
-    },
     downloadCredentials() {
       this.forceFileDownload(
         JSON.stringify(this.signedVerifiablePresentation),
@@ -355,44 +290,13 @@ export default {
       const file = event.target.files[0];
       this.readFile(file, this.onfileLoadSuccess)
     },
-    getCredentials(attributesMap) {
-      const schemaUrl = `${this.$config.nodeServer.BASE_URL}${this.$config.nodeServer.SCHEMA_GET_EP}${this.selected}`;
-      return hypersignSDK.credential.generateCredential(schemaUrl, {
-        subjectDid: this.holderDid,
-        issuerDid: this.user.publicKey,
-        expirationDate: new Date().toISOString(),
-        attributesMap,
-      }).then((signedCred) => {
-        return signedCred;
-      });
-    },
-
-    signCredentials(credential) {
-      return hypersignSDK.credential.signCredential(credential, this.user.publicKey, this.user.privateKey).then(
-        (signedCredential) => {
-          return signedCredential;
-        }
-      );
-    },
     async generatePresentation() {
       this.isLoading = true
       try {
         const issuerDid = this.presentationTemplate.issuerDid.split(',')
-
-        // const vc = JSON.parse(localStorage.getItem("credential"));
-        // if(!vc) throw new Error('Please select verifiable credential file')
-        // const vp_unsigned = await hypersignSDK.credential.generatePresentation(vc, this.user.id);
-        // const vp_signed = await hypersignSDK.credential.signPresentation(vp_unsigned, this.user.id, this.user.privateKey, "test_challenge")
-        // this.signedVerifiablePresentation = vp_signed;
-        // this.isLoading = false
-        // this.isCredentialIssued = true;
-        // this.notifySuccess("Presentation generated and sigend")
-        // localStorage.removeItem('credential')
-
         const headers = {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${this.authToken}`
-
         }
         const body = {
           issuerDid,
@@ -405,13 +309,14 @@ export default {
           callbackUrl: this.presentationTemplate.callbackUrl,
         }
         const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.PRESENTATION_TEMPLATE_EP}`
-        const res = await fetch(url, {
+        fetch(url, {
           body: JSON.stringify(body),
           method: "POST",
           headers: headers,
+        }).then((res) => res.json()).then(json => {
+          this.$store.commit('insertApresentationTemplate', json)
+          this.notifySuccess('Template Successfully created')
         })
-        console.log(res);
-
       } catch (e) {
         this.isLoading = false
         this.notifyErr(e.message)
