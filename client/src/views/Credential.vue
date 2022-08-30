@@ -98,7 +98,7 @@
               <td>{{ row.credStatus ? row.credStatus.claim.statusReason  : "-"}}</td>
               <td> 
                 <button type="button" class="btn btn-primary" @click="generateCred(`${row._id}`)" v-if="row.credStatus">Send</button>
-                <span>-</span>
+                <span v-else>-</span>
               </td>
             </tr>
           </tbody>
