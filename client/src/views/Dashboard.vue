@@ -43,7 +43,7 @@
      <h3 class="leftAlign">Welcome, {{user.name}} !</h3>
      <div class="row">
       <div class="col-md-6">
-          <Profile/>
+        <Profile/>
       </div>
       <div class="col-md-6">
         <Dashboard/>
@@ -56,9 +56,13 @@
 <script>
 import Dashboard from '@/components/Dashboard.vue'
 import Profile from '@/components/Profile.vue'
+import UtilsMixin from '../mixins/utils';
+
 export default {
   name: "PanelPage",
-  mounted() {
+  async mounted() {
+    this.getList('SCHEMA')
+    this.getList('CREDENTIAL')
   },
   components: { 
     Dashboard,
@@ -66,6 +70,7 @@ export default {
   },
   data() {
     return {
+      page: 1,
       appList: [],
       user: {},
       appName: "",
@@ -77,21 +82,61 @@ export default {
     this.user = JSON.parse(usrStr);
   },
   methods: {
-    notifySuccess(msg){
-      this.$notify({
-          group: 'foo',
-          title: 'Information',
-          type: 'success',
-          text: msg
-        });
+    vcStatus(vcId){
+      return fetch(vcId+':')
+      .then(resp => {
+        return resp.json()
+      }).then(data => {
+        return data
+      }).catch(e => {
+        Promise.reject(e.message)
+      })
     },
-    notifyErr(msg){
-      this.$notify({
-          group: 'foo',
-          title: 'Error',
-          type: 'error',
-          text: msg
-        });
+    async getList(type) {
+      let url = "";
+      let options = {}
+      if (type === "SCHEMA") {
+        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.SCHEMA_LIST_EP}?page=${this.schema_page}&limit=10`
+
+        options = {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${this.authToken}`
+          }
+        }
+      } else {
+        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_LIST_EP}`;
+        options = {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${this.authToken}`
+          }
+        }
+      }
+
+      const resp = await fetch(url, options);
+      const j = await resp.json();
+      if (j && j.status == 500) {
+        return this.notifyErr(`Error:  ${j.error}`);
+      }
+      if (type === "SCHEMA") {
+        console.log(j);
+        const schemaList = j.schemaList
+        schemaList.forEach(schema => {
+          this.$store.commit('insertAschema', schema)
+        })
+      } else {
+        const newUpdatedList = await Promise.all (j.credList.map(async (eachVc) => {
+          const x = await this.vcStatus(eachVc.vc_id)
+          Object.assign(eachVc, { ...x})
+          return eachVc
+        }))
+        newUpdatedList.forEach(credential => {
+          this.$store.commit('insertAcredential', credential)
+        })
+      }
     },
     gotosubpage: id => {
       this.$router.push(`${id}`);
@@ -108,36 +153,7 @@ export default {
         this.$router.push('/login')
                 }
     },
-    // createApp(){
-    //   if(!this.appName) this.notifyErr('AppName can not be blank')
-    //   const url = `http://${location.hostname}:9000/api/app/register`;
-    //   const appData = {
-    //     name: this.appName
-    //   }
-    //   fetch(url,{
-    //       body: JSON.stringify(appData),
-    //       method: 'POST',
-    //       headers: {
-    //         'x-auth-token': this.authToken,
-    //         'Accept': 'application/json',
-    //         'Content-Type': 'application/json'
-    //       }
-    //     })
-    //   .then(res => res.json())
-    //   .then(json => {
-    //     if(json.status == 200){
-    //       this.appList.push(json.message)
-    //       this.notifySuccess("App successfully created")
-    //     }
-    //   })
-    //   .catch(e => {
-    //     this.notifyErr(e.message)
-    //   })
-    // },
-    // goToDetailsPage: function(id) {
-    //     this.$router.push("/studio/apps/"+id);
-    // }
-
-  }
+  },
+  mixins: [UtilsMixin],
 };
 </script>

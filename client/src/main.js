@@ -4,6 +4,8 @@ import router from './router'
 import BootstrapVue from 'bootstrap-vue'
 import Notifications from 'vue-notification'
 import config from './config'
+import store from './store/store';
+
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -17,5 +19,6 @@ Vue.prototype.$config = config
 
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount('#app')

@@ -237,22 +237,6 @@ export default {
         );
       }
     },
-    notifySuccess(msg) {
-      this.$notify({
-        group: 'foo',
-        title: 'Information',
-        type: 'success',
-        text: msg
-      });
-    },
-    notifyErr(msg) {
-      this.$notify({
-        group: 'foo',
-        title: 'Error',
-        type: 'error',
-        text: msg
-      });
-    },
     async getList(type) {
       let url = "";
       let options = {}
@@ -376,27 +360,6 @@ export default {
       console.log(attributesMap);
       return attributesMap;
     },
-
-    getCredentials(attributesMap) {
-      console.log(this.schemaMap[this.selected]);
-      const schemaUrl = `${this.$config.nodeServer.BASE_URL_REST}${this.$config.nodeServer.SCHEMA_GET_REST}/${this.selected}:`;
-      return hypersignSDK.credential.generateCredential(schemaUrl, {
-        subjectDid: this.holderDid,
-        issuerDid: this.user.publicKey,
-        expirationDate: new Date().toISOString(),
-        attributesMap,
-      }).then((signedCred) => {
-        return signedCred;
-      });
-    },
-
-    signCredentials(credential) {
-      return hypersignSDK.credential.signCredential(credential, this.user.publicKey, this.user.privateKey).then(
-        (signedCredential) => {
-          return signedCredential;
-        }
-      );
-    },
     async issueCredential() {
       try {
         this.isLoading = true
@@ -406,24 +369,11 @@ export default {
         // generateAttributeMap
         const attributeMap = await this.generateAttributeMap();
 
-        // const verifiableCredential = await this.getCredentials(attributeMap);
-        // signCredentials
-
         const fields = Object.assign({}, attributeMap)
         const schemaId = this.selected
         const issuerDid = this.user.id
         const subjectDid = this.holderDid
 
-
-
-
-        // const signedVerifiableCredential = await this.signCredentials(
-        //   verifiableCredential
-        // );
-
-
-        //       this.signedVerifiableCredential = signedVerifiableCredential;
-        // console.log(signedVerifiableCredential);
         const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_ISSUE_EP}`;
         console.log(url);
         const headers = {
@@ -449,24 +399,6 @@ export default {
             console.log(URL);
             this.openWallet(URL)
           })
-
-        //   .then((res) => res.json())
-        //   .then((j) => {
-        //     if (j.status != 200) throw new Error(`Error: ${j.error}`);
-        //     if (j.status === 200) {
-        //       this.isCredentialIssued = true;
-        //       this.onSchemaOptionChange(null);
-        //       this.vcList.push({
-        //         ...j.message
-        //       })
-        //       this.isLoading = false
-        //       this.notifySuccess("Credential successfully issued")
-        //     }
-        //   })
-        //   .catch((e) => {
-        //     this.isLoading = false
-        //     this.notifyErr(`Error: ${e.message}`)
-        //   });
       } catch (e) {
         this.isLoading = false
         this.notifyErr(`Error: ${e.message}`)

@@ -110,13 +110,19 @@ export default {
   name: "Profile",
   mounted() {},
   components: {},
+  computed:{
+    credentialCount(){
+      return this.$store.getters.totalCredentials;
+    },
+    schemaCount(){
+      return this.$store.getters.totalSchemas;
+    }
+  },
   data() {
     return {
       active: 0,
       userKeys: [],
       appList: [],
-      schemaCount: 0,
-      credentialCount: 0,
       user: {
         id: "",
         publicKey: "",

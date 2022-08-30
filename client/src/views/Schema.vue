@@ -194,21 +194,16 @@ color: #888b8f;
               <!-- <td>{{row.attributes}}</td> -->
               <td
                 style="word-wrap: break-word;min-width: 200px;max-width: 200px;"
-              ><a target="_blank" :href="`${$config.explorer.BASE_URL}txdetails?hash=0x${row.transactionHash}`">0x{{row.transactionHash}}</a></td>
+              ><a target="_blank" :href="`${$config.explorer.BASE_URL}txdetails?hash=0x${row.transactionHash}`">{{shorten('0x' + row.transactionHash)}}</a></td>
               <td>{{row.status}}</td>
               <!-- <td>{{row.did}}</td> -->
             
             </tr>
           </tbody>
         </table>
-        <button  @click="fetchSchemasPrev()" class="btn btn-outline-warning btn-sm">Prev</button> 
-        <button class="btn btn-outline-warning btn-sm"  @click="fetchSchemasNext()"  > Next </button>
-        <!-- </div> -->
-        <!-- </div> -->
-      </div>
-      <!-- </div> -->
-
-
+        <!-- <button  @click="fetchSchemasPrev()" class="btn btn-outline-warning btn-sm">Prev</button> 
+        <button class="btn btn-outline-warning btn-sm"  @click="fetchSchemasNext()"  > Next </button> -->
+        </div>      
     </div>
   </div>
 </template>
@@ -221,6 +216,11 @@ import UtilsMixin from '../mixins/utils';
 export default {
   name: "IssueCredential",
   components: { QrcodeVue, Info },
+  computed: {
+    schemaList(){
+      return this.$store.state.schemaList;
+    }
+  },
   data() {
     return {
       description: "Credential Schema defines what information will go inside a verifiable credential. For example: Directorate General of Civil Aviation (DGCA) can define a schema (or format) for flights tickets, being issued by all airline companies in India.",
@@ -252,7 +252,6 @@ export default {
       authToken: localStorage.getItem("authToken"),
       selectOptions: [{ value: null, text: "Please select a schema" }],
       schemaMap: {},
-      schemaList: [],
       credentialDescription: "",
       fullPage: true,
       isLoading: false,
@@ -270,10 +269,8 @@ export default {
     };
   },
   created() {
-   
     const usrStr = localStorage.getItem("user");
     this.user = JSON.parse(usrStr);
-     this.fetchSchemasPrev();
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -281,22 +278,7 @@ export default {
     });
   },
   methods: {
-    notifySuccess(msg){
-        this.$notify({
-          group: 'foo',
-          title: 'Information',
-          type: 'success',
-          text: msg
-        });
-    },
-    notifyErr(msg){
-      this.$notify({
-          group: 'foo',
-          title: 'Error',
-          type: 'error',
-          text: msg
-        });
-    },
+    // Need to put this method in action
     fetchSchemasPrev() {
      this.page-=1;
      if(this.page<1){
@@ -334,7 +316,6 @@ this.page=1;
       };
       fetch(url,{
         headers,
-       
       })
         .then((res) => res.json())
         .then((j) => {
@@ -348,18 +329,11 @@ this.page=1;
         })
         .catch((e) => this.notifyErr(`Error: ${e.message}`));
     },
-    fetchData(url, option) {
-      fetch(url)
-        .then((res) => res.json())
-        .then((j) => {
-          if (j.status != 200) throw new Error(j.error);
-          return j.message;
-        })
-        .catch((e) => this.notifyErr(`Error: ${e.message}`));
-    },
+
     gotosubpage: (id) => {
       this.$router.push(`${id}`);
     },
+
     addBlankAttrBox() {
       console.log(this.attributeName , this.attributeTypes);
       if (this.attributeName !==""  && this.attributeTypes!=="" ) {
@@ -380,41 +354,8 @@ this.page=1;
         this.notifyErr("Name or Type Cannot be blank")
       }
     },
-    // onSchemaOptionChange(event) {
-    //   this.attributes = [];
-    //   this.issueCredAttributes = [];
-    //   this.selected = null;
-    //   this.credentialName = "";
-    // },
-    // OnSchemaSelectDropDownChange(event) {
-    //   if (event) {
-    //     this.issueCredAttributes = [];
-    //     this.schemaMap[event].forEach((e) => {
-    //       this.issueCredAttributes.push({
-    //         type: "text",
-    //         name: e,
-    //         value: "",
-    //       });
-    //     });
-    //   } else {
-    //     this.issueCredAttributes = [];
-    //   }
-    // },
-    // forceFileDownload(data, fileName) {
-    //   const url = window.URL.createObjectURL(new Blob([data]));
-    //   const link = document.createElement("a");
-    //   link.href = url;
-    //   link.setAttribute("download", fileName);
-    //   document.body.appendChild(link);
-    //   link.click();
-    // },
-    // downloadCredentials() {
-    //   this.forceFileDownload(
-    //     JSON.stringify(this.signedVerifiableCredential),
-    //     "vc.json"
-    //   );
-    // },
-     openWallet(url) {
+
+    openWallet(url) {
       if (url != "") {
         this.walletWindow = window.open(
           `${url}`,
@@ -423,6 +364,7 @@ this.page=1;
         );
       }
     },
+
     createSchema() {        
       this.isLoading = true
       if (this.credentialName == "")
@@ -439,9 +381,8 @@ this.page=1;
       };
       this.QrData.data=schemaData
       const URLString=JSON.stringify(this.QrData)
-            // const urlEncoded= encodeURI(URLString)
       const URL=`${this.$config.webWalletAddress}/deeplink?url=${URLString}`
-      console.log(URL);
+      
       let headers = {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${this.authToken}`
@@ -459,14 +400,14 @@ this.page=1;
             this.notifySuccess("Credential successfull created");
             this.credentialName = 'Schema'
 
-            this.schemaList.push({
-             ...(j.schema)
-            });
-            console.log(QR_DATA);
-                  const URL=`${this.$config.webWalletAddress}/deeplink?url=${JSON.stringify(QR_DATA)}`
+            // this.schemaList.push({
+            //  ...(j.schema)
+            // });
+            this.$store.commit('insertAschema', j.schema)
 
-            this.openWallet(URL)
-            console.log(URL);
+
+            const URL=`${this.$config.webWalletAddress}/deeplink?url=${JSON.stringify(QR_DATA)}`
+            this.openWallet(URL)            
             this.isLoading = false
           } else {
             this.isLoading = false
