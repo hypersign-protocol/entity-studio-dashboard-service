@@ -211,11 +211,12 @@ color: #888b8f;
 <script>
 import fetch from "node-fetch";
 import QrcodeVue from "qrcode.vue";
-import Info from '@/components/Info.vue'
+import Info from '@/components/Info.vue';
 import UtilsMixin from '../mixins/utils';
+import Loading from "vue-loading-overlay";
 export default {
   name: "IssueCredential",
-  components: { QrcodeVue, Info },
+  components: { QrcodeVue, Info, Loading },
   computed: {
     schemaList(){
       return this.$store.state.schemaList;
@@ -241,21 +242,10 @@ export default {
       credentialName: "",
       isCredentialIssued: false,
       signedVerifiableCredential: "",
-      credentials: JSON.parse(localStorage.getItem("credentials")),
-      subjectDid: "did:hs:AmitKumar",
-      radioOptions: [
-        { text: "Create new schema", value: "create" },
-        { text: "Select existing schema", value: "existing" },
-      ],
-      selected: null,
-      attributeValues: {},
-      authToken: localStorage.getItem("authToken"),
-      selectOptions: [{ value: null, text: "Please select a schema" }],
-      schemaMap: {},
+      authToken: localStorage.getItem("authToken"),      
       credentialDescription: "",
       fullPage: true,
       isLoading: false,
-      
       QrData: { 
       "QRType": "ISSUE_SCHEMA",
        "serviceEndpoint": "", 
@@ -278,58 +268,6 @@ export default {
     });
   },
   methods: {
-    // Need to put this method in action
-    fetchSchemasPrev() {
-     this.page-=1;
-     if(this.page<1){
-this.page=1;
-     }
-      const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.SCHEMA_LIST_EP}?page=${this.page}&limit=10`;
-       let headers = {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${this.authToken}`
-      };
-      fetch(url,{
-        headers,
-       
-      })
-        .then((res) => res.json())
-        .then((j) => {
-          console.log(j);
-          if (j.status != 200) throw new Error(j.error);
-          this.schemaList = j.schemaList;
-          if (this.schemaList && this.schemaList.length > 0) {
-            this.schemaList = this.schemaList.filter(
-              (x) => x.did === this.user.id
-            );
-          }
-        })
-        .catch((e) => this.notifyErr(`Error: ${e.message}`));
-    },
-    
-    fetchSchemasNext() {
-     this.page+=1;
-      const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.SCHEMA_LIST_EP}?page=${this.page}&limit=10`;
-       let headers = {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${this.authToken}`
-      };
-      fetch(url,{
-        headers,
-      })
-        .then((res) => res.json())
-        .then((j) => {
-          if (j.status != 200) throw new Error(j.error);
-          this.schemaList = j.schemaList;
-          if (this.schemaList && this.schemaList.length > 0) {
-            this.schemaList = this.schemaList.filter(
-              (x) => x.did === this.user.id
-            );
-          }
-        })
-        .catch((e) => this.notifyErr(`Error: ${e.message}`));
-    },
-
     gotosubpage: (id) => {
       this.$router.push(`${id}`);
     },
@@ -365,12 +303,14 @@ this.page=1;
       }
     },
 
-    createSchema() {        
-      this.isLoading = true
+    createSchema() {  
+      try{
+        this.isLoading = true
       if (this.credentialName == "")
-        return this.notifyErr("Error: SchemaName can not be blank");
+        throw new Error("SchemaName can not be blank");
       if (this.attributes.length == 0)
-        return this.notifyErr("Error: Atleast one attribute is required");
+        throw new Error("Atleast one attribute is required");
+      
       const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.SAVE_SCHEMA_EP}`;
       const schemaData = {
         name: this.credentialName,
@@ -380,14 +320,10 @@ this.page=1;
         additionalProperties: this.additionalProperties,
       };
       this.QrData.data=schemaData
-      const URLString=JSON.stringify(this.QrData)
-      const URL=`${this.$config.webWalletAddress}/deeplink?url=${URLString}`
-      
       let headers = {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${this.authToken}`
       };
-    //  this.openWallet(URL)
       fetch(url, {
         method: "POST",
         body: JSON.stringify( { QR_DATA:this.QrData}),
@@ -397,23 +333,26 @@ this.page=1;
         .then((j) => {
          const {QR_DATA}=j
           if (j.status === 200) {
-            this.notifySuccess("Credential successfull created");
-            this.credentialName = 'Schema'
+            this.notifySuccess("Schema creation initiated. Please approve the transaction from your wallet");
+            // TODO: Why this is hardcoded?
+            this.credentialName = 'Schema';
 
-            // this.schemaList.push({
-            //  ...(j.schema)
-            // });
+            // Store the information in store.
             this.$store.commit('insertAschema', j.schema)
-
-
+            
+            // Open the wallet for trasanctional approval.
             const URL=`${this.$config.webWalletAddress}/deeplink?url=${JSON.stringify(QR_DATA)}`
             this.openWallet(URL)            
-            this.isLoading = false
           } else {
-            this.isLoading = false
-            this.notifyErr(`Error: ${j.error}`);
+            throw new Error(`${j.error}`);
           }
         });
+      } catch(e) {
+        console.error(e)
+        this.notifyErr(`Error: ${e.message}`);
+      } finally {
+        this.isLoading = false;
+      }    
     },
   },
   mixins: [UtilsMixin],
