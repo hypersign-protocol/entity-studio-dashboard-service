@@ -220,16 +220,11 @@ export default {
         console.log(j);
         const schemaList = j.schemaList
         schemaList.forEach(schema => {
-          this.$store.commit('insertAschema', schema)
+          this.$store.dispatch('insertAschema', schema)
         })
       } else {
-        const newUpdatedList = await Promise.all (j.credList.map(async (eachVc) => {
-          const x = await this.vcStatus(eachVc.vc_id)
-          Object.assign(eachVc, { ...x})
-          return eachVc
-        }))
-        newUpdatedList.forEach(credential => {
-          this.$store.commit('insertAcredential', credential)
+        j.credList.forEach(credential => {
+          this.$store.dispatch('insertAcredential', credential)
         })
       }
     },

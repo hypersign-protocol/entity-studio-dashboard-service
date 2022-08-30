@@ -179,25 +179,36 @@ color: #888b8f;
           <thead class="thead-light">
             <tr>
               <th>Schema Id</th>  
-              <th>Tx Hash</th>
+              <th>Name</th>
+              <th>Model Version</th>
+              <th>Description</th>
+              <th>Properties</th>
+              <th>Created At</th>
+              <th>Transaction Hash</th>
               <th>Status</th>
-              <!-- <th>author</th> -->
             </tr>
           </thead>
 
           <tbody>
             <tr v-for="row in schemaList" :key="row">
               <td>
-                <a :href="`${$config.nodeServer.BASE_URL_REST}${$config.nodeServer.SCHEMA_GET_REST}${row.schemaId}:`" target="_blank">{{ shorten(row.schemaId) }}</a>
+                <a :href="`${$config.nodeServer.BASE_URL_REST}${$config.nodeServer.SCHEMA_GET_REST}${row.schemaId}:`" target="_blank">{{ row.schemaId? shorten(row.schemaId): "-" }}</a>
               </td>
-            
-              <!-- <td>{{row.attributes}}</td> -->
+
+              <td>{{ row.schemaDetails? row.schemaDetails.name : "-" }}</td>
+              <td>{{ row.schemaDetails? row.schemaDetails.modelVersion : "-"}}</td>
+              <td>{{ row.schemaDetails? row.schemaDetails.schema.description : "-"}}</td>
+              <td>{{ row.schemaDetails? Object.keys(row.schemaDetails.schema.properties).toString() : "-"}}</td>
+              
+              <td>{{ row.schemaDetails? row.schemaDetails.authored : "-"}}</td>
+              
               <td
-                style="word-wrap: break-word;min-width: 200px;max-width: 200px;"
-              ><a target="_blank" :href="`${$config.explorer.BASE_URL}txdetails?hash=0x${row.transactionHash}`">{{shorten('0x' + row.transactionHash)}}</a></td>
+                style="word-wrap: break-word;min-width: 200px;max-width: 200px;" 
+              >
+              <a target="_blank" :href="`${$config.explorer.BASE_URL}txdetails?hash=0x${row.transactionHash}`" v-if="row.transactionHash">{{shorten('0x' + row.transactionHash)}}</a>
+              <span v-else>-</span>
+              </td>
               <td>{{row.status}}</td>
-              <!-- <td>{{row.did}}</td> -->
-            
             </tr>
           </tbody>
         </table>
@@ -338,7 +349,7 @@ export default {
             this.credentialName = 'Schema';
 
             // Store the information in store.
-            this.$store.commit('insertAschema', j.schema)
+            this.$store.dispatch('insertAschema', j.schema);
             
             // Open the wallet for trasanctional approval.
             const URL=`${this.$config.webWalletAddress}/deeplink?url=${JSON.stringify(QR_DATA)}`

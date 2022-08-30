@@ -1,8 +1,8 @@
 export default {
     methods: {
         shorten(str){
-            if(!str){
-                return str
+            if(!str || str === 'undefined'){
+                return ""
             }
             if(str.length <= 8){
                 return str

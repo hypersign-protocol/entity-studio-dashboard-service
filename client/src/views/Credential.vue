@@ -84,19 +84,21 @@
           <tbody>
             <tr v-for="row in vcList" :key="row.vc_id">
               <td>
-                <a :href="`${row.vc_id}:`" target="_blank>">{{ shorten(row.vc.id)
-                  }}</a>
+                <a :href="`${row.vc_id}:`" target="_blank>" v-if="row.vc_id">{{ shorten(row.vc_id) }}</a>
+                <span>-</span>
               </td>
               <td>
                 <a :href="`${$config.nodeServer.BASE_URL_REST}${$config.nodeServer.SCHEMA_GET_REST}${row.schemaId}:`" target="_blank">{{ shorten(row.schemaId) }}</a>
               </td>
               <td>{{ row.subjectDid }}</td>
-              <td>{{ row.credStatus.issuanceDate}}</td>
-              <td>{{ row.credStatus.expirationDate }}</td>
-              <!-- <td>{{ row.credStatus ? row.credStatus.credentialHash }}</td> -->
-              <td> {{ row.credStatus.claim.currentStatus }}</td>
-              <td>{{ row.credStatus.claim.statusReason  }}</td>
-              <td> <button type="button" class="btn btn-primary" @click="generateCred(`${row._id}`)">Send</button>
+              <td>{{ row.credStatus ? row.credStatus.issuanceDate: "-"}}</td>
+              <td>{{ row.credStatus ? row.credStatus.expirationDate : "-"}}</td>
+              <!-- <td>{{ row.credStatus ?  row.credStatus.credentialHash : "-"}}</td>  -->
+              <td> {{ row.credStatus ? row.credStatus.claim.currentStatus : "Initiated"}}</td>
+              <td>{{ row.credStatus ? row.credStatus.claim.statusReason  : "-"}}</td>
+              <td> 
+                <button type="button" class="btn btn-primary" @click="generateCred(`${row._id}`)" v-if="row.credStatus">Send</button>
+                <span>-</span>
               </td>
             </tr>
           </tbody>
@@ -112,8 +114,6 @@
 
 <script>
 import fetch from "node-fetch";
-import conf from '../config';
-const { hypersignSDK } = conf;
 import Info from '@/components/Info.vue'
 import UtilsMixin from '../mixins/utils';
 import HfPopUp from "../components/element/hfPopup.vue";
@@ -122,6 +122,12 @@ export default {
   name: "IssueCredential",
   components: { Info, HfPopUp, Loading },
   computed: {
+    vcList(){
+      return this.$store.state.vcList;
+    },
+    selectOptions(){
+      return this.$store.getters.listOfAllSchemaOptions;
+    }
   },
   data() {
     return {
@@ -147,9 +153,6 @@ export default {
       selected: null,
       attributeValues: {},
       authToken: localStorage.getItem("authToken"),
-      selectOptions: [{ value: null, text: "Please select a schema" }],
-      schemaMap: {},
-      vcList: [],
       vcCredStatusMap: {}, 
       schemaList: [],
       fullPage: true,
@@ -172,42 +175,13 @@ export default {
   created() {
     const usrStr = localStorage.getItem("user");
     this.user = JSON.parse(usrStr);
-    //console.log(this.user)
-    this.getList('SCHEMA')
-    this.getList('CREDENTIAL')
-
-    
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
       vm.prevRoute = from;
     });
   },
-  computed: {
-
-  },
   methods: {
-    copy() {
-      this.$refs.clone.focus();
-      document.execCommand('copy');
-    },
-    
-    vcStatus(vcId){
-      const url = `https://jagrat.hypersign.id/node1/rest/hypersign-protocol/hidnode/ssi/credential/${vcId}:`
-      return fetch(vcId+':')
-      .then(resp => {
-        return resp.json()
-      }).then(data => {
-        // const { credStatus } = data;
-        // const  { claim } = credStatus
-        // const { currentStatus } = claim;
-        // console.log(claim)
-        // return currentStatus;
-        return data
-      }).catch(e => {
-        Promise.reject(e.message)
-      })
-    },
     async  generateCred(id) {
 
       const body = {
@@ -227,8 +201,7 @@ export default {
       this.credUrl = resp.url;
       this.$root.$emit('modal-show')
       this.notifySuccess("Cred Url Generated Successfully")
-  }
-    ,
+    },
     openWallet(url) {
       if (url != "") {
         this.walletWindow = window.open(
@@ -238,93 +211,13 @@ export default {
         );
       }
     },
-    async getList(type) {
-      let url = "";
-      let options = {}
-      if (type === "SCHEMA") {
-        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.SCHEMA_LIST_EP}?page=${this.schema_page}&limit=10`
-
-        options = {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${this.authToken}`
-          }
-        }
-      } else {
-        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_LIST_EP}`;
-        options = {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${this.authToken}`
-          }
-        }
-      }
-
-      const resp = await fetch(url, options);
-      const j = await resp.json();
-      if (j && j.status == 500) {
-        return this.notifyErr(`Error:  ${j.error}`);
-      }
-      if (type === "SCHEMA") {
-        console.log(j);
-        const schemaList = j.schemaList
-        if (schemaList && schemaList.length > 0) {
-          schemaList.forEach(async s => {
-            if (s.did != this.user.id) return            
-            if (s.status === "Registered") {
-              let schemaGetURL = `${this.$config.nodeServer.BASE_URL_REST}${this.$config.nodeServer.SCHEMA_GET_REST}${s.schemaId}:`
-              // console.log(schemaGetURL);
-              const res = await fetch(schemaGetURL)
-              const data = await res.json()
-              //  console.log(data.schema[0].schema.properties);
-              this.schemaMap[s.schemaId] = JSON.parse(data.schema[0].schema.properties)
-              if (data.schema[0].schema.required.length > 0) {
-                data.schema[0].schema.required.forEach(e => {
-                  this.schemaMap[s.schemaId][e].required = true
-                })
-              }
-
-              this.selectOptions.push({
-                value: s.schemaId,
-                text: `${s.schemaId} | ${s.status}`
-              })
-            }
-          });
-        }
-      } else {
-        const newUpdatedList = await Promise.all (j.credList.map(async (eachVc) => {
-          const x = await this.vcStatus(eachVc.vc_id)
-          Object.assign(eachVc, { ...x})
-          return eachVc
-        }))
-        this.vcList = newUpdatedList;
-      }
-    },
-    gotosubpage: (id) => {
-      this.$router.push(`${id}`);
-    },
-    addBlankAttrBox() {
-      if (this.attributeName != " ") {
-        this.attributes.push(this.attributeName);
-        this.attributeName = " ";
-      }
-    },
-    onSchemaOptionChange(event) {
-      //console.log(event);
-      this.attributes = [];
-      this.issueCredAttributes = [];
-      this.selected = null;
-      this.credentialName = "";
-    },
     OnSchemaSelectDropDownChange(event) {
-      console.log(event);
       if (event) {
         this.issueCredAttributes = [];
         const id = this.issueCredAttributes.length;
-        console.log(this.schemaMap[event]);
-        for (const e in this.schemaMap[event]) {
+        const selectedSchema = this.$store.getters.findSchemaBySchemaID(event);
+        const schemaMap =  selectedSchema.schemaDetails.schema.properties;
+        for (const e in schemaMap) {
           this.issueCredAttributes.push({
             id: id + event,
             type: e.type,
@@ -376,7 +269,7 @@ export default {
         const subjectDid = this.holderDid
 
         const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_ISSUE_EP}`;
-        console.log(url);
+
         const headers = {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${this.authToken}`
@@ -394,15 +287,15 @@ export default {
           body: JSON.stringify({ QR_DATA: this.QrData }),
         }).then((res) => res.json())
           .then(json => {
-            console.log(json);
             const { QR_DATA } = json
             const URL = `${this.$config.webWalletAddress}/deeplink?url=${JSON.stringify(QR_DATA)}`
-            console.log(URL);
             this.openWallet(URL)
           })
       } catch (e) {
         this.isLoading = false
         this.notifyErr(`Error: ${e.message}`)
+      } finally {
+        this.isLoading = false;
       }
     },
   },
