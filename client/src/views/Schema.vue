@@ -51,6 +51,9 @@ font-style: bold ;
 color: #888b8f;
 }
 
+.word-wrap{
+  word-wrap: anywhere;
+}
 
 .card{
   border-radius: 10px;
@@ -197,8 +200,8 @@ color: #888b8f;
 
               <td>{{ row.schemaDetails? row.schemaDetails.name : "-" }}</td>
               <td>{{ row.schemaDetails? row.schemaDetails.modelVersion : "-"}}</td>
-              <td>{{ row.schemaDetails? row.schemaDetails.schema.description : "-"}}</td>
-              <td>{{ row.schemaDetails? Object.keys(row.schemaDetails.schema.properties).toString() : "-"}}</td>
+              <td class="word-wrap">{{ row.schemaDetails? row.schemaDetails.schema.description : "-"}}</td>
+              <td class="word-wrap">{{ row.schemaDetails? Object.keys(row.schemaDetails.schema.properties).toString() : "-"}}</td>
               
               <td>{{ row.schemaDetails? row.schemaDetails.authored : "-"}}</td>
               
