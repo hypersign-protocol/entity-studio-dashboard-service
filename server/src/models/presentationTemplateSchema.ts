@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 export interface IPresentationTemplate extends Document {
-    templateOwnerDid:string,
+    orgDid:string;
     queryType: string,
     domain: string,
     name: string,
@@ -9,12 +9,14 @@ export interface IPresentationTemplate extends Document {
     reason: string,
     required: boolean,
     callbackUrl: string,
+    templateOwnerDid:string
 }
 
 
 
 
 export const PresentationTemplateSchema = new Schema({
+    orgDid: { type: String, required: false },
     templateOwnerDid:{type:String,required:true},
     queryType: { type: String, required: true },
     domain: { type: String, required: true },

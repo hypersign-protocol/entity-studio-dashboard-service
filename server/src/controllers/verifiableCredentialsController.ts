@@ -24,10 +24,10 @@ const issueCredential = async (req: Request, res: Response, next: NextFunction) 
         logger.info("==========CredController ::issueCredential Starts ================")
 
         const { QR_DATA, hypersign } = req.body
-        const { issuerDid, subjectDid, schemaId } = QR_DATA.data
+        const { issuerDid, subjectDid, schemaId ,orgDid } = QR_DATA.data
         QR_DATA.data.issuerDid = hypersign.data.id;
 
-        const creadObj = await creadSchema.create({ issuerDid, subjectDid, schemaId, createdAt: new Date() })
+        const creadObj = await creadSchema.create({ issuerDid, subjectDid, schemaId, createdAt: new Date() ,orgDid})
 
         QR_DATA.data.expirationDate = new Date('12/12/2027')
         QR_DATA.serviceEndpoint = `${WALLET_WEB_HOOK_CREAD}/${creadObj._id}`;
@@ -67,7 +67,8 @@ const getCredentialList = async (req: Request, res: Response, next: NextFunction
         logger.info("==========CredController ::getCredentialList Starts ================")
 
         const { hypersign } = req.body
-        const credList = await creadSchema.find({ issuerDid: hypersign.data.id }).sort({ createdAt: -1 })
+        const orgDid = req.params.id
+        const credList = await creadSchema.find({ issuerDid: hypersign.data.id ,orgDid }).sort({ createdAt: -1 })
         logger.info("==========CredController ::getCredentialList Ends ================")
 
         res.json({

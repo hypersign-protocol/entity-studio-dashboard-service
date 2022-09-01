@@ -1,17 +1,28 @@
 import Router from 'express';
-
+import User from '../models/UserSchema';
+import Org from '../models/OrgSchema';
 export const walletAuthRoutes = (hypersign) => {
 
     const router = Router();
     // Implement authentication API
     // Doc: https://github.com/hypersign-protocol/hypersign-auth-js-sdk/blob/master/docs.md#hypersignauthenticate
-    router.post('/hs/api/v2/auth', hypersign.authenticate.bind(hypersign), (req, res) => {
+    router.post('/hs/api/v2/auth', hypersign.authenticate.bind(hypersign), async (req, res) => {
         try {
             const { user } = req.body.hypersign.data;
-            
-                // Do something with the user data.
-                // The hsUserData contains userdata and authorizationToken
-            res.status(200).send({ status: 200, message: user , error: null });
+            const { name, email, id } = user
+            console.log(name, email, id);
+
+            let query = { email, did: id };
+            let options = { upsert: true, new: true, setDefaultsOnInsert: true };
+            const userObj = await User.find({ email, did: id })
+            if (userObj.length === 0) {
+                const newUser = new User({ email, did: id, name })
+                await newUser.save()
+            }
+
+            // Do something with the user data.
+            // The hsUserData contains userdata and authorizationToken
+            res.status(200).send({ status: 200, message: user, error: null });
         } catch (e) {
             res.status(500).send({ status: 500, message: "failure", error: e });
         }
@@ -41,7 +52,7 @@ export const walletAuthRoutes = (hypersign) => {
             const { hypersign } = req.body;
             const { data } = hypersign;
             console.log(hypersign)
-            res.status(200).send({...data });
+            res.status(200).send({ ...data });
         } catch (e) {
             res.status(500).send({ status: 500, message: null, error: e });
         }
@@ -53,7 +64,7 @@ export const walletAuthRoutes = (hypersign) => {
     router.post('/protected', hypersign.authorize.bind(hypersign), (req, res) => {
         try {
             const user = req.body.hypersign.data;
-                // Do whatever you want to do with it
+            // Do whatever you want to do with it
             res.status(200).send({ status: 200, message: user, error: null });
         } catch (e) {
             res.status(500).send(e)

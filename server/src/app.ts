@@ -14,6 +14,7 @@ import path from 'path'
 import http from 'http'
 import { schemaRoutes } from './routes/schemaRoutes';
 import { presentationRoute } from './routes/presentationRoutes';
+import { orgRoutes } from './routes/orgRoutes';
 const HypersignAuth = require('hypersign-auth-node-sdk')
 export default function app() {
     db.openConnection()
@@ -29,7 +30,7 @@ export default function app() {
     const server = http.createServer(app)
    
 
-    const whitelistedUrls = ["http://localhost:9000","http://entity.hypersign.id","https://entity.hypersign.id" ,"http://localhost:9001", "https://wallet-stage.hypersign.id" ,"undefined" , "*" ,"http://localhost:4999"]
+    const whitelistedUrls = ["http://localhost:9000","http://192.168.29.12:9001","http://192.168.29.209:9001","http://entity.hypersign.id","https://entity.hypersign.id" ,"http://localhost:9001", "https://wallet-stage.hypersign.id" ,"undefined" , "*" ,"http://localhost:4999"]
 
     function corsOptionsDelegate(req, callback) {
         let corsOptions;
@@ -39,6 +40,7 @@ export default function app() {
         } else {
             corsOptions = { origin: false } // disable CORS for this request
         }
+        console.log(req.header('Origin')  )      
         callback(null, corsOptions) // callback expects two parameters: error and options
     }
 
@@ -66,7 +68,7 @@ export default function app() {
         app.use('/api/v1/credential', credentialRoutes(hypersign))
         app.use('/api/v1/schema', schemaRoutes(hypersign))
         app.use('/api/v1/presentation', presentationRoute(hypersign))
-
+        app.use('/api/v1/org', orgRoutes(hypersign))
         app.use(walletAuthRoutes(hypersign)) 
 
 

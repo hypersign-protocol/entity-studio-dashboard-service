@@ -8,7 +8,7 @@ export const presentationRoute = (hypersign) => {
     router.post('/verify', verifyPresentation)
     router.post('/template', hypersign.authorize.bind(hypersign), presentationTempalate)
     router.get('/template/:id', hypersign.authorize.bind(hypersign), presentationTempalateById)
-    router.get('/template', hypersign.authorize.bind(hypersign), presentationTempalateAll)
+    router.get('/template/:orgDid', hypersign.authorize.bind(hypersign), presentationTempalateAll)
     return router;
 }
 

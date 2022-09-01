@@ -79,7 +79,8 @@ const presentationTempalateAll= async (req: Request, res: Response, next: NextFu
 
     try {
         const {data}=req.body.hypersign
-        const allTemplate= await PresentationTemplateSchema.find({templateOwnerDid:data.id})
+        const orgDid=req.params.orgDid
+        const allTemplate= await PresentationTemplateSchema.find({templateOwnerDid:data.id,orgDid})
         res.json(allTemplate)
     } catch (error) {
         res.status(500).json(error)
@@ -94,11 +95,12 @@ const presentationTempalate = async (req: Request, res: Response, next: NextFunc
             schemaId,
             reason,
             required,
-            callbackUrl } = req.body
+            callbackUrl ,orgDid} = req.body
             const {data}=req.body.hypersign
             
         const presentationTemplateObj = await PresentationTemplateSchema.create({
             queryType,
+            orgDid,
             domain,
             name,
             issuerDid,
