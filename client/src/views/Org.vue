@@ -179,6 +179,11 @@ import Loading from "vue-loading-overlay";
                     this.notifySuccess("Org Created successfull");
                     this.$store.commit('insertAnOrg', j.org);
                     this.$store.commit('selectAnOrg', j.org._id)
+                    this.openSlider();
+
+                    if(this.edit){
+                      this.$store.commit('updateAnOrg', j.org)
+                    }
                   }
                 })
 

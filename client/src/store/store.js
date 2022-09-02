@@ -77,6 +77,10 @@ export default new Vuex.Store({
                 console.log('already exists scheme id =' + payload._id);
             }
         },
+        updateAnOrg(state, payload) {
+            const orgToUpdateIndex = state.orgList.findIndex(x => x._id === payload._id);
+            Object.assign(state.orgList[orgToUpdateIndex], {...payload});
+        },
         insertApresentationTemplate(state, payload) {
             if (!state.templateList.find(x => x._id === payload._id)) {
                 state.templateList.push(payload);
@@ -89,6 +93,7 @@ export default new Vuex.Store({
                 console.log('already exists credential id =' + payload._id);
             }
         },
+        
         //     fetchAllOrgDataOnOrgSelect(state, payload) {
         //         console.log(state , payload);
         // }
