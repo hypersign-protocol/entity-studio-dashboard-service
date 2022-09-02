@@ -30,10 +30,13 @@
                     <label for="region"><strong>Network:</strong></label>
                     <input type="text" class="form-control" id="region" v-model="orgStore.network" aria-describedby="regionHelp" placeholder="Select your region">
                 </div> -->
-                <div class="form-group">
-                    <button class="btn btn-primary" @click="createAnOrg()">Save</button>
+                <div class="form-group" v-if="edit">
+                    <button  class="btn btn-primary" @click="createAnOrg()">  Edit</button>
+                   
                 </div>
-                
+                <div class="form-group" v-else>
+                <button  class="btn btn-primary" @click="createAnOrg()">  Save</button>
+                </div>
             </div>
             
         </StudioSideBar>
@@ -107,7 +110,7 @@
 import HfPopUp from "../components/element/hfPopup.vue";
 import StudioSideBar from "../components/element/StudioSideBar.vue";
 import UtilsMixin from '../mixins/utils';
-
+import 'vue-loading-overlay/dist/vue-loading.css';
 import Loading from "vue-loading-overlay";
 
     export default {
@@ -129,7 +132,7 @@ import Loading from "vue-loading-overlay";
                     userDid: "",
                 },
               authToken: localStorage.getItem("authToken"),      
-
+              isLoading:true
             }
         },
         components: { HfPopUp, Loading, StudioSideBar },
@@ -167,7 +170,7 @@ import Loading from "vue-loading-overlay";
           
               const body  ={ orgData:this.orgStore}
 
-
+              this.isLoading=true;
               fetch(url, {
                 method,
                 body: JSON.stringify(body),
@@ -176,15 +179,23 @@ import Loading from "vue-loading-overlay";
                 .then((j) => {
                   console.log(j)
                   if (j.status === 200) {
-                    this.notifySuccess("Org Created successfull");
+                 
                     this.$store.commit('insertAnOrg', j.org);
                     this.$store.commit('selectAnOrg', j.org._id)
                     this.openSlider();
 
+                    this.notifySuccess("Org Created successfull");
                     if(this.edit){
                       this.$store.commit('updateAnOrg', j.org)
+                      this.notifySuccess("Org Edited successfull");
                     }
+                   
                   }
+                }).catch((e) => {
+                  console.log(e);
+                  this.notifyError("Something went wrong");
+                }).finally(()=>{
+                  this.isLoading=false;
                 })
 
               // TODO: Implement API to create an organization

@@ -4,6 +4,7 @@ const hsdk = require('lds-sdk')
 console.log(process.env);
 const config = {
     studioServer: {
+        SCHEMA_SSE:process.env.VUE_APP_SCHEMA_SSE,
         BASE_URL: process.env.VUE_APP_STUDIO_SERVER_BASE_URL, // EnvProvider.value('STUDIO_SERVER_BASE_URL'),
         ACCPCT_CRED_EP: process.env.VUE_APP_ACCPCT_CRED_EP|| "api/v1/credential/accepct",
         SAVE_SCHEMA_EP: process.env.VUE_APP_STUDIO_SERVER_SAVE_SCHEMA ||"api/v1/schema/issue",

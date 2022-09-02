@@ -1,14 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
-import Schema from '../models/Schema';
+import Schema, { ISchema } from '../models/Schema';
 import { logger, WALLET_WEBHOOK } from '../config'
-
+const DELAY = 5000;
+const STOP = 1000 * 60;
+let timer = 0;
 
 const saveSchema = async (req: Request, res: Response, next: NextFunction) => {
     try {
         logger.info("==========SchemaController ::saveSchema Starts ================")
 
         const { QR_DATA, hypersign } = req.body;
-        const SchemaObj = await Schema.create({ did: hypersign.data.id, createdAt: new Date(),orgDid:QR_DATA.data.orgDid, status: "Initiated" })
+        const SchemaObj = await Schema.create({ did: hypersign.data.id, createdAt: new Date(), orgDid: QR_DATA.data.orgDid, status: "Initiated" })
 
         QR_DATA.serviceEndpoint = `${WALLET_WEBHOOK}/${SchemaObj._id}`;
         logger.info("==========SchemaController ::saveSchema Ends ================")
@@ -21,16 +23,67 @@ const saveSchema = async (req: Request, res: Response, next: NextFunction) => {
     }
 
 }
+const getSchemaById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
 
+        logger.info("==========SchemaController ::getSchemaById Starts================")
+
+        const id = req.params.id
+        // const schema = await Schema.findOne({ _id: id }).exec()
+
+
+        logger.info("==========SchemaController ::getSchemaById Ends================")
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        // res.json(schema)
+        send(res, id)
+    } catch (error) {
+        logger.error("==========SchemaController ::getSchemaById Ends================")
+
+        res.status(500).json(error)
+    }
+}
+const send = async (res, id) => {
+    try {
+        timer = timer + DELAY;
+        const schema: ISchema | null = await Schema.findOne({ _id: id }).exec()
+        if (schema) {
+            res.write(`data: ${JSON.stringify(schema)}\n\n`);
+
+           
+            if (schema.status === "Registered") {
+                timer = 0;
+                logger.info("==========SchemaController ::SSE Ends================")
+                return 
+
+
+            }
+            if ((timer > STOP) || (timer === STOP)) {
+                timer
+                logger.info("==========SchemaController ::SSE Ends================")
+
+                return 
+
+            }
+            setTimeout(() => { send(res, id) }, DELAY)
+            
+            return
+        }
+    } catch (error) {
+        logger.error("==========SchemaController ::SSE Ends================")
+
+        return res.end();
+    }
+}
 
 const getSchema = async (req: Request, res: Response, next: NextFunction) => {
     try {
 
-logger.info("==========SchemaController ::getSchema Starts================")
+        logger.info("==========SchemaController ::getSchema Starts================")
         const Max_limit = 10
         const { hypersign } = req.body;
         const { page, limit } = req.query
-        const orgDid=req.params.orgDid        
+        const orgDid = req.params.orgDid
         let limitInt = limit ? parseInt(limit.toString()) : Max_limit;
         if (limitInt > Max_limit) {
             limitInt = Max_limit;
@@ -40,7 +93,7 @@ logger.info("==========SchemaController ::getSchema Starts================")
         const skip = (pageInt - 1) * limitInt;
 
 
-        const schemaList = await Schema.find({ did: hypersign.data.id,orgDid }).sort({ createdAt: -1 }).skip(skip).limit(limitInt)
+        const schemaList = await Schema.find({ did: hypersign.data.id, orgDid ,status:"Registered"}).sort({ createdAt: -1 })
         logger.info("==========SchemaController ::getSchema Ends================")
         res.status(200).json({ schemaList, status: 200 })
     } catch (error) {
@@ -68,5 +121,5 @@ const setStatusSchema = async (req: Request, res: Response, next: NextFunction) 
 }
 
 export {
-    saveSchema, setStatusSchema, getSchema
+    saveSchema, setStatusSchema, getSchema, getSchemaById
 }

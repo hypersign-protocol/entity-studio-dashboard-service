@@ -67,7 +67,10 @@ export default new Vuex.Store({
                 state.schemaList.push(payload);
             } else {
                 console.log('already exists scheme id =' + payload._id);
-                this.updateAschema(state, payload)
+                this.commit('updateAschema', payload);
+              //  state.updateAschema(state, payload)
+
+                
             }
         },
         insertAnOrg(state, payload) {
@@ -76,6 +79,12 @@ export default new Vuex.Store({
             } else {
                 console.log('already exists scheme id =' + payload._id);
             }
+        },
+        updateAschema(state, payload) {
+            console.log('updating schema');
+            let index = state.schemaList.findIndex(x => x._id === payload._id);
+           Object.assign(state.schemaList[index], {...payload});
+           // state.schemaList[index] = payload;
         },
         updateAnOrg(state, payload) {
             const orgToUpdateIndex = state.orgList.findIndex(x => x._id === payload._id);
