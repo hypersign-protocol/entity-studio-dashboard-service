@@ -154,6 +154,7 @@ export default {
   async mounted() {
     console.log('Initiating mounted with schema and credentials');
    EventBus.$on("initializeStore",this.initializeStore)
+   this.initializeStore('login')
   },
   methods: {
      initializeStore(login){
