@@ -5,37 +5,37 @@
   padding-left: 25px;
 }
 
-.selectedButton{
+.selectedButton {
   border-bottom: 1px solid #8080809e;
   font-weight: bold;
 }
 
-.nav-style{
+.nav-style {
   background: #FFFFFF;
   margin-bottom: 1%;
-  padding:5px;
-  padding-left:1.5%;
+  padding: 5px;
+  padding-left: 1.5%;
   text-align: left;
   box-shadow:
-         rgba(0, 0, 0, 0.1) 0px 2px 2px 0px, 
-            rgba(0, 0, 0, 0.02) 0px 3px 1px -2px, 
-            rgba(0, 0, 0, 0.01) 0px 1px 5px 0px;
+    rgba(0, 0, 0, 0.1) 0px 2px 2px 0px,
+    rgba(0, 0, 0, 0.02) 0px 3px 1px -2px,
+    rgba(0, 0, 0, 0.01) 0px 1px 5px 0px;
 }
 
-.rightAlign{
+.rightAlign {
   text-align: end;
 }
 
-.card-radius{
+.card-radius {
   border-radius: 10px;
 }
 
 
 .logo-style {
-    width: 144px;
-    /* height: 40px; */
-    margin-top: 9px;
-    margin-left: 5px;
+  width: 144px;
+  /* height: 40px; */
+  margin-top: 9px;
+  margin-left: 5px;
 }
 
 #app {
@@ -46,30 +46,31 @@
   background: #F6F6F687;
 }
 
-.subtitle{
+.subtitle {
   padding-left: 10px;
   color: gray;
   font-size: larger;
   margin-top: auto;
 }
-
-
 </style>
 <template>
   <div id="app">
     <div class="row nav-style">
-      <div class="col-md-4">        
+      <div class="col-md-4">
         <!-- <h5 class="leftAlign">{{$config.app.name}}</h5>  -->
         <div class="form-group form-inline">
-          <img class="logo-style" src="https://thumb.tildacdn.com/tild3065-3765-4865-b331-393637653931/-/resize/150x/-/format/webp/hypersign_Yellow.png"> 
-          <h4 class="subtitle"> <span style="opacity:0.4">|</span> {{$config.app.name}} ({{$config.app.version}})</h4>  
+          <img class="logo-style"
+            src="https://thumb.tildacdn.com/tild3065-3765-4865-b331-393637653931/-/resize/150x/-/format/webp/hypersign_Yellow.png">
+          <h4 class="subtitle"> <span style="opacity:0.4">|</span> {{ $config.app.name }} ({{ $config.app.version }})</h4>
         </div>
       </div>
       <div class="col-md-2" v-if="isShow" style="padding-top:12px">
         <OrgDropDown></OrgDropDown>
       </div>
-      <div class="col-md-6 rightAlign" style="padding-top:12px" v-if="!(authRoutes.includes($router.history.current.name))">
-          <button type="button" @click="goToNextPage(m.name)" class="btn btn-light btn-sm" v-for="m in getMenu()" :key="m.name" v-if="m.isShow">{{m.name}}</button>    
+      <div class="col-md-6 rightAlign" style="padding-top:12px"
+        v-if="!(authRoutes.includes($router.history.current.name))">
+        <button type="button" @click="goToNextPage(m.name)" class="btn btn-light btn-sm" v-for="m in getMenu()"
+          :key="m.name" v-if="m.isShow">{{ m.name }}</button>
       </div>
     </div>
     <router-view />
@@ -85,6 +86,7 @@
   text-align: center;
   color: #2c3e50;
 }
+
 #nav {
   padding: 30px;
 }
@@ -107,16 +109,17 @@
 .leftAlign {
   text-align: left;
 }
+
 .rightAlign {
   text-align: right;
 }
-.marginLeft
-{
-margin-left: 13%
+
+.marginLeft {
+  margin-left: 13%
 }
-.marginRight
-{
-margin-right: 12%
+
+.marginRight {
+  margin-right: 12%
 }
 </style>
 
@@ -125,57 +128,62 @@ margin-right: 12%
 import UtilsMixin from './mixins/utils';
 import OrgDropDown from './components/element/OrgDropDown.vue'
 export default {
-  components: {OrgDropDown},
-  computed:{
-    isShow(){
+  components: { OrgDropDown },
+  computed: {
+    isShow() {
+  
       return this.$store.getters.isAnyOrgSelected;
+
     },
-    selectedOrg(){
+    selectedOrg() {
       return this.$store.getters.getSelectedOrg;
     }
   },
-  data(){
+  data() {
     return {
       authToken: localStorage.getItem('authToken'),
       schema_page: 1,
-      authRoutes:  ['register', 'PKIIdLogin'],
+      authRoutes: ['register', 'PKIIdLogin'],
       menu: [
-               
+
       ]
     }
   },
- 
+
   async mounted() {
     console.log('Initiating mounted with schema and credentials');
-    if(this.authToken){
-      this.fetchAllOrgs()
+    if (this.authToken) {
+      
+      await this.fetchAllOrgs()
+      console.log('Fetched all orgs');
+
     }
   },
   methods: {
-    getMenu(){
+    getMenu() {
       const menu = [
-      { 
-          name: "Dashboard",  
+        {
+          name: "Dashboard",
           path: "/studio/dashboard",
           isShow: true,
         },
-        { 
-          name: "Organization",   
+        {
+          name: "Organization",
           path: "/studio/org",
           isShow: true,
         },
-        { 
-          name: "Schema",  
+        {
+          name: "Schema",
           path: "/studio/schema",
           isShow: this.isShow,
         },
-        { 
-          name: "Credentials",  
+        {
+          name: "Credentials",
           path: "/studio/credential",
           isShow: this.isShow,
         },
-        { 
-          name: "Presentation",  
+        {
+          name: "Presentation",
           path: "/studio/presentation",
           isShow: this.isShow,
         },
@@ -183,23 +191,23 @@ export default {
           name: "Logout",
           path: "/login",
           isShow: true,
-        }, 
+        },
       ]
       console.log(this.isShow)
       return menu;
-      
+
     },
-    vcStatus(vcId){
-      return fetch(vcId+':')
-      .then(resp => {
-        return resp.json()
-      }).then(data => {
-        return data
-      }).catch(e => {
-        Promise.reject(e.message)
-      })
+    vcStatus(vcId) {
+      return fetch(vcId + ':')
+        .then(resp => {
+          return resp.json()
+        }).then(data => {
+          return data
+        }).catch(e => {
+          Promise.reject(e.message)
+        })
     },
-    fetchAllOrgs(){
+    fetchAllOrgs() {
       // TODO: Get list of orgs 
       const url = `${this.$config.studioServer.BASE_URL}api/v1/org/all`
       const headers = {
@@ -210,13 +218,25 @@ export default {
       fetch(url, {
         headers
       }).then(response => response.json()).then(json => {
+        const data = json.org
         // TODO: iterate through them
-        json.forEach(org => {
-          // Store them in the store.
-          this.$store.commit('insertAnOrg', org)
-        })
+        if (data) {
+          data.forEach(org => {
+            // Store them in the store.
+            this.$store.commit('insertAnOrg', org)
+          })
+        }
+        if (data && data.length > 0) {
+
+          console.log(data);
+          this.$store.commit('selectAnOrg', data[0]._id)
+          this.$store.dispatch('fetchAllOrgDataOnOrgSelect', data[0]._id)
+        }
+
+
       })
     },
+
     fetchTemplates() {
       const url = `${this.$config.studioServer.BASE_URL}api/v1/presentation/template/${this.selectedOrg._id}/`
       const headers = {
@@ -273,21 +293,22 @@ export default {
         })
       }
     },
-    logout(){
+
+    logout() {
       localStorage.removeItem('authToken')
       localStorage.removeItem('user')
       localStorage.removeItem("credentials")
       localStorage.removeItem("userData")
     },
-    goToNextPage(route){
+    goToNextPage(route) {
       const r = this.getMenu().find(x => x.name === route)
-      if(r.name === "Logout") this.logout()
+      if (r.name === "Logout") this.logout()
       this.$router.push(r.path)
-      if(this.$route.params.nextUrl != null){
-                    this.$router.push(this.$route.params.nextUrl)
-                }else{
+      if (this.$route.params.nextUrl != null) {
+        this.$router.push(this.$route.params.nextUrl)
+      } else {
         this.$router.push(r.path)
-                }
+      }
     }
   },
   mixins: [UtilsMixin]

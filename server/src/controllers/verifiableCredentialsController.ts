@@ -67,7 +67,7 @@ const getCredentialList = async (req: Request, res: Response, next: NextFunction
         logger.info("==========CredController ::getCredentialList Starts ================")
 
         const { hypersign } = req.body
-        const orgDid = req.params.id
+        const orgDid = req.params.orgDid
         const credList = await creadSchema.find({ issuerDid: hypersign.data.id ,orgDid }).sort({ createdAt: -1 })
         logger.info("==========CredController ::getCredentialList Ends ================")
 

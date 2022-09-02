@@ -1,39 +1,40 @@
-import  Vue from 'vue';
+import Vue from 'vue';
 import Vuex from 'vuex';
-
+import config from '../config'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        schemaList:[],
+        schemaList: [],
         vcList: [],
         templateList: [],
         orgList: [
         ],
         selectedOrgDid: ""
+
     },
     getters: {
-        isAnyOrgSelected(state){
-            return state.selectedOrgDid != "" ? true: false
+        isAnyOrgSelected(state) {
+            return state.selectedOrgDid != "" ? true : false
         },
-        totalSchemas(state){
+        totalSchemas(state) {
             return state.schemaList.length;
         },
-        totalCredentials(state){
+        totalCredentials(state) {
             return state.vcList.length;
         },
-        findSchemaBySchemaID: (state) => (schemaId)=> {
+        findSchemaBySchemaID: (state) => (schemaId) => {
             return state.schemaList.find(x => x.schemaId === schemaId);
         },
-        findOrgByOrgID: (state) => (orgId)=> {
-            return state.orgList.find(x => x._id === orgId);
+        findOrgByOrgID: (state) => (orgDid) => {
+            return state.orgList.find(x => x._id === orgDid);
         },
         getSelectedOrg: (state) => {
             return state.orgList.find(x => x._id === state.selectedOrgDid)
         },
-        listOfAllSchemaOptions(state){
+        listOfAllSchemaOptions(state) {
             let schemaIdnames = state.schemaList.map(x => {
-                if(x.schemaId && x.schemaId !== undefined && x.status === 'Registered'){
+                if (x.schemaId && x.schemaId !== undefined && x.status === 'Registered') {
                     return {
                         text: x.schemaDetails.name,
                         value: x.schemaId
@@ -49,67 +50,204 @@ export default new Vuex.Store({
         }
     },
     mutations: {
-        selectAnOrg(state, orgId){
-            state.selectedOrgDid = orgId;
+        selectAnOrg(state, orgDid) {
+            state.selectedOrgDid = orgDid;
+
         },
-        insertAschema(state, payload){
-            if(!state.schemaList.find(x => x._id === payload._id)){
+        insertAschema(state, payload) {
+            if (!state.schemaList.find(x => x._id === payload._id)) {
                 state.schemaList.push(payload);
-            }else{
+            } else {
                 console.log('already exists scheme id =' + payload._id);
-                this.updateAschema(state,payload)
+                this.updateAschema(state, payload)
             }
         },
-        insertAnOrg(state, payload){
-            if(!state.orgList.find(x => x._id === payload._id)){
+        insertAnOrg(state, payload) {
+            if (!state.orgList.find(x => x._id === payload._id)) {
                 state.orgList.push(payload);
-            }else{
+            } else {
                 console.log('already exists scheme id =' + payload._id);
             }
         },
-        insertApresentationTemplate(state, payload){
-            if(!state.templateList.find(x => x._id === payload._id)){
+        insertApresentationTemplate(state, payload) {
+            if (!state.templateList.find(x => x._id === payload._id)) {
                 state.templateList.push(payload);
             }
         },
-        insertAcredential(state, payload){
-            if(!state.vcList.find(x => x._id === payload._id)){
+        insertAcredential(state, payload) {
+            if (!state.vcList.find(x => x._id === payload._id)) {
                 state.vcList.push(payload);
-            }else{
+            } else {
                 console.log('already exists credential id =' + payload._id);
             }
         },
+        //     fetchAllOrgDataOnOrgSelect(state, payload) {
+        //         console.log(state , payload);
+        // }
     },
     actions: {
-        insertAschema({commit}, payload){
+        insertAschema({ commit }, payload) {
             const { schemaId } = payload;
-            if(schemaId){
-                // TODO: remove hardcoding 
-                const url  = `https://jagrat.hypersign.id/node1/rest/hypersign-protocol/hidnode/ssi/schema/${schemaId}:`
+            if (schemaId) {
+                               
+                const url = `${config.nodeServer.BASE_URL_REST}${config.nodeServer.SCHEMA_GET_REST}${schemaId}:`
                 fetch(url).then(response => response.json()).then(json => {
                     const shcemaDetial = json.schema[0];
-                    if(shcemaDetial.schema.properties){
+                    if (shcemaDetial.schema.properties) {
                         let propertiesStr = shcemaDetial.schema.properties;
                         const props = JSON.parse(propertiesStr)
                         shcemaDetial.schema.properties = props;
                     }
-                    payload['schemaDetails'] =shcemaDetial;
-                    commit('insertAschema', payload);    
+                    payload['schemaDetails'] = shcemaDetial;
+                    commit('insertAschema', payload);
                 }).catch(e => console.log)
             } else {
-                commit('insertAschema', payload);    
+                commit('insertAschema', payload);
             }
         },
-        insertAcredential({commit}, payload) {
+        insertAcredential({ commit }, payload) {
             const { vc_id } = payload;
-            if(vc_id){
-                fetch(vc_id+':').then(response => response.json()).then(json => {
-                    Object.assign(payload, { ...json});
+            if (vc_id) {
+                fetch(vc_id + ':').then(response => response.json()).then(json => {
+                    Object.assign(payload, { ...json });
                     commit('insertAcredential', payload);
                 }).catch(e => console.log)
             } else {
                 commit('insertAcredential', payload);
-            } 
+            }
+        },
+
+        fetchAllOrgDataOnOrgSelect({ commit }, payload) {
+            this.authToken = localStorage.getItem('authToken');
+            // fetch all templete   
+            {
+                let url = `${config.studioServer.BASE_URL}api/v1/presentation/template/org/${this.getters.getSelectedOrg._id}/`
+                const headers = {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${this.authToken}`
+
+                }
+                fetch(url, {
+                    headers
+                }).then(response => response.json()).then(json => {
+                    
+                    if (json.length!==0) {
+                        this.state.templateList=[]
+                        json.forEach(template => {
+                            this.commit('insertApresentationTemplate', template)
+                        })
+                    }else{
+                        this.state.templateList=[]
+                    }
+                })
+            }
+            // fetch all schemas
+            {
+                const url = `${config.studioServer.BASE_URL}${config.studioServer.SCHEMA_LIST_EP}/${this.getters.getSelectedOrg._id}/?page=1&limit=10`
+
+                const options = {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${this.authToken}`
+                    }
+                }
+
+
+                fetch(url, {
+                    headers: options.headers
+                }).then(response => response.json()).then(json => {
+                   
+                    if (json && json.schemaList.length!==0) {
+                        this.state.schemaList = []
+                        json.schemaList.forEach(schema => {
+
+                            this.dispatch('insertAschema', schema)
+                        })
+                    } else {
+                       
+
+                        this.state.schemaList = []
+                    }
+                })
+
+
+            }
+
+            //fetct all credentials
+            {
+                const url = `${config.studioServer.BASE_URL}${config.studioServer.CRED_LIST_EP}/${this.getters.getSelectedOrg._id}`;
+                const options = {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${this.authToken}`
+                    }
+                }
+                fetch(url, {
+                    headers: options.headers
+                }).then(response => response.json()).then(json => {
+                    if (json && json.credList.length!==0) {
+                        this.state.vcList = []
+                        json.credList.forEach(credential => {
+                            this.dispatch('insertAcredential', credential)
+                        })
+                    }else{
+                        this.state.vcList = []
+                    }
+                    
+                })
+
+
+            }
+
+
+
+
+            //   async getList(type) {
+            //     let url = "";
+            //     let options = {}
+            //     if (type === "SCHEMA") {
+            //       url = `${config.studioServer.BASE_URL}${config.studioServer.SCHEMA_LIST_EP}/${this.selectedOrg._id}/?page=${this.schema_page}&limit=10`
+
+            //       options = {
+            //         method: "GET",
+            //         headers: {
+            //           "Content-Type": "application/json",
+            //           "Authorization": `Bearer ${this.authToken}`
+            //         }
+            //       }
+            //     } else {
+            //       url = `${config.studioServer.BASE_URL}${config.studioServer.CRED_LIST_EP}/${this.selectedOrg._id}`;
+            //       options = {
+            //         method: "GET",
+            //         headers: {
+            //           "Content-Type": "application/json",
+            //           "Authorization": `Bearer ${this.authToken}`
+            //         }
+            //       }
+            //     }
+
+            //     const resp = await fetch(url, options);
+            //     const j = await resp.json();
+            //     if (j && j.status == 500) {
+            //       return this.notifyErr(`Error:  ${j.error}`);
+            //     }
+            //     if (type === "SCHEMA") {
+            //       console.log(j);
+            //       const schemaList = j.schemaList
+            //       schemaList.forEach(schema => {
+            //         this.$store.dispatch('insertAschema', schema)
+            //       })
+            //     } else {
+            //       j.credList.forEach(credential => {
+            //         this.$store.dispatch('insertAcredential', credential)
+            //       })
+            //     }
+            //   },
+
         }
+
+
     }
 })

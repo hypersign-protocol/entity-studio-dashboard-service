@@ -14,7 +14,7 @@ export const OrgDbSchema = new Schema({
     },
     orgDid: {
         type: String,
-        required: true,
+        required: false,
     },
     region: {
         type: String,

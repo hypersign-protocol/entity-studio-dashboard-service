@@ -189,7 +189,6 @@ export default {
 
       const body = {
         id,
-        orgDid: this.selectedOrg._id
       }
       const options = {
         method: "POST",
@@ -199,7 +198,6 @@ export default {
         body: JSON.stringify(body)
       }
       const URL = this.$config.studioServer.BASE_URL + this.$config.studioServer.ACCPCT_CRED_EP
-      
       const res = await fetch(URL, options)
       const resp =await res.json()
       this.credUrl = resp.url;
@@ -282,7 +280,8 @@ export default {
           fields,
           schemaId,
           issuerDid,
-          subjectDid
+          subjectDid,
+          orgDid:this.$store.state.selectedOrgDid
         };
         this.QrData.data = creadData
         fetch(url, {

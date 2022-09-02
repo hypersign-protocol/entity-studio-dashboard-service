@@ -8,7 +8,7 @@ const saveSchema = async (req: Request, res: Response, next: NextFunction) => {
         logger.info("==========SchemaController ::saveSchema Starts ================")
 
         const { QR_DATA, hypersign } = req.body;
-        const SchemaObj = await Schema.create({ did: hypersign.data.id, createdAt: new Date(),orgDid:QR_DATA.orgDid, status: "Initiated" })
+        const SchemaObj = await Schema.create({ did: hypersign.data.id, createdAt: new Date(),orgDid:QR_DATA.data.orgDid, status: "Initiated" })
 
         QR_DATA.serviceEndpoint = `${WALLET_WEBHOOK}/${SchemaObj._id}`;
         logger.info("==========SchemaController ::saveSchema Ends ================")
@@ -30,7 +30,7 @@ logger.info("==========SchemaController ::getSchema Starts================")
         const Max_limit = 10
         const { hypersign } = req.body;
         const { page, limit } = req.query
-        const orgDid=req.params.orgDid
+        const orgDid=req.params.orgDid        
         let limitInt = limit ? parseInt(limit.toString()) : Max_limit;
         if (limitInt > Max_limit) {
             limitInt = Max_limit;

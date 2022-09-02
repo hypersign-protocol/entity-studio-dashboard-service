@@ -193,7 +193,7 @@ color: #888b8f;
           </thead>
 
           <tbody>
-            <tr v-for="row in schemaList" :key="row">
+            <tr v-for="row in schemaList" :key="row._id">
               <td>
                 <a :href="`${$config.nodeServer.BASE_URL_REST}${$config.nodeServer.SCHEMA_GET_REST}${row.schemaId}:`" target="_blank">{{ row.schemaId? shorten(row.schemaId): "-" }}</a>
               </td>
@@ -335,7 +335,7 @@ export default {
         fields: this.attributes,
         description: this.credentialDescription,
         additionalProperties: this.additionalProperties,
-        orgDid: this.selectedOrg._id
+        orgDid: this.$store.state.selectedOrgDid
       };
       this.QrData.data=schemaData
       let headers = {

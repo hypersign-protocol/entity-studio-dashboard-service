@@ -7,7 +7,7 @@
             <div class="container">
                 <div class="form-group">
                     <label for="orgName"><strong>Org DID:</strong></label>
-                    <input type="text" class="form-control" id="orgId" v-model="orgStore._id" aria-describedby="orgNameHelp" disabled>
+                    <input type="text" class="form-control" id="orgDid" v-model="orgStore._id" aria-describedby="orgNameHelp" disabled>
                 </div>
                 <div class="form-group">
                     <label for="orgName"><strong>Organization Name:</strong></label>
@@ -117,13 +117,14 @@ import Loading from "vue-loading-overlay";
         },
         data(){
             return {
+              edit:false,
                 orgStore: {
                     name: "Hypermine Pvt Ltd",
                     domain: "hypermine.in",
                     logo: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%3Fid%3DOIP.5EZ51foyo3QBV2FHnKq1cwHaEc%26pid%3DApi&f=1",
                     region: "US EAST",
                     network:"Jagrat",
-                    orgId: "",
+                    orgDid: "",
                     userDid: "",
                 },
               authToken: localStorage.getItem("authToken"),      
@@ -132,27 +133,43 @@ import Loading from "vue-loading-overlay";
         },
         components: { HfPopUp, Loading, StudioSideBar },
         methods: {
-            switchOrg(orgId){
-                this.$store.commit('selectAnOrg', orgId)
+            switchOrg(orgDid){
+                this.$store.commit('selectAnOrg', orgDid)
+                this.$store.dispatch('fetchAllOrgDataOnOrgSelect', orgDid)
             },
             openSlider(){
                 this.$root.$emit("bv::toggle::collapse", "sidebar-right");
             },
-            editOrg(orgId){
-                Object.assign(this.orgStore, {...this.$store.getters.findOrgByOrgID(orgId) })
+            editOrg(orgDid){
+              this.edit=true
+                Object.assign(this.orgStore, {...this.$store.getters.findOrgByOrgID(orgDid) })
                 this.openSlider();
             },
             createAnOrg(){
-              const url = `${this.$config.studioServer.BASE_URL}api/v1/org/create`
+              let url
+              let method
+              if (this.edit){
+                method = "PUT"
+                 url = `${this.$config.studioServer.BASE_URL}api/v1/org/update`
+
+              }else{
+                url = `${this.$config.studioServer.BASE_URL}api/v1/org/create`
+                method = "POST"
+
+              }
+               
               const headers = {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${this.authToken}`
               }
-              const body  = this.orgStore;
+              this.orgStore.userDid =JSON.parse(localStorage.getItem("user")).id
+          
+              const body  ={ orgData:this.orgStore}
+
 
               fetch(url, {
-                method: "POST",
-                body: JSON.stringify(this.orgStore),
+                method,
+                body: JSON.stringify(body),
                 headers,
               }) .then((res) => res.json())
                 .then((j) => {

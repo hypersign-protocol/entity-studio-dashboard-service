@@ -16,6 +16,8 @@ export default {
     methods: {
         switchOrg(event){
                 this.$store.commit('selectAnOrg', event.target.value)
+               
+                 this.$store.dispatch('fetchAllOrgDataOnOrgSelect', event.target.value)
         },
     }
 }

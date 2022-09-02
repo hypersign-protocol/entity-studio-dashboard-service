@@ -39,7 +39,7 @@
                     </div>
                     <div class="form-group">
                       <label class="floatLeft">Name (optional):</label>
-                      <input class="form-control" type="text" v-model="presentationTemplate.names" />
+                      <input class="form-control" type="text" v-model="presentationTemplate.name" />
 
 
                     </div>
@@ -310,7 +310,7 @@ export default {
           reason: this.presentationTemplate.reason,
           required: this.presentationTemplate.required,
           callbackUrl: this.presentationTemplate.callbackUrl,
-          orgDid: this.selectedOrg._id
+          orgDid:this.$store.state.selectedOrgDid
         }
         const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.PRESENTATION_TEMPLATE_EP}`
         fetch(url, {
