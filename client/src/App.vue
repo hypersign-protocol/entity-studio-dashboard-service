@@ -127,6 +127,7 @@
 <script>
 import UtilsMixin from './mixins/utils';
 import OrgDropDown from './components/element/OrgDropDown.vue'
+import EventBus from './eventbus'
 export default {
   components: { OrgDropDown },
   computed: {
@@ -152,14 +153,21 @@ export default {
 
   async mounted() {
     console.log('Initiating mounted with schema and credentials');
-    if (this.authToken) {
-      
-      await this.fetchAllOrgs()
-      console.log('Fetched all orgs');
-
-    }
+   EventBus.$on("initializeStore",this.initializeStore)
   },
   methods: {
+     initializeStore(login){
+      console.log(login);    
+      this.authToken = localStorage.getItem('authToken'); 
+     // console.log(this.authToken);
+      if (this.authToken) {    
+        
+       this.fetchAllOrgs()
+      console.log('Fetched all orgs');
+    }else{
+      console.log("else");
+     }
+    },
     getMenu() {
       const menu = [
         {
@@ -299,6 +307,9 @@ export default {
       localStorage.removeItem('user')
       localStorage.removeItem("credentials")
       localStorage.removeItem("userData")
+      
+     
+      this.$store.commit('resetStore')
     },
     goToNextPage(route) {
       const r = this.getMenu().find(x => x.name === route)

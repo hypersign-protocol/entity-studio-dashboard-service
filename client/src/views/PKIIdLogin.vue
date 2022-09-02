@@ -145,6 +145,7 @@ import Loading from "vue-loading-overlay";
 import "vue-loading-overlay/dist/vue-loading.css";
 import config from "../config";
 const { sha256hashStr } = require("../utils/hash");
+import EventBus from "../eventbus";
 export default {
   name: "Login",
   components: {
@@ -221,7 +222,7 @@ export default {
         const refreshToken = messageData.data.hypersign.data.refreshToken
         localStorage.setItem("authToken", authorizationToken);
         localStorage.setItem("refreshToken", refreshToken)
-
+        EventBus.$emit("initializeStore",'login');
 
         if (localStorage.getItem("authToken") != null) {
           if (this.walletWindow) {

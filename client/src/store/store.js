@@ -50,6 +50,14 @@ export default new Vuex.Store({
         }
     },
     mutations: {
+        resetStore(state){
+            console.log('resetting store');
+            state.orgList=[]
+            state.schemaList=[]
+            state.vcList=[]
+            state.templateList=[]
+            state.selectedOrgDid=""
+        },
         selectAnOrg(state, orgDid) {
             state.selectedOrgDid = orgDid;
 
