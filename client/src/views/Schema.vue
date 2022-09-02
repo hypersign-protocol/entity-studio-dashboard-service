@@ -234,6 +234,9 @@ export default {
   computed: {
     schemaList(){
       return this.$store.state.schemaList;
+    },
+    selectedOrg(){
+      return this.$store.getters.getSelectedOrg;
     }
   },
   data() {
@@ -332,6 +335,7 @@ export default {
         fields: this.attributes,
         description: this.credentialDescription,
         additionalProperties: this.additionalProperties,
+        orgDid: this.selectedOrg._id
       };
       this.QrData.data=schemaData
       let headers = {

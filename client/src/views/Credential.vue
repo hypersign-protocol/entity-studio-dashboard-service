@@ -127,6 +127,9 @@ export default {
     },
     selectOptions(){
       return this.$store.getters.listOfAllSchemaOptions;
+    },
+    selectedOrg(){
+      return this.$store.getters.getSelectedOrg;
     }
   },
   data() {
@@ -185,7 +188,8 @@ export default {
     async  generateCred(id) {
 
       const body = {
-        id
+        id,
+        orgDid: this.selectedOrg._id
       }
       const options = {
         method: "POST",

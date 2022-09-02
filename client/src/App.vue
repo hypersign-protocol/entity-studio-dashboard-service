@@ -65,26 +65,13 @@
           <h4 class="subtitle"> <span style="opacity:0.4">|</span> {{$config.app.name}} ({{$config.app.version}})</h4>  
         </div>
       </div>
-        <div class="col-md-8 rightAlign" style="padding-top:12px" v-if="!(authRoutes.includes($router.history.current.name))">
-          <!-- <div > -->
-            <button type="button" @click="goToNextPage(m.name)" class="btn btn-light btn-sm" v-for="m in menu" :key="m.name">{{m.name}}</button>    
-          <!-- </div> -->
-        </div>
-        
-        <!-- <h6
-          class="leftAlign"
-          style="color:grey; font-style: italic;"
-        >{{$config.app.decription}}</h6> -->
-        <!-- <h6 class="leftAlign" style="color:grey; font-style: italic;">Version: {{$config.app.version}}</h6> -->
-        <!-- <hr style="opacity: 1.5" /> -->
-      
-    </div>
-    <!-- <div class="row">
-      <div class="col-md-9 rightAlign marginLeft" v-if="!(authRoutes.includes($router.history.current.name))">
-        <button @click="goToNextPage(m.name)" class="btn btn-link btn-sm" v-for="m in menu" :key="m.name">{{m.name}}</button>
-        <hr style="opacity: 1.5" />
+      <div class="col-md-2" v-if="isShow" style="padding-top:12px">
+        <OrgDropDown></OrgDropDown>
       </div>
-    </div> -->
+      <div class="col-md-6 rightAlign" style="padding-top:12px" v-if="!(authRoutes.includes($router.history.current.name))">
+          <button type="button" @click="goToNextPage(m.name)" class="btn btn-light btn-sm" v-for="m in getMenu()" :key="m.name" v-if="m.isShow">{{m.name}}</button>    
+      </div>
+    </div>
     <router-view />
     <notifications group="foo" />
   </div>
@@ -136,48 +123,72 @@ margin-right: 12%
 
 <script>
 import UtilsMixin from './mixins/utils';
+import OrgDropDown from './components/element/OrgDropDown.vue'
 export default {
+  components: {OrgDropDown},
+  computed:{
+    isShow(){
+      return this.$store.getters.isAnyOrgSelected;
+    },
+    selectedOrg(){
+      return this.$store.getters.getSelectedOrg;
+    }
+  },
   data(){
     return {
       authToken: localStorage.getItem('authToken'),
       schema_page: 1,
       authRoutes:  ['register', 'PKIIdLogin'],
       menu: [
-        { 
+               
+      ]
+    }
+  },
+ 
+  async mounted() {
+    console.log('Initiating mounted with schema and credentials');
+    if(this.authToken){
+      this.fetchAllOrgs()
+    }
+  },
+  methods: {
+    getMenu(){
+      const menu = [
+      { 
           name: "Dashboard",  
           path: "/studio/dashboard",
           isShow: true,
         },
         { 
+          name: "Organization",   
+          path: "/studio/org",
+          isShow: true,
+        },
+        { 
           name: "Schema",  
           path: "/studio/schema",
-          isShow: true,
+          isShow: this.isShow,
         },
         { 
           name: "Credentials",  
           path: "/studio/credential",
-          isShow: true,
+          isShow: this.isShow,
         },
         { 
           name: "Presentation",  
           path: "/studio/presentation",
-          isShow: true,
+          isShow: this.isShow,
         },
         {
           name: "Logout",
           path: "/login",
-          isShow: false,
-        },        
+          isShow: true,
+        }, 
       ]
-    }
-  },
-  async mounted() {
-    console.log('Initiating mounted with schema and credentials');
-    this.getList('SCHEMA')
-    this.getList('CREDENTIAL')
-    this.fetchTemplates();
-  },
-  methods: {
+      console.log(this.isShow)
+      return menu;
+      
+    },
     vcStatus(vcId){
       return fetch(vcId+':')
       .then(resp => {
@@ -188,8 +199,26 @@ export default {
         Promise.reject(e.message)
       })
     },
+    fetchAllOrgs(){
+      // TODO: Get list of orgs 
+      const url = `${this.$config.studioServer.BASE_URL}api/v1/org/all`
+      const headers = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${this.authToken}`
+
+      }
+      fetch(url, {
+        headers
+      }).then(response => response.json()).then(json => {
+        // TODO: iterate through them
+        json.forEach(org => {
+          // Store them in the store.
+          this.$store.commit('insertAnOrg', org)
+        })
+      })
+    },
     fetchTemplates() {
-      const url = `${this.$config.studioServer.BASE_URL}api/v1/presentation/template`
+      const url = `${this.$config.studioServer.BASE_URL}api/v1/presentation/template/${this.selectedOrg._id}/`
       const headers = {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${this.authToken}`
@@ -207,7 +236,7 @@ export default {
       let url = "";
       let options = {}
       if (type === "SCHEMA") {
-        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.SCHEMA_LIST_EP}?page=${this.schema_page}&limit=10`
+        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.SCHEMA_LIST_EP}/${this.selectedOrg._id}/?page=${this.schema_page}&limit=10`
 
         options = {
           method: "GET",
@@ -217,7 +246,7 @@ export default {
           }
         }
       } else {
-        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_LIST_EP}`;
+        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_LIST_EP}/${this.selectedOrg._id}`;
         options = {
           method: "GET",
           headers: {
@@ -251,7 +280,7 @@ export default {
       localStorage.removeItem("userData")
     },
     goToNextPage(route){
-      const r = this.menu.find(x => x.name === route)
+      const r = this.getMenu().find(x => x.name === route)
       if(r.name === "Logout") this.logout()
       this.$router.push(r.path)
       if(this.$route.params.nextUrl != null){
