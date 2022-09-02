@@ -106,6 +106,7 @@
   <script>
 import HfPopUp from "../components/element/hfPopup.vue";
 import StudioSideBar from "../components/element/StudioSideBar.vue";
+import UtilsMixin from '../mixins/utils';
 
 import Loading from "vue-loading-overlay";
 
@@ -176,7 +177,8 @@ import Loading from "vue-loading-overlay";
                   console.log(j)
                   if (j.status === 200) {
                     this.notifySuccess("Org Created successfull");
-                    // this.$store.commit('insertAnOrg', payload);
+                    this.$store.commit('insertAnOrg', j.org);
+                    this.$store.commit('selectAnOrg', j.org._id)
                   }
                 })
 
@@ -187,6 +189,7 @@ import Loading from "vue-loading-overlay";
                 //this.$store.commit('insertAnOrg', payload);
               // Close the sideba
             }
-        }
+        },
+        mixins: [UtilsMixin]
     }
   </script>
