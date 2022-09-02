@@ -149,6 +149,9 @@ export default {
   computed:{
     templateList(){
       return this.$store.state.templateList;
+    },
+    selectedOrg(){
+      return this.$store.getters.getSelectedOrg;
     }
   },
   data() {
@@ -307,6 +310,7 @@ export default {
           reason: this.presentationTemplate.reason,
           required: this.presentationTemplate.required,
           callbackUrl: this.presentationTemplate.callbackUrl,
+          orgDid: this.selectedOrg._id
         }
         const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.PRESENTATION_TEMPLATE_EP}`
         fetch(url, {

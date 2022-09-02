@@ -3,14 +3,12 @@ import Router from 'vue-router'
 import PKIIdLogin from './views/PKIIdLogin.vue'
 import Register from './views/Register.vue'
 import config from './config'
-// import AppDetails from './views/AppDetails.vue'
-// import IssueCredential from './views/IssueCredential.vue'
 import Credential from './views/Credential.vue'
 import Presentation from './views/Presentation.vue'
 import Dashboard from './views/Dashboard.vue'
-// import Profile from './views/Profile.vue'
 import fetch from 'node-fetch'
 import Schema from './views/Schema.vue'
+import Org from './views/Org.vue'
 
 Vue.use(Router)
 
@@ -40,6 +38,14 @@ const router =  new Router({
       path: '/studio/dashboard',
       name: 'dashboard',
       component: Dashboard,
+      meta: {
+        requiresAuth: true
+      } 
+    },
+    {
+      path: '/studio/org',
+      name: 'Org',
+      component: Org,
       meta: {
         requiresAuth: true
       } 
