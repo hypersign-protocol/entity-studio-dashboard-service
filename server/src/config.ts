@@ -28,6 +28,7 @@ const host = process.env.HOST || "localhost";
 const WALLET_WEBHOOK = process.env.WALLET_WEB_HOOK
 const WALLET_WEB_HOOK_ORG_DID = process.env.WALLET_WEB_HOOK_ORG_DID
 const WALLET_WEB_HOOK_CREAD = process.env.WALLET_WEB_HOOK_CREAD;
+const ORG_SERVICE_ENDPOINT_GET_STATUS = process.env.ORG_SERVICE_END_POINT
 const bootstrapConfig = {
     keysfilePath: path.join(__dirname + '/keys.json'),
     schemafilePath: path.join(__dirname + '/schema.json')
@@ -99,7 +100,7 @@ export {
     mail,
     bootstrapConfig,
     hypersignSDK, dbConnUrl,
-    WALLET_WEBHOOK, WALLET_WEB_HOOK_CREAD,WALLET_WEB_HOOK_ORG_DID,
+    WALLET_WEBHOOK, WALLET_WEB_HOOK_CREAD,WALLET_WEB_HOOK_ORG_DID,ORG_SERVICE_ENDPOINT_GET_STATUS,
     studioServerBaseUrl,
     pathToIssueCred,mnemonic,walletOptions
 }
