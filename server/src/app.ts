@@ -30,7 +30,7 @@ export default function app() {
     const server = http.createServer(app)
    
 
-    const whitelistedUrls = ["http://localhost:9000","http://192.168.29.12:9001","http://192.168.29.209:9001","http://entity.hypersign.id","https://entity.hypersign.id" ,"http://localhost:9001", "https://wallet-stage.hypersign.id" ,"undefined" , "*" ,"http://localhost:4999"]
+    const whitelistedUrls = ["http://localhost:9000","http://192.168.29.12:9001","https://localhost:9001","http://192.168.29.209:9001","http://entity.hypersign.id","https://entity.hypersign.id" ,"http://localhost:9001", "https://wallet-stage.hypersign.id" ,"undefined" , "*" ,"http://localhost:4999"]
 
     function corsOptionsDelegate(req, callback) {
         let corsOptions;
