@@ -90,7 +90,7 @@
             </div>
             <div class="col-md-8" style="flex-wrap: wrap; padding:20px">
               <p>DID</p>
-              <p class="fVal"><a :href="`${$config.nodeServer.BASE_URL}${$config.nodeServer.DID_RESOLVE_EP}`+user.id" target="_blank">{{user.id}}</a></p>
+              <p class="fVal"><a :href="`${$config.nodeServer.BASE_URL_REST}${$config.nodeServer.DID_RESOLVE_EP}${user.id}:`" target="_blank">{{user.id}}</a></p>
               <p>EMAIL</p>
               <p class="fVal">{{user.email}}</p>
               <p v-if="user.phoneNumber">Phone Number: {{user.phoneNumber}}</p>

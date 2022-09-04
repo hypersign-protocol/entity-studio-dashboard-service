@@ -5,11 +5,20 @@
     </div>
     <StudioSideBar title="Add Organization">
       <div class="container">
-        <div class="form-group">
+        <div class="form-group" v-if="orgStore.orgDid">
           <label for="orgName"><strong>Org DID:</strong></label>
+          <input type="text" class="form-control" id="orgDid" v-model="orgStore.orgDid" aria-describedby="orgNameHelp"
+            disabled>
+          <small id="orgNameHelp" class="form-text text-muted">
+            <a :href="`${$config.nodeServer.BASE_URL_REST}${$config.nodeServer.DID_RESOLVE_EP}${orgStore.orgDid}:`" target="_blank">Resolve DID</a>
+          </small>
+        </div>
+        <div class="form-group" v-else>
+          <label for="orgName"><strong>Org ID:</strong></label>
           <input type="text" class="form-control" id="orgDid" v-model="orgStore._id" aria-describedby="orgNameHelp"
             disabled>
         </div>
+        
         <div class="form-group">
           <label for="orgName"><strong>Organization Name:</strong></label>
           <input type="text" class="form-control" id="orgName" v-model="orgStore.name" aria-describedby="orgNameHelp"
