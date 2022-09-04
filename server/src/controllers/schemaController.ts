@@ -35,7 +35,7 @@ const getSchemaById = async (req: Request, res: Response, next: NextFunction) =>
         logger.info("==========SchemaController ::getSchemaById Ends================")
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Content-Type', 'text/event-stream');
-        res.setHeader('Access-Control-Allow-Credentials', 'true');
+       // res.setHeader('Access-Control-Allow-Credentials', 'true');
         
         
         // res.json(schema)
