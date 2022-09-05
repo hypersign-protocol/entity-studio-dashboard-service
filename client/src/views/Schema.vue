@@ -298,8 +298,8 @@ export default {
         this.notifyErr("Name or Type Cannot be blank")
       }
     },
-    ssePupulateSchema(id, store) {
-      const sse = new EventSource(`${config.studioServer.SCHEMA_SSE}${id}`);
+    ssePopulateSchema(id, store) {
+      const sse = new EventSource(`${this.$config.studioServer.SCHEMA_SSE}${id}`);
     
       
       sse.onmessage = function (e) {
@@ -311,7 +311,7 @@ export default {
         }
       }
       sse.onopen = function (e) {
-        console.log("Connection to server opened.");
+        console.log("Connection to server opened.",e);
       };
 
       sse.onerror = function (e) {

@@ -3,90 +3,164 @@
     <div class="form-group" style="text-align: right">
       <button @click="openSlider()" class="btn btn-primary">+ Organization</button>
     </div>
-      <StudioSideBar title="Add Organization">
-        <div class="container">
-          <div class="form-group" v-if="orgStore.orgDid">
-            <label for="orgName"><strong>Org DID:</strong></label>
-            <input type="text" class="form-control" id="orgDid" v-model="orgStore.orgDid" aria-describedby="orgNameHelp"
-              disabled>
-            <small id="orgNameHelp" class="form-text text-muted">
-              <a :href="`${$config.nodeServer.BASE_URL_REST}${$config.nodeServer.DID_RESOLVE_EP}${orgStore.orgDid}:`" target="_blank">Resolve DID</a>
-            </small>
-          </div>
-          <div class="form-group" v-else>
-            <label for="orgName"><strong>Org ID:</strong></label>
-            <input type="text" class="form-control" id="orgDid" v-model="orgStore._id" aria-describedby="orgNameHelp"
-              disabled>
-          </div>
-          
-          <div class="form-group">
-            <label for="orgName"><strong>Organization Name:</strong></label>
-            <input type="text" class="form-control" id="orgName" v-model="orgStore.name" aria-describedby="orgNameHelp"
-              placeholder="Enter your org name">
-            <small id="orgNameHelp" class="form-text text-muted">Some help text</small>
-          </div>
-          <div class="form-group">
-            <label for="domain"><strong>Domain:</strong></label>
-            <input type="text" class="form-control" id="domain" v-model="orgStore.domain" aria-describedby="domainHelp"
-              placeholder="Enter your domain name">
-          </div>
-          <div class="form-group">
-            <label for="logo"><strong>Logo URL:</strong></label>
-            <input type="text" class="form-control" id="logo" v-model="orgStore.logo" aria-describedby="logoHelp"
-              placeholder="Enter logo URL">
-          </div>
-          <div class="form-group">
-            <label for="region"><strong>Region:</strong></label>
-            <input type="text" class="form-control" id="region" v-model="orgStore.region" aria-describedby="regionHelp"
-              placeholder="Select your region">
-          </div>
-          <!-- <div class="form-group">
+    <StudioSideBar title="Add Organization">
+      <div class="container">
+        <div class="form-group" v-if="orgStore.orgDid">
+          <label for="orgName"><strong>Org DID:</strong></label>
+          <input type="text" class="form-control" id="orgDid" v-model="orgStore.orgDid" aria-describedby="orgNameHelp"
+            disabled>
+          <small id="orgNameHelp" class="form-text text-muted">
+            <a :href="`${$config.nodeServer.BASE_URL_REST}${$config.nodeServer.DID_RESOLVE_EP}${orgStore.orgDid}:`"
+              target="_blank">Resolve DID</a>
+          </small>
+        </div>
+        <div class="form-group" v-else>
+          <label for="orgName"><strong>Org ID:</strong></label>
+          <input type="text" class="form-control" id="orgDid" v-model="orgStore._id" aria-describedby="orgNameHelp"
+            disabled>
+        </div>
+
+        <div class="form-group">
+          <label for="orgName"><strong>Organization Name:</strong></label>
+          <input type="text" class="form-control" id="orgName" v-model="orgStore.name" aria-describedby="orgNameHelp"
+            placeholder="Enter your org name">
+          <small id="orgNameHelp" class="form-text text-muted">Some help text</small>
+        </div>
+        <div class="form-group">
+          <label for="domain"><strong>Domain:</strong></label>
+          <input type="text" class="form-control" id="domain" v-model="orgStore.domain" aria-describedby="domainHelp"
+            placeholder="Enter your domain name">
+        </div>
+        <div class="form-group">
+          <label for="logo"><strong>Logo URL:</strong></label>
+          <input type="text" class="form-control" id="logo" v-model="orgStore.logo" aria-describedby="logoHelp"
+            placeholder="Enter logo URL">
+        </div>
+        <div class="form-group">
+          <label for="region"><strong>Region:</strong></label>
+          <input type="text" class="form-control" id="region" v-model="orgStore.region" aria-describedby="regionHelp"
+            placeholder="Select your region">
+        </div>
+        <!-- <div class="form-group">
                       <label for="region"><strong>Network:</strong></label>
                       <input type="text" class="form-control" id="region" v-model="orgStore.network" aria-describedby="regionHelp" placeholder="Select your region">
                   </div> -->
-          <div class="form-group" v-if="edit">
-            <button class="btn btn-primary" @click="createAnOrg()"> Edit</button>
+        <div class="form-group" v-if="edit">
+          <button class="btn btn-primary" @click="createAnOrg()"> Edit</button>
 
-          </div>
-          <div class="form-group" v-else>
-            <button class="btn btn-primary" @click="createAnOrg()"> Save</button>
-          </div>
         </div>
-      </StudioSideBar>
+        <div class="form-group" v-else>
+          <button class="btn btn-primary" @click="createAnOrg()"> Save</button>
+        </div>
+      </div>
+    </StudioSideBar>
     <div class="row" v-if="orgList.length > 0">
       <div class="col-lg-4" v-for="eachOrg in orgList" :key="eachOrg._id">
-        <b-card :title="eachOrg.name"  tag="article"
-          style="max-width: 30rem; margin-top: 20px" class="mb-2 eventCard">
+
+        <b-card :title="eachOrg.name" tag="article" style="max-width: 30rem; margin-top: 10px; max-height:25rem"
+          class="mb-2 eventCard" img-top v-if="eachOrg.orgDid && eachOrg.status=='Registered'">
+
+
           <ul style="
-                list-style-type: none;
-                padding-left: 0px;
-                min-height: 80px;
-                color:grey
-              ">
-            <!-- <li>
-              <span class="card-title">{{ eachOrg.orgDid? eachOrg.orgDid : eachOrg._id }}</span>
-            </li> -->
+                  list-style-type: none;
+                  padding-left: 0px;
+                  min-height: 80px;
+                ">
+            <li>
+              <span class="card-title">{{ eachOrg.orgDid }}</span>
+            </li>
+            <li>
+              <span class="card-title">{{ eachOrg.network }}</span>
+
+            </li>
             <li>
               <span class="card-title">{{ eachOrg.domain }}</span>
             </li>
-            <!-- <li>
-              <span class="card-title">Schemas : 10 </span>
-            </li>
-            <li>
-              <span class="card-title">Issued Credentials : 10 </span>
-            </li> -->
           </ul>
-          
-          <footer><small style="float: right">
+
+          <footer>
+            <small style="float: right">
               <span @click="editOrg(eachOrg._id)" title="Click to edit this event" style="cursor: pointer">
                 Edit
               </span> |
               <span @click="switchOrg(eachOrg._id)" title="Click to edit this event" style="cursor: pointer">
                 Switch
               </span>
-          </small>
+            </small>
           </footer>
         </b-card>
+        <b-card :title="eachOrg.name" tag="article" style="max-width: 30rem; margin-top: 25px; max-height:25rem"
+          class="mb-2 eventCard" img-top v-else-if=" eachOrg.status=='Failed'">
+
+
+          <ul style="
+                  list-style-type: none;
+                  padding-left: 0px;
+                  min-height: 80px;
+                ">
+            <li>
+              <span class="card-title">{{ eachOrg.network }}</span>
+
+            </li>
+            <li>
+              <span class="card-title">{{ eachOrg.domain }}</span>
+            </li>
+            <li>
+              <li>
+              <li> <span class="card-title">Failed  </span></li>
+            </li>
+            </li>
+            <li>
+              <span class="card-title"><img src="https://www.freeiconspng.com/thumbs/error-icon/sign-red-error-icon-1.png"
+                  height="25" width="25" /></span>
+            </li>
+          </ul>
+
+
+          <footer>
+            <small style="float: right">
+              <span  title="Click to edit this event" style="cursor: pointer">
+                Failed
+              </span> 
+              
+            </small>
+          </footer>
+
+        </b-card>
+        <b-card :title="eachOrg.name" tag="article" style="max-width: 30rem; margin-top: 25px; max-height:25rem"
+          class="mb-2 eventCard" img-top v-else>
+
+
+          <ul style="
+                  list-style-type: none;
+                  padding-left: 0px;
+                  min-height: 80px;
+                ">
+            <li>
+              <span class="card-title">{{ eachOrg.network }}</span>
+
+            </li>
+            <li>
+              <span class="card-title">{{ eachOrg.domain }}</span>
+            </li>
+            <li>
+              <li> <span class="card-title">Processing ..... </span></li>
+            </li>
+            <li>
+              <span class="card-title"><img src="https://i.gifer.com/origin/b4/b4d657e7ef262b88eb5f7ac021edda87.gif"  height="25" width="25"/></span>
+            </li>
+          </ul>
+
+
+
+
+        </b-card>
+
+
+
+
+
+
       </div>
     </div>
     <div class="form-group" v-else>
@@ -106,27 +180,25 @@
     text-align: left;
   }
   
-  .eventCard{
-    border-left: 10px solid var(--ds-background-accent-red-subtler,#FFBDAD8F);
+  .eventCard {
+    border-left: 10px solid var(--ds-background-accent-red-subtler, #FFBDAD8F);
   }
   
   .eventCard:hover {
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 10px;
     cursor: pointer;
   }
-
-  .card{
-    
-  }
-
-  .card-body {
-  -ms-flex: 1 1 auto;
-  -webkit-box-flex: 1;
-  flex: 1 1 auto;
-  min-height: 1px;
-  padding: 1.25rem;
   
-}
+  .card {}
+  
+  .card-body {
+    -ms-flex: 1 1 auto;
+    -webkit-box-flex: 1;
+    flex: 1 1 auto;
+    min-height: 1px;
+    padding: 1.25rem;
+  
+  }
   </style>
 
   <script>
@@ -156,18 +228,48 @@ export default {
         userDid: "",
       },
       authToken: localStorage.getItem("authToken"),
-      isLoading: true
+      isLoading: true,
+      isProcessFinished: true
     }
   },
   components: { HfPopUp, Loading, StudioSideBar },
   methods: {
+    ssePopulateOrg(id, store) {
+      const sse = new EventSource(`${this.$config.studioServer.ORG_SSE}${id}`);
+      sse.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log(data);
+        if (data.status === "Registered" || data.status === "Failed") {
+
+          sse.close();
+          store.commit("insertAnOrg", data)
+        }
+        // store.commit("updateCredStatus", data);
+      };
+
+      sse.onopen = function (e) {
+        console.log("Connection to server opened.", e);
+      };
+
+      sse.onerror = function (e) {
+        console.log(e)
+        sse.close();
+      }
+      return
+
+    },
     openWallet(url) {
       if (url != "") {
+
+
         this.walletWindow = window.open(
           `${url}`,
           "popUpWindow",
           `height=800,width=400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes`
         );
+        this.isProcessFinished = false;
+
+
       }
     },
     switchOrg(orgDid) {
@@ -183,6 +285,7 @@ export default {
       this.openSlider();
     },
     createAnOrg() {
+
       let url
       let method
       if (this.edit) {
@@ -210,8 +313,8 @@ export default {
         headers,
       }).then((res) => res.json())
         .then((j) => {
-          console.log(j)
 
+          const { org } = j
           if (!this.edit) {
             let QR_DATA = j.QrData
             let URL = `${this.$config.webWalletAddress}/deeplink?url=${JSON.stringify(QR_DATA)}`
@@ -222,6 +325,7 @@ export default {
 
             this.$store.commit('insertAnOrg', j.org);
             this.$store.commit('selectAnOrg', j.org._id)
+            this.isProcessFinished = true;
             this.openSlider();
 
             this.notifySuccess("Org Created successfull");
@@ -231,6 +335,13 @@ export default {
             }
 
           }
+          if (!this.edit) {
+            console.log(org)
+            this.ssePopulateOrg(org._id, this.$store)
+
+          }
+
+
         }).catch((e) => {
           console.log(e);
           this.notifyError("Something went wrong");

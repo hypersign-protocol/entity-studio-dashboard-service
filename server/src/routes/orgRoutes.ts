@@ -6,7 +6,7 @@ export const orgRoutes = (hypersign) => {
     const router = Router();
     router.post('/create', hypersign.authorize.bind(hypersign),CreateOrg);
 
-    router.post('/status/:id',setOrgStatus )
+    router.post('/status/:id', setOrgStatus)
     router.put('/update', hypersign.authorize.bind(hypersign),updateOrg)
     router.get('/all', hypersign.authorize.bind(hypersign), GetOrgsByUserDid)
     router.get('/sse/:id',GetOrgByIdSSE)
