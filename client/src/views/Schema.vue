@@ -64,6 +64,16 @@
 .card {
   border-radius: 10px;
 }
+
+.container {
+    padding: 20px;
+    text-align: left;
+  }
+
+  .tile{
+    max-height:150px;
+    overflow: auto
+  }
 </style>
 <template>
   <div class="home">
@@ -72,76 +82,78 @@
     <div class="row">
       <div class="col-md-12" style="text-align: left">
         <Info :message="description" />
-        <div class="card">
-          <div class="card-header">
-            <b-button v-b-toggle.collapse-1 variant="link">Create Schema</b-button>
+          <div class="form-group" style="text-align: right">
+            <button @click="openSlider()" class="btn btn-primary">+ Schema</button>
           </div>
-          <b-collapse id="collapse-1" class="mt-2">
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="form-group form-inline">
-                    <label style="margin-right: 8%">Schema Name:</label>
-                    <input type="text" v-model="credentialName" size="30" placeholder="Enter schema name"
-                      class="form-control" />
-                  </div>
-                  <div class="form-group form-inline">
-                    <label style="margin-right: 12%">Description:</label>
-                    <textarea v-model="credentialDescription" rows="5" cols="29" placeholder="Enter description"
-                      class="form-control"></textarea>
-                  </div>
-                  <div class="form-group form-inline">
-                    <label style="margin-right: 3%">Additional Properties</label>
-                    <input size="100px" v-model="additionalProperties" type="checkbox" />
-                  </div>
+          <StudioSideBar title="Creat Schema">
+              <div class="container">
+                <div class="form-group">
+                  <label for="schemaName"><strong>Schema Name:</strong></label>
+                  <input type="text" class="form-control" id="schemaName" v-model="credentialName" aria-describedby="schemaNameHelp">
                 </div>
-                <div class="col-md-6">
-                  <div class="col-md-6">
-                    <div class="form-group form-inline">
-                      <label style="margin-right: 5%">Name</label>
-                      <input type="text" class="form-control" size="30" v-model="attributeName"
-                        placeholder="Enter attribute name" />
-                    </div>
-                    <div class="form-group form-inline">
-                      <label style="margin-right: 5%">Type</label>
-                      <input type="text" class="form-control" size="30" v-model="attributeTypes"
-                        placeholder="Enter attribute Type (eg. String)" />
-                    </div>
-                    <div class="form-group form-inline">
-                      <label style="margin-right: 5%">Format</label>
-                      <input type="text" class="form-control" size="30" v-model="attributeFormat"
-                        placeholder="Enter attribute Format (eg email)" />
-                    </div>
-                    <div class="form-group form-inline">
-                      <label style="margin-right: 5%">Required</label>
-                      <input type="checkbox" class="form-control" size="200px" v-model="attributeRequired" />
-                    </div>
-
-                    <a class="btn btn-primary" style="margin-left: 5%; border-radius:30px; color:white"
-                      v-on:click="addBlankAttrBox()">Add +</a>
+                <div class="form-group">
+                  <label for="schDescription"><strong>Description:</strong></label>
+                  <textarea type="text" class="form-control" id="schDescription" v-model="credentialDescription"  rows="5" cols="20" aria-describedby="orgNameHelp"></textarea>
+                </div>
+                <div class="form-group card">
+                  <div class="card-header">
+                    <b-button v-b-toggle.collapse-1 variant="link">Fields Configurations</b-button>
                   </div>
-                  <div class="form-group" style="min-height:150px;max-height:150px;overflow: auto">
-                    <div v-for="attr in attributes" :key="attr.type">
-                      <div class="sm-tiles">
-                        {{ attr.name }}
-                        <span>x</span>
+                  <b-collapse id="collapse-1" class="mt-2" style="padding:10px">
+                    <div class="form-group tile" v-if="attributes.length > 0">
+                      <div v-for="attr in attributes" :key="attr.type">
+                        <div class="sm-tiles">
+                          {{ attr.name }}
+                          <span>x</span>
+                        </div>
                       </div>
                     </div>
+                    <div class="form-group row">
+                      <label for="ipattributeName" class="col-sm-2 col-form-label">Name</label>
+                      <div class="col-sm-10">
+                        <input type="text" class="form-control"  v-model="attributeName" id="ipattributeName" placeholder="">
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label for="type" class="col-sm-2 col-form-label">Type</label>
+                      <div class="col-sm-10">
+                        <input type="text" class="form-control"  v-model="attributeTypes" id="type" placeholder="">
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label for="type" class="col-sm-2 col-form-label">Format</label>
+                      <div class="col-sm-10">
+                        <input type="text" class="form-control"  v-model="attributeFormat" id="type" placeholder="Enter attribute Format (eg email)">
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label for="required" class="col-sm-2 col-form-label">Required?</label>
+                      <div class="col-sm-10">
+                        <input type="checkbox" v-model="attributeRequired" id="required" >
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <div class="col-sm-10">
+                        <a class="btn btn-primary" style="color:white; " v-on:click="addBlankAttrBox()">Add +</a>
+                      </div>
+                    </div>
+                  </b-collapse>
+                </div>
+                <div class="form-group">
+                  <label for="schDescription"><strong>Additional Properties?:</strong></label>
+                  <input v-model="additionalProperties" type="checkbox" />
+                </div>
+                <div class="form-group row">
+                  <div class="col-md-12">
+                    <hr/>
+                    <button class="btn btn-outline-primary btn-sm" @click="createSchema()">Create</button>
                   </div>
                 </div>
               </div>
-              <div class="row">
-                <div class="col-md-12">
-                  <hr />
-                  <button class="btn btn-outline-primary btn-sm" @click="createSchema()">Create</button>
-                </div>
-              </div>
-            </div>
-          </b-collapse>
-        </div>
+          </StudioSideBar>
       </div>
     </div>
-    <div class="row" style="margin-top: 2%;">
+    <div class="row" style="margin-top: 2%;" v-if="schemaList.length > 0">
       <div class="col-md-12">
         <table class="table table-bordered" style="background:#FFFF">
           <thead class="thead-light">
@@ -187,6 +199,9 @@
         <button class="btn btn-outline-warning btn-sm"  @click="fetchSchemasNext()"  > Next </button> -->
       </div>
     </div>
+    <div class="form-group" v-else>
+      <h2>Create your first schema!</h2>
+    </div>
   </div>
 </template>
 
@@ -197,9 +212,11 @@ import Info from '@/components/Info.vue';
 import UtilsMixin from '../mixins/utils';
 import Loading from "vue-loading-overlay";
 import config from "../config";
+import StudioSideBar from "../components/element/StudioSideBar.vue";
+
 export default {
   name: "IssueCredential",
-  components: { QrcodeVue, Info, Loading },
+  components: { QrcodeVue, Info, Loading, StudioSideBar },
   computed: {
     schemaList() {
       return this.$store.state.schemaList;
@@ -254,6 +271,9 @@ export default {
     });
   },
   methods: {
+    openSlider() {
+      this.$root.$emit("bv::toggle::collapse", "sidebar-right");
+    },
     gotosubpage: (id) => {
       this.$router.push(`${id}`);
     },
@@ -352,6 +372,7 @@ export default {
               const URL = `${this.$config.webWalletAddress}/deeplink?url=${JSON.stringify(QR_DATA)}`
               this.openWallet(URL)
               this.ssePupulateSchema(j.schema._id, this.$store)
+              this.openSlider();
             } else {
               throw new Error(`${j.error}`);
             }
