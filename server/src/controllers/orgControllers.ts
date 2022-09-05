@@ -106,7 +106,7 @@ const GetOrgByIdSSE = async (req: Request, res: Response, next: NextFunction) =>
         res.setHeader('Connection', 'keep-alive')
         res.setHeader('Cache-Control', 'no-cache')
         res.setHeader('X-Accel-Buffering', 'no')
-        send(res,OrgById,id,timer,DELAY,STOP,'OrgController')
+        send(res,OrgById,id,timer,DELAY,STOP,'OrgController' ,orgStatusByid )
     } catch (e) {
         res.status(500).send({ status: 500, message: null, error: e })
     }
@@ -114,6 +114,11 @@ const GetOrgByIdSSE = async (req: Request, res: Response, next: NextFunction) =>
 const OrgById=async(id)=>{
     const org = await Org.findOne({ _id: id }).exec()
     return org
+}
+const orgStatusByid=async (id)=>{
+    return await Org.findOneAndUpdate({_id:id}, { status: 'Failed' },{ returnDocument: 'after'}).exec()
+  
+   
 }
 const updateOrg = async (req: Request, res: Response, next: NextFunction) => {
     try {

@@ -71,7 +71,7 @@ const getSchema = async (req: Request, res: Response, next: NextFunction) => {
         const skip = (pageInt - 1) * limitInt;
 
 
-        const schemaList = await Schema.find({ did: hypersign.data.id, orgDid, status: "Registered" }).sort({ createdAt: -1 })
+        const schemaList = await Schema.find({ did: hypersign.data.id, orgDid }).sort({ createdAt: -1 })
         logger.info("==========SchemaController ::getSchema Ends================")
         res.status(200).json({ schemaList, status: 200 })
     } catch (error) {

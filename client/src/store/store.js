@@ -68,7 +68,7 @@ export default new Vuex.Store({
             } else {
                 console.log('already exists scheme id =' + payload._id);
                 this.commit('updateAschema', payload);
-              //  state.updateAschema(state, payload)
+              //  state.updateAschema(state, payload) 
 
                 
             }
@@ -78,6 +78,7 @@ export default new Vuex.Store({
                 state.orgList.push(payload);
             } else {
                 console.log('already exists scheme id =' + payload._id);
+                this.commit('updateAnOrg', payload);
             }
         },
         updateAschema(state, payload) {
@@ -100,8 +101,14 @@ export default new Vuex.Store({
                 state.vcList.push(payload);
             } else {
                 console.log('already exists credential id =' + payload._id);
+                this.commit('updateAcredential', payload);
             }
         },
+        updateAcredential(state, payload) {
+            console.log("updating a credential" ,payload);
+            let index = state.vcList.findIndex(x => x._id === payload._id);
+            Object.assign(state.vcList[index], {...payload});
+        }
         
         //     fetchAllOrgDataOnOrgSelect(state, payload) {
         //         console.log(state , payload);

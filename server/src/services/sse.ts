@@ -1,11 +1,11 @@
 import { logger } from "../config";
 
 
-const send = async (res, func ,id, timer,DELAY,STOP,log) => {
+const send = async (res, func ,id, timer,DELAY,STOP,log,func2?) => {
     try {
         timer = timer + DELAY;
          const data = await func(id)
-         
+        
         if (data) {
             res.write(`data: ${JSON.stringify(data)}\n\n`);
             
@@ -19,16 +19,30 @@ const send = async (res, func ,id, timer,DELAY,STOP,log) => {
 
             }
             if ((timer > STOP) || (timer === STOP)) {
+                console.log("timer", timer);
+                
                 if (data.status !== "Registered") {
                     logger.info(`===========${log} SSE:: Ends================`)
-                    data.status = "Failed"
+                    data.status = "Failed"                    
+                  
+                   
+                    if(typeof func2 === "function"){
+                       const  data2= await func2(id)
+                     
+                       
+                       res.write(`data: ${JSON.stringify(data2)}\n\n`);
+                       return
+                       
+
+                    }else{
                     res.write(`data: ${JSON.stringify(data)}\n\n`);
                     return
+                    }
                 }
 
 
             }
-            setTimeout(() => { send(res, func,id, timer,DELAY,STOP,log) }, DELAY)
+            setTimeout(() => { send(res, func,id, timer,DELAY,STOP,log,func2) }, DELAY)
 
             return
         }
