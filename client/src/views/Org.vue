@@ -61,9 +61,10 @@
                 list-style-type: none;
                 padding-left: 0px;
                 min-height: 80px;
+                color:grey
               ">
             <li>
-              <span class="card-title">{{ eachOrg.network }}</span>
+              <span class="card-title">{{ eachOrg.orgDid? eachOrg.orgDid : eachOrg._id }}</span>
             </li>
             <li>
               <span class="card-title">{{ eachOrg.domain }}</span>
