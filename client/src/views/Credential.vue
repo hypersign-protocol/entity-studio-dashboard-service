@@ -20,15 +20,14 @@
     <div class="row">
       <div class="col-md-12" style="text-align: left">
         <Info :message="description" />
-        <div class="card">
-          <div class="card-header">
-            <b-button v-b-toggle.collapse-1 variant="link">Issue Credential</b-button>
-          </div>
-          <b-collapse id="collapse-1" class="mt-2">
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-6">
-                  <form style="max-height:300px; overflow:auto; padding: 5px">
+        <div class="form-group" style="text-align: right">
+            <button @click="openSlider()" class="btn btn-primary">+ Issue Credential</button>
+          </div>          
+            <StudioSideBar title="Creat Schema">
+              <div class="container">
+                <div class="form-group row">
+                  <div class="col-md-12">
+                    <form style="max-height:300px; overflow:auto; padding: 5px">
                     <div class="form-group">
                       <input type="text" class="form-control" placeholder="Issued To (did:hs:...)"
                         v-model="holderDid" />
@@ -40,32 +39,23 @@
 
                     </div>
                     <div class="form-group" v-for="attr in issueCredAttributes" :key="attr.name">
-                      <label>{{ attr.name }}</label>
-                      <input type="text" v-model="attr.value" class="form-control"
-                        placeholder="Enter attribute value" />
+                      <label for="schDescription"><strong>{{ attr.name }}</strong></label>
+                      <input type="text" class="form-control" id="schemaName" v-model="attr.value" aria-describedby="schemaNameHelp" placeholder="Enter attribute value">
                     </div>
                   </form>
-                  <hr />
-                  <button class="btn btn-outline-primary btn-sm" @click="issueCredential()">Issue</button>
-                </div>
-                <div class="col-md-6" style="padding: 30px" v-if="isCredentialIssued">
-                  <div class="form-group" style="text-align:center">
-                    <qrcode-vue :value="signedVerifiableCredential" :size="200" level="H"></qrcode-vue>
-                    <label class="title">Scan the QR code using Hypersign Wallet!</label>
                   </div>
-                  <div class="form-group" style="text-align:center">
-                    <p></p>
-                    <h5>OR</h5>
-                    <button class="btn btn-link" @click="downloadCredentials()">Download Credential</button>
+                </div>
+                <div class="form-group row">
+                  <div class="col-md-12">
+                    <hr />
+                    <button class="btn btn-outline-primary btn-sm" @click="issueCredential()">Issue</button>
                   </div>
                 </div>
               </div>
-            </div>
-          </b-collapse>
-        </div>
+              </StudioSideBar>
       </div>
     </div>
-    <div class="row" style="margin-top: 2%;">
+    <div class="row" style="margin-top: 2%;" v-if="vcList.length > 0">
       <div class="col-md-12">
         <table class="table table-bordered" style="background:#FFFF">
           <thead class="thead-light">
@@ -110,6 +100,9 @@
         </hf-pop-up>
       </div>
     </div>
+    <div class="form-group" v-else>
+      <h2>Issue your first credential!</h2>
+    </div>
   </div>
 </template>
 
@@ -119,9 +112,10 @@ import Info from '@/components/Info.vue'
 import UtilsMixin from '../mixins/utils';
 import HfPopUp from "../components/element/hfPopup.vue";
 import Loading from "vue-loading-overlay";
+import StudioSideBar from "../components/element/StudioSideBar.vue";
 export default {
   name: "IssueCredential",
-  components: { Info, HfPopUp, Loading },
+  components: { Info, HfPopUp, Loading, StudioSideBar },
   computed: {
     vcList(){
       return this.$store.state.vcList;
@@ -186,7 +180,9 @@ export default {
     });
   },
   methods: {
-
+    openSlider() {
+      this.$root.$emit("bv::toggle::collapse", "sidebar-right");
+    },
     ssePopulateCredStatus(id,store){
       const sse = new EventSource(`${this.$config.studioServer.CRED_SSE}${id}`);
       sse.onmessage = (event) => {
