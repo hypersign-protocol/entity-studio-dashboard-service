@@ -3,7 +3,7 @@ import Schema, { ISchema } from '../models/Schema';
 import { logger, sse_client, WALLET_WEBHOOK } from '../config'
 const DELAY = 5000;
 const STOP = 1000 * 60;
-let timer = 0;
+
 
 const saveSchema = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -25,7 +25,7 @@ const saveSchema = async (req: Request, res: Response, next: NextFunction) => {
 }
 const getSchemaById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-
+        let timer = 0;
         logger.info("==========SchemaController ::getSchemaById Starts================")
 
         const id = req.params.id
@@ -33,42 +33,45 @@ const getSchemaById = async (req: Request, res: Response, next: NextFunction) =>
         res.setHeader('Access-Control-Allow-Origin', `${sse_client}`);
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Access-Control-Allow-Credentials', 'true');
-        res.setHeader( 'Connection', 'keep-alive')
+        res.setHeader('Connection', 'keep-alive')
         res.setHeader('Cache-Control', 'no-cache')
         res.setHeader('X-Accel-Buffering', 'no')
-        
+
         // res.json(schema)
-        send(res, id)
+        send(res, id, timer)
     } catch (error) {
         logger.error("==========SchemaController ::getSchemaById Ends================")
 
         res.status(500).json(error)
     }
 }
-const send = async (res, id) => {
+const send = async (res, id, timer) => {
     try {
         timer = timer + DELAY;
         const schema: ISchema | null = await Schema.findOne({ _id: id }).exec()
         if (schema) {
             res.write(`data: ${JSON.stringify(schema)}\n\n`);
 
-           
+
             if (schema.status === "Registered") {
                 timer = 0;
                 logger.info("==========SchemaController ::SSE Ends================")
-                return 
+                return
 
 
             }
             if ((timer > STOP) || (timer === STOP)) {
-                timer
-                logger.info("==========SchemaController ::SSE Ends================")
+                if (schema.status !== "Registered") {
+                    logger.info("==========SchemaController ::SSE Ends================")
+                    schema.status = "Failed"
+                    res.write(`data: ${JSON.stringify(schema)}\n\n`);
+                    return
+                }
 
-                return 
 
             }
-            setTimeout(() => { send(res, id) }, DELAY)
-            
+            setTimeout(() => { send(res, id, timer) }, DELAY)
+
             return
         }
     } catch (error) {
@@ -95,7 +98,7 @@ const getSchema = async (req: Request, res: Response, next: NextFunction) => {
         const skip = (pageInt - 1) * limitInt;
 
 
-        const schemaList = await Schema.find({ did: hypersign.data.id, orgDid ,status:"Registered"}).sort({ createdAt: -1 })
+        const schemaList = await Schema.find({ did: hypersign.data.id, orgDid, status: "Registered" }).sort({ createdAt: -1 })
         logger.info("==========SchemaController ::getSchema Ends================")
         res.status(200).json({ schemaList, status: 200 })
     } catch (error) {
