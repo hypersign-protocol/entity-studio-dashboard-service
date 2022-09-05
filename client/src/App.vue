@@ -56,18 +56,19 @@
 <template>
   <div id="app">
     <div class="row nav-style">
-      <div class="col-md-4">
+      <div class="col-md-3">
         <!-- <h5 class="leftAlign">{{$config.app.name}}</h5>  -->
         <div class="form-group form-inline">
           <img class="logo-style"
             src="https://thumb.tildacdn.com/tild3065-3765-4865-b331-393637653931/-/resize/150x/-/format/webp/hypersign_Yellow.png">
           <h4 class="subtitle"> <span style="opacity:0.4">|</span> {{ $config.app.name }} ({{ $config.app.version }})</h4>
+          
         </div>
       </div>
-      <div class="col-md-2" v-if="isShow" style="padding-top:12px">
-        <OrgDropDown></OrgDropDown>
+      <div class="col-md-3">
+        <OrgDropDown v-if="isShow" style="padding-top:12px"></OrgDropDown>
       </div>
-      <div class="col-md-6 rightAlign" style="padding-top:12px"
+      <div class="col-md-6   rightAlign" style="padding-top:12px"
         v-if="!(authRoutes.includes($router.history.current.name))">
         <button type="button" @click="goToNextPage(m.name)" class="btn btn-light btn-sm" v-for="m in getMenu()"
           :key="m.name" v-if="m.isShow">{{ m.name }}</button>
@@ -80,11 +81,22 @@
 
 <style>
 #app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  /* font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #2c3e50; */
+
+
+  color: #212529;
+text-align: left;
+background-color: #fff;
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: 1.42857142857143;
+text-decoration-skip-ink: auto;
 }
 
 #nav {

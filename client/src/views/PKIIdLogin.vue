@@ -234,7 +234,7 @@ export default {
             // console.log(_this.$router);
             // window.location.href =
             //   window.location.origin + "/dashboard";
-            _this.$router.push("dashboard");
+            _this.$router.push("org");
           }
         }
       } else if (messageData.op == "reload") {

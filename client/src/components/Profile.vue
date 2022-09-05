@@ -58,7 +58,6 @@
 
 </style>
 
-
 <template>  
   <div class="row">
     <div class="col-md-12" style="margin-top:2%; margin-bottom:7%">
@@ -66,7 +65,7 @@
         <div class="col-md-5">
           <div class="card">
             <div class="card-body tile">{{schemaCount}}</div>
-            <div class="card-header">AUTHORED SCHEMA</div>
+            <div class="card-header">AUTHORED SCHEMAS</div>
           </div>
         </div>
         <div class="col-md-5">
