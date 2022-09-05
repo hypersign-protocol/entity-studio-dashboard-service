@@ -22,15 +22,15 @@
     <div class="row">
       <div class="col-md-12" style="text-align: left">
         <Info :message="description" />
-        <div class="card">
-          <div class="card-header">
-            <b-button v-b-toggle.collapse-1 variant="link">Generate Presentation Template</b-button>
-          </div>
-          <b-collapse id="collapse-1" class="mt-2">
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-6">
-                  <form style="max-height:300px; min-height: 300px; overflow:auto; padding: 5px">
+        
+          <div class="form-group" style="text-align: right">
+            <button @click="openSlider()" class="btn btn-primary">+ Presentation Template</button>
+          </div>  
+          <StudioSideBar title="Create Presentation Template">
+
+              <div class="form-group row container">
+                <div class="col-md-12">
+                  <form>
                     <div class="form-group">
                       <label class="floatLeft">Domain :</label>
                       <input class="form-control" type="url" v-model="presentationTemplate.domain" />
@@ -69,33 +69,19 @@
                     </div>
                     <div class="form-group">
                       <label class="floatLeft ">Required :</label>
-                      <input class="form-control" type="checkbox" v-model="presentationTemplate.required" />
-
-
+                      <input type="checkbox" v-model="presentationTemplate.required" />
                     </div>
 
                   </form>
                   <hr />
                   <button class="btn btn-outline-primary btn-sm" @click="generatePresentation()">Generate</button>
                 </div>
-                <div class="col-md-6" style="padding: 30px" v-if="isCredentialIssued">
-                  <div class="form-group" style="text-align:center">
-                    <qrcode-vue :value="signedVerifiablePresentation" :size="200" level="H"></qrcode-vue>
-                    <label class="title">Scan the QR code using Hypersign Wallet!</label>
-                  </div>
-                  <div class="form-group" style="text-align:center">
-                    <p></p>
-                    <h5>OR</h5>
-                    <button class="btn btn-link" @click="downloadCredentials()">Download Presentation</button>
-                  </div>
-                </div>
               </div>
-            </div>
-          </b-collapse>
-        </div>
+            </StudioSideBar>
+          
       </div>
     </div>
-    <div class="row" style="margin-top: 2%;">
+    <div class="row" style="margin-top: 2%;" v-if="templateList.length >0">
       <div class="col-md-12">
         <table class="table table-bordered" style="background:#FFFF">
           <thead class="thead-light">
@@ -128,8 +114,9 @@
         <!-- </div> -->
       </div>
       <!-- </div> -->
-
-
+    </div>
+    <div class="form-group" v-else>
+      <h2>Create your first presentation template!</h2>
     </div>
 
   </div>
@@ -138,6 +125,7 @@
 <script>
 import fetch from "node-fetch";
 import UtilsMixin from '../mixins/utils';
+import StudioSideBar from "../components/element/StudioSideBar.vue";
 
 import conf from '../config';
 const { hypersignSDK } = conf;
@@ -145,7 +133,7 @@ import QrcodeVue from "qrcode.vue";
 import Info from '@/components/Info.vue'
 export default {
   name: "Presentation",
-  components: { QrcodeVue, Info },
+  components: { QrcodeVue, Info , StudioSideBar},
   computed:{
     templateList(){
       return this.$store.state.templateList;
@@ -222,6 +210,9 @@ export default {
     });
   },
   methods: {
+    openSlider() {
+      this.$root.$emit("bv::toggle::collapse", "sidebar-right");
+    },
     showClaims() {
       if (this.isClaims) this.isClaims = false;
       else this.isClaims = true;
@@ -320,6 +311,7 @@ export default {
         }).then((res) => res.json()).then(json => {
           this.$store.commit('insertApresentationTemplate', json)
           this.notifySuccess('Template Successfully created')
+          this.openSlider();
         })
       } catch (e) {
         this.isLoading = false

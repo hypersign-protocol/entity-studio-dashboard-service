@@ -21,9 +21,9 @@
       <div class="col-md-12" style="text-align: left">
         <Info :message="description" />
         <div class="form-group" style="text-align: right">
-            <button @click="openSlider()" class="btn btn-primary">+ Issue Credential</button>
+            <button @click="openSlider()" class="btn btn-primary">+ Credential</button>
           </div>          
-            <StudioSideBar title="Creat Schema">
+            <StudioSideBar title="Issue Credential">
               <div class="container">
                 <div class="form-group row">
                   <div class="col-md-12">
@@ -325,6 +325,7 @@ export default {
             this.openWallet(URL)
 
              this.ssePopulateCredStatus(creadRecord._id,this.$store)
+             this.openSlider();
           })
       } catch (e) {
         this.isLoading = false

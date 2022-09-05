@@ -85,7 +85,7 @@
           <div class="form-group" style="text-align: right">
             <button @click="openSlider()" class="btn btn-primary">+ Schema</button>
           </div>
-          <StudioSideBar title="Creat Schema">
+          <StudioSideBar title="Create Schema">
               <div class="container">
                 <div class="form-group">
                   <label for="schemaName"><strong>Schema Name:</strong></label>
