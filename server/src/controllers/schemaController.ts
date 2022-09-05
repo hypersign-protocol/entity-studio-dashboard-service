@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import Schema, { ISchema } from '../models/Schema';
-import { logger, WALLET_WEBHOOK } from '../config'
+import { logger, sse_client, WALLET_WEBHOOK } from '../config'
 const DELAY = 5000;
 const STOP = 1000 * 60;
 let timer = 0;
@@ -33,9 +33,9 @@ const getSchemaById = async (req: Request, res: Response, next: NextFunction) =>
 
 
         logger.info("==========SchemaController ::getSchemaById Ends================")
-        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Origin', `${sse_client}`);
         res.setHeader('Content-Type', 'text/event-stream');
-       // res.setHeader('Access-Control-Allow-Credentials', 'true');
+         res.setHeader('Access-Control-Allow-Credentials', 'true');
         
         
         // res.json(schema)

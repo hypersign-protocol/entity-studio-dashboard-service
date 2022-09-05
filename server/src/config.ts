@@ -45,7 +45,7 @@ const db = new sqlite.Database(db_path, (err) => {
         logger.info(`Connected to ssi-infa database. DB path = ${db_path}`)
     }
 });
-
+const sse_client=process.env.SSE_CLIENT_URL
 // DID Related: 
 // TODO: Not required for this project. so remove
 const did = {
@@ -102,5 +102,5 @@ export {
     hypersignSDK, dbConnUrl,
     WALLET_WEBHOOK, WALLET_WEB_HOOK_CREAD,WALLET_WEB_HOOK_ORG_DID,ORG_SERVICE_ENDPOINT_GET_STATUS,
     studioServerBaseUrl,
-    pathToIssueCred,mnemonic,walletOptions
+    pathToIssueCred,mnemonic,walletOptions,sse_client
 }
