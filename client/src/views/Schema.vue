@@ -279,8 +279,9 @@ export default {
       }
     },
     ssePupulateSchema(id, store) {
-      const sse = new EventSource(`${config.studioServer.SCHEMA_SSE}${id}`, { withCredentials: true, headers: { 'Authorization': 'Bearer ' + this.authToken } });
-
+      const sse = new EventSource(`${config.studioServer.SCHEMA_SSE}${id}`);
+    
+      
       sse.onmessage = function (e) {
         const data = JSON.parse(e.data)
          console.log(data);
@@ -289,6 +290,9 @@ export default {
           store.dispatch("insertAschema", data)
         }
       }
+      sse.onopen = function (e) {
+        console.log("Connection to server opened.");
+      };
 
       sse.onerror = function (e) {
         console.log(e)

@@ -29,16 +29,13 @@ const getSchemaById = async (req: Request, res: Response, next: NextFunction) =>
         logger.info("==========SchemaController ::getSchemaById Starts================")
 
         const id = req.params.id
-        // const schema = await Schema.findOne({ _id: id }).exec()
-
-
         logger.info("==========SchemaController ::getSchemaById Ends================")
         res.setHeader('Access-Control-Allow-Origin', `${sse_client}`);
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Access-Control-Allow-Credentials', 'true');
         res.setHeader( 'Connection', 'keep-alive')
-    res.setHeader('Cache-Control', 'no-cache')
-    res.setHeader('X-Accel-Buffering', 'no')
+        res.setHeader('Cache-Control', 'no-cache')
+        res.setHeader('X-Accel-Buffering', 'no')
         
         // res.json(schema)
         send(res, id)
