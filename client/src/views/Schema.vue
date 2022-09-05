@@ -283,7 +283,7 @@ export default {
 
       sse.onmessage = function (e) {
         const data = JSON.parse(e.data)
-        // console.log(data);
+         console.log(data);
         if (data.status === "Registered") {
           sse.close();
           store.dispatch("insertAschema", data)
