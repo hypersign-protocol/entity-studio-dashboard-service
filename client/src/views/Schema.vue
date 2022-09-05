@@ -196,7 +196,6 @@ import QrcodeVue from "qrcode.vue";
 import Info from '@/components/Info.vue';
 import UtilsMixin from '../mixins/utils';
 import Loading from "vue-loading-overlay";
-import config from "../config";
 export default {
   name: "IssueCredential",
   components: { QrcodeVue, Info, Loading },
@@ -278,8 +277,8 @@ export default {
         this.notifyErr("Name or Type Cannot be blank")
       }
     },
-    ssePupulateSchema(id, store) {
-      const sse = new EventSource(`${config.studioServer.SCHEMA_SSE}${id}`);
+    ssePopulateSchema(id, store) {
+      const sse = new EventSource(`${this.$config.studioServer.SCHEMA_SSE}${id}`);
     
       
       sse.onmessage = function (e) {
@@ -291,7 +290,7 @@ export default {
         }
       }
       sse.onopen = function (e) {
-        console.log("Connection to server opened.");
+        console.log("Connection to server opened.",e);
       };
 
       sse.onerror = function (e) {
@@ -351,7 +350,7 @@ export default {
               // Open the wallet for trasanctional approval.
               const URL = `${this.$config.webWalletAddress}/deeplink?url=${JSON.stringify(QR_DATA)}`
               this.openWallet(URL)
-              this.ssePupulateSchema(j.schema._id, this.$store)
+              this.ssePopulateSchema(j.schema._id, this.$store)
             } else {
               throw new Error(`${j.error}`);
             }

@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import Schema, { ISchema } from '../models/Schema';
 import { logger, sse_client, WALLET_WEBHOOK } from '../config'
-const DELAY = 5000;
-const STOP = 1000 * 60;
+import { send } from '../services/sse';
+
 
 
 const saveSchema = async (req: Request, res: Response, next: NextFunction) => {
@@ -26,6 +26,8 @@ const saveSchema = async (req: Request, res: Response, next: NextFunction) => {
 const getSchemaById = async (req: Request, res: Response, next: NextFunction) => {
     try {
         let timer = 0;
+        const DELAY = 5000;
+        const STOP = 5000 * 60;
         logger.info("==========SchemaController ::getSchemaById Starts================")
 
         const id = req.params.id
@@ -38,48 +40,19 @@ const getSchemaById = async (req: Request, res: Response, next: NextFunction) =>
         res.setHeader('X-Accel-Buffering', 'no')
 
         // res.json(schema)
-        send(res, id, timer)
+        send(res, getSchemaData,id, timer,DELAY,STOP,"SchemaController")
     } catch (error) {
         logger.error("==========SchemaController ::getSchemaById Ends================")
 
         res.status(500).json(error)
     }
 }
-const send = async (res, id, timer) => {
-    try {
-        timer = timer + DELAY;
-        const schema: ISchema | null = await Schema.findOne({ _id: id }).exec()
-        if (schema) {
-            res.write(`data: ${JSON.stringify(schema)}\n\n`);
 
-
-            if (schema.status === "Registered") {
-                timer = 0;
-                logger.info("==========SchemaController ::SSE Ends================")
-                return
-
-
-            }
-            if ((timer > STOP) || (timer === STOP)) {
-                if (schema.status !== "Registered") {
-                    logger.info("==========SchemaController ::SSE Ends================")
-                    schema.status = "Failed"
-                    res.write(`data: ${JSON.stringify(schema)}\n\n`);
-                    return
-                }
-
-
-            }
-            setTimeout(() => { send(res, id, timer) }, DELAY)
-
-            return
-        }
-    } catch (error) {
-        logger.error("==========SchemaController ::SSE Ends================")
-
-        return res.end();
-    }
+const getSchemaData=async (id)=>{
+    const schema: ISchema | null = await Schema.findOne({ _id: id }).exec()
+return schema
 }
+
 
 const getSchema = async (req: Request, res: Response, next: NextFunction) => {
     try {

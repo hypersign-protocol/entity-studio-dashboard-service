@@ -83,6 +83,7 @@
           </thead>
           <tbody>
             <tr v-for="row in vcList" :key="row.vc_id">
+            
               <td>
                 <a :href="`${row.vc_id}:`" target="_blank>" v-if="row.vc_id">{{ shorten(row.vc_id) }}</a>
                 <span>-</span>
@@ -94,7 +95,7 @@
               <td>{{ row.credStatus ? row.credStatus.issuanceDate: "-"}}</td>
               <td>{{ row.credStatus ? row.credStatus.expirationDate : "-"}}</td>
               <!-- <td>{{ row.credStatus ?  row.credStatus.credentialHash : "-"}}</td>  -->
-              <td> {{ row.credStatus ? row.credStatus.claim.currentStatus : "Initiated"}}</td>
+              <td> {{ row.credStatus ? row.credStatus.claim.currentStatus : row.status}}</td>
               <td>{{ row.credStatus ? row.credStatus.claim.statusReason  : "-"}}</td>
               <td> 
                 <button type="button" class="btn btn-primary" @click="generateCred(`${row._id}`)" v-if="row.credStatus">Send</button>
@@ -185,6 +186,34 @@ export default {
     });
   },
   methods: {
+
+    ssePopulateCredStatus(id,store){
+      const sse = new EventSource(`${this.$config.studioServer.CRED_SSE}${id}`);
+      sse.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log(data);
+        if (data.status === "Registered" || data.status === "Failed") {
+          
+          sse.close();
+          store.dispatch("insertAcredential", data)
+        }
+        // store.commit("updateCredStatus", data);
+      };
+
+      sse.onopen = function (e) {
+        console.log("Connection to server opened.",e);
+      };
+
+      sse.onerror = function (e) {
+        console.log(e)
+        sse.close();
+      }
+      return
+
+
+    },
+      
+    
     async  generateCred(id) {
 
       const body = {
@@ -290,9 +319,16 @@ export default {
           body: JSON.stringify({ QR_DATA: this.QrData }),
         }).then((res) => res.json())
           .then(json => {
-            const { QR_DATA } = json
-            const URL = `${this.$config.webWalletAddress}/deeplink?url=${JSON.stringify(QR_DATA)}`
+            const { QR_DATA,creadRecord } = json
+            
+
+            this.$store.dispatch("insertAcredential", creadRecord)
+
+
+           const URL = `${this.$config.webWalletAddress}/deeplink?url=${JSON.stringify(QR_DATA)}`
             this.openWallet(URL)
+
+             this.ssePopulateCredStatus(creadRecord._id,this.$store)
           })
       } catch (e) {
         this.isLoading = false

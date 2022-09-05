@@ -1,15 +1,17 @@
 import { Request, Response, NextFunction } from 'express'
-import { jwtExpiryInMilli, jwtSecret, pathToIssueCred, studioServerBaseUrl, logger } from '../config';
+import { jwtExpiryInMilli, jwtSecret, pathToIssueCred, studioServerBaseUrl, logger, sse_client } from '../config';
 import jwt from 'jsonwebtoken'
 import creadSchema from '../models/CreadSchema';
 import { WALLET_WEB_HOOK_CREAD } from '../config'
+import { send } from '../services/sse';
+
 const setCredentialStatus = async (req: Request, res: Response, next: NextFunction) => {
     try {
         logger.info("==========CredController ::setCredentialStatus Starts ================")
         const id = req.params.id
         const { issuerDid, subjectDid, schemaId } = req.body.vc
 
-        const credObj = await creadSchema.findOneAndUpdate({ _id: id }, { vc: req.body.vc, vc_id: req.body.vc.credentialStatus.id, issuerDid, subjectDid, schemaId })
+        const credObj = await creadSchema.findOneAndUpdate({ _id: id }, { vc: req.body.vc, vc_id: req.body.vc.credentialStatus.id, issuerDid, subjectDid, schemaId ,status:"Registered" })
         logger.info("==========CredController ::setCredentialStatus Ends ================")
 
         res.json({ msg: "success" })
@@ -19,6 +21,39 @@ const setCredentialStatus = async (req: Request, res: Response, next: NextFuncti
         res.json(error)
     }
 }
+const getCredentialById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+       
+        let timer = 0;
+        const DELAY = 5000;
+        const STOP = 5000 * 60;
+        logger.info("==========CredController ::getCredentialById Starts ================")
+
+        const id = req.params.id
+        logger.info("==========CredController ::getCredentialById Ends ================")
+
+        res.setHeader('Access-Control-Allow-Origin', `${sse_client}`);
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader('Connection', 'keep-alive')
+        res.setHeader('Cache-Control', 'no-cache')
+        res.setHeader('X-Accel-Buffering', 'no')
+        send(res,getCread,id,timer,DELAY,STOP,"CredController")
+
+      //  res.json(cred)
+     
+    } catch (error) {
+        logger.error("==========CredController ::getCredentialById Ends ================")
+
+        res.status(500).json(error)
+    }
+}
+
+const getCread=async(id)=>{
+    return  await creadSchema.findOne({ _id: id })
+
+}
+
 const issueCredential = async (req: Request, res: Response, next: NextFunction) => {
     try {
         logger.info("==========CredController ::issueCredential Starts ================")
@@ -27,7 +62,7 @@ const issueCredential = async (req: Request, res: Response, next: NextFunction) 
         const { issuerDid, subjectDid, schemaId ,orgDid } = QR_DATA.data
         QR_DATA.data.issuerDid = hypersign.data.id;
 
-        const creadObj = await creadSchema.create({ issuerDid, subjectDid, schemaId, createdAt: new Date() ,orgDid})
+        const creadObj = await creadSchema.create({ issuerDid, subjectDid, schemaId,status:"Initiated", createdAt: new Date() ,orgDid})
 
         QR_DATA.data.expirationDate = new Date('12/12/2027')
         QR_DATA.serviceEndpoint = `${WALLET_WEB_HOOK_CREAD}/${creadObj._id}`;
@@ -36,7 +71,7 @@ const issueCredential = async (req: Request, res: Response, next: NextFunction) 
 
         logger.info("==========CredController ::issueCredential Ends ================")
 
-        res.json({ QR_DATA, status: 200 })
+        res.json({ QR_DATA, creadRecord: creadObj, status: 200 })
 
     } catch (error) {
         logger.error("==========CredController ::issueCredential Ends ================")
@@ -148,5 +183,5 @@ const accpctWalletCredential = async (req: Request, res: Response, next: NextFun
 export {
     issueCredential,
     getCredentialList,
-    setCredentialStatus, accepctCredential, accpctWalletCredential
+    setCredentialStatus, accepctCredential, accpctWalletCredential,getCredentialById
 }
