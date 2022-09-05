@@ -10,7 +10,6 @@ import blogRoutes from './routes/blog';
 import appRoutes from './routes/app';
 import { credentialRoutes } from './routes/verifiableCredentials';
 import db from './dbConn';
-import path from 'path'
 import http from 'http'
 import { schemaRoutes } from './routes/schemaRoutes';
 import { presentationRoute } from './routes/presentationRoutes';
