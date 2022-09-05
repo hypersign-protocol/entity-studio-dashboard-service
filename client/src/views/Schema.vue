@@ -371,7 +371,7 @@ export default {
               // Open the wallet for trasanctional approval.
               const URL = `${this.$config.webWalletAddress}/deeplink?url=${JSON.stringify(QR_DATA)}`
               this.openWallet(URL)
-              this.ssePupulateSchema(j.schema._id, this.$store)
+              this.ssePopulateSchema(j.schema._id, this.$store)
               this.openSlider();
             } else {
               throw new Error(`${j.error}`);
