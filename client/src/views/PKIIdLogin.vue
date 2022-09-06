@@ -55,83 +55,41 @@ h5 span {
   background: #fff;
   padding: 0 10px;
 }
+
+.center{
+  display: flex;
+  justify-content: center;
+}
 </style>
 <template>
   <!-- <div class="row" style="margin-left: 35%;"> -->
   <div class="row" style="align-content: center;">
     <loading :active.sync="isLoading" :can-cancel="true" :is-full-page="fullPage"></loading>
-    <div class="col-md-7" style="font-size: small;color:grey;" hidden>
-      Can we put one big image here?
-    </div>
-    <div class="col-md-3" style="font-size: small;color:grey;margin-left: 36%;">
-      <form action="#" style="padding:6px">
-        <b-card no-body style="padding: 40px">
+    <div class="col-md-3" style="font-size: small;color:grey;margin: 0 auto;">
+      <b-card no-body style="padding: 40px">
+        <div class="form-group center">
           <h4>Login</h4>
-          <hr />
-          <div class="row">
-            <form action="#" class="col-md-12">
-              <div class="form-group">
-                <vue-qr  margin="1" :text="qr_data" :size="250" :logoSrc="src" ></vue-qr>
-                <label style="font-size:small; color:grey; margin-top:1%">Scan QR code using Hypersign Mobile
-                  App</label>
-                <div>
-                  <!-- <p style="font-size:small;"> Don’t have the app yet? <a href="#">Get it now</a></p> -->
-                  <span style="font-size: small; color:grey; padding: 10px">
-                    Get the app on
-                    <a href="https://play.google.com/store/apps/details?id=com.hypersign.cordova"
-                      target="__blank">Android</a>
-                    or
-                    <a :href="$config.webWalletAddress" target="__blank">Web</a>
-                  </span>
-                </div>
-              </div>
-              <div class="form-group">
-                <h5><span>Or</span></h5>
-              </div>
-              <div class="mb-2 primary">
-                <a v-if="this.value != ''" class="btn btn-hypersign  button-theme" :style="buttonThemeCss" href="#"
+          
+        </div>
+        <hr/>
+        <div class="form-group center">
+            <vue-qr  margin="1" :text="qr_data" :size="250" :logoSrc="src" ></vue-qr>
+        </div>
+        <div class="form-group centeralign">
+          Scan the QR code
+        </div>
+        <div class="form-group center">
+          <h5><span>Or</span></h5>
+        </div>
+        <div class="form-group center">
+            <a v-if="this.value != ''" class="btn btn-hypersign  button-theme" :style="buttonThemeCss" href="#"
                   @click.prevent="openWallet()">
                   <div style="font-size: smaller; padding: 10px;">
                     Click To Login
                   </div>
                 </a>
-              </div>
-              <!-- <div class="form-group">
-                <label class="floatLeft">Upload keys.json:</label>
-                <input
-                  type="file"
-                  class="form-control"
-                  placeholder
-                  @change="onFileChange"
-                  accept="*.json"
-                />
-              </div>
-              <div class="form-group">
-                <label class="floatLeft">Upload vc.json:</label>
-                <input type="file" class="form-control" placeholder @change="onFileChange" />
-              </div> -->
-            </form>
-          </div>
-          <div class="row">
-            <!-- <div class="col-sm-3" hidden>
-              <button
-                type="button"
-                data-toggle="modal"
-                @click="downloadPresentation()"
-                class="btn btn-primary btn-sm floatLeft"
-              >View Proof</button>
-            </div> -->
-            <!-- <div class="col-sm-3">
-              <button type="button" data-toggle="modal" @click="login('PKI')"
-                class="btn btn-primary btn-sm floatLeft">Login</button>
-            </div> -->
-            <div class="col-md-9 floatRight">
-              Do not have an account?
-              <a @click="push('register')" style="color:blue; cursor: pointer;">SignUp</a>
-            </div>
-          </div>
-        </b-card>
-      </form>
+        </div>
+      </b-card>
     </div>
   </div>
 </template>
