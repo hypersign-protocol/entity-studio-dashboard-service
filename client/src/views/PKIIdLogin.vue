@@ -114,7 +114,7 @@ export default {
   data() {
     return {
       qr_data:{},
-      src:require("../assets/icon.png"),
+      src: require("../assets/icon.png"),
       active: 0,
       username: "",
       password: "",

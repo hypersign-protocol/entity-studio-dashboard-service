@@ -58,14 +58,8 @@
       <div class="col-lg-4" v-for="eachOrg in orgList" :key="eachOrg._id">
 
         <b-card :title="eachOrg.name" tag="article" style="max-width: 30rem; margin-top: 10px; max-height:25rem"
-          class="mb-2 eventCard" img-top v-if="eachOrg.orgDid && eachOrg.status=='Registered'">
-
-
-          <ul style="
-                  list-style-type: none;
-                  padding-left: 0px;
-                  min-height: 80px;
-                ">
+          class="mb-2 eventCard" img-top>
+          <ul style="list-style-type: none;padding-left: 0px;min-height: 80px;">
             <li>
               <span class="card-title">{{ eachOrg.orgDid }}</span>
             </li>
@@ -77,9 +71,29 @@
               <span class="card-title">{{ eachOrg.domain }}</span>
             </li>
           </ul>
-
           <footer>
-            <small style="float: right">
+            <div class="form-group row" style="margin-bottom: 0rem;">
+              <div class="col-sm-10">
+              <ul style="list-style-type: none;padding-left: 0px;">
+              <li v-if="eachOrg.status === 'Failed'">
+              <span class="card-title" >
+                <img :src="images.redcross" height="25" width="25" /> Failed
+              </span>
+            </li>
+            <li v-else-if="eachOrg.status === 'Registered'">
+              <span class="card-title" >
+                <img :src="images.greentick" height="21" width="21"/> Registered
+              </span>
+            </li>
+            <li v-else>
+              <span class="card-title" >
+                <img :src="images.loader"  height="25" width="25"/> Processing ..... 
+              </span>
+            </li>
+            </ul>
+            </div>
+           
+              <small>
               <span @click="editOrg(eachOrg._id)" title="Click to edit this event" style="cursor: pointer">
                 Edit
               </span> |
@@ -87,80 +101,11 @@
                 Switch
               </span>
             </small>
+            </div>
+           
+            
           </footer>
         </b-card>
-        <b-card :title="eachOrg.name" tag="article" style="max-width: 30rem; margin-top: 25px; max-height:25rem"
-          class="mb-2 eventCard" img-top v-else-if=" eachOrg.status=='Failed'">
-
-
-          <ul style="
-                  list-style-type: none;
-                  padding-left: 0px;
-                  min-height: 80px;
-                ">
-            <li>
-              <span class="card-title">{{ eachOrg.network }}</span>
-
-            </li>
-            <li>
-              <span class="card-title">{{ eachOrg.domain }}</span>
-            </li>
-            <li>
-              <li>
-              <li> <span class="card-title">Failed  </span></li>
-            </li>
-            </li>
-            <li>
-              <span class="card-title"><img src="https://www.freeiconspng.com/thumbs/error-icon/sign-red-error-icon-1.png"
-                  height="25" width="25" /></span>
-            </li>
-          </ul>
-
-
-          <footer>
-            <small style="float: right">
-              <span  title="Click to edit this event" style="cursor: pointer">
-                Failed
-              </span> 
-              
-            </small>
-          </footer>
-
-        </b-card>
-        <b-card :title="eachOrg.name" tag="article" style="max-width: 30rem; margin-top: 25px; max-height:25rem"
-          class="mb-2 eventCard" img-top v-else>
-
-
-          <ul style="
-                  list-style-type: none;
-                  padding-left: 0px;
-                  min-height: 80px;
-                ">
-            <li>
-              <span class="card-title">{{ eachOrg.network }}</span>
-
-            </li>
-            <li>
-              <span class="card-title">{{ eachOrg.domain }}</span>
-            </li>
-            <li>
-              <li> <span class="card-title">Processing ..... </span></li>
-            </li>
-            <li>
-              <span class="card-title"><img src="https://i.gifer.com/origin/b4/b4d657e7ef262b88eb5f7ac021edda87.gif"  height="25" width="25"/></span>
-            </li>
-          </ul>
-
-
-
-
-        </b-card>
-
-
-
-
-
-
       </div>
     </div>
     <div class="form-group" v-else>
@@ -181,7 +126,7 @@
   }
   
   .eventCard {
-    border-left: 10px solid var(--ds-background-accent-red-subtler, #FFBDAD8F);
+    border-left: 10px solid var(--ds-background-accent-red-subtler, #ADE8FF8F);
   }
   
   .eventCard:hover {
@@ -226,10 +171,16 @@ export default {
         network: "Jagrat",
         orgDid: "",
         userDid: "",
+        status: "",
       },
       authToken: localStorage.getItem("authToken"),
       isLoading: true,
-      isProcessFinished: true
+      isProcessFinished: true,
+      images: {
+        greentick: require("../assets/green-tick.png"),
+        redcross: require("../assets/red-cross.png"),
+        loader: require("../assets/small-loader.gif"),
+      }
     }
   },
   components: { HfPopUp, Loading, StudioSideBar },
