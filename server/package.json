@@ -28,7 +28,7 @@
     "express": "^4.17.1",
     "hid-hd-wallet": "git+https://github.com/hypersign-protocol/hid-hd-wallet.git#ssi-integration",
     "hs-ssi-sdk": "^6.1.0",
-    "hypersign-auth-node-sdk": "^6.0.1",
+    "hypersign-auth-node-sdk": "^6.0.2",
     "jsonwebtoken": "^8.5.1",
     "lds-sdk": "^4.0.1",
     "mongoose": "^6.5.2",
