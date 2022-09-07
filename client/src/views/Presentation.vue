@@ -32,43 +32,31 @@
                 <div class="col-md-12">
                   <form>
                     <div class="form-group">
-                      <label class="floatLeft">Domain :</label>
+                      <label class="floatLeft"><strong>Domain:</strong></label>
                       <input class="form-control" type="url" v-model="presentationTemplate.domain" />
-
-
                     </div>
                     <div class="form-group">
-                      <label class="floatLeft">Name (optional):</label>
+                      <label class="floatLeft"><strong>Name (optional):</strong></label>
                       <input class="form-control" type="text" v-model="presentationTemplate.name" />
-
-
                     </div>
                     <div class="form-group">
-                      <label class="floatLeft">IssuerDid</label>
+                      <label class="floatLeft"><strong>IssuerDid:</strong></label>
                       <input class="form-control" type="text" v-model="presentationTemplate.issuerDid" />
-
-
                     </div>
                     <div class="form-group">
-                      <label class="floatLeft">Schema Id :</label>
+                      <label class="floatLeft"><strong>Schema Id:</strong></label>
                       <input class="form-control" type="text" v-model="presentationTemplate.schemaId" />
-
-
                     </div>
                     <div class="form-group">
-                      <label class="floatLeft">Reason :</label>
+                      <label class="floatLeft"><strong>Reason:</strong></label>
                       <input class="form-control" type="text" v-model="presentationTemplate.reason" />
-
-
                     </div>
                     <div class="form-group">
-                      <label class="floatLeft">Callback URI</label>
+                      <label class="floatLeft"><strong>Callback URI:</strong></label>
                       <input class="form-control" type="url" v-model="presentationTemplate.callbackUrl" />
-
-
                     </div>
                     <div class="form-group">
-                      <label class="floatLeft ">Required :</label>
+                      <label class="floatLeft "><strong>Required:</strong></label>
                       <input type="checkbox" v-model="presentationTemplate.required" />
                     </div>
 
