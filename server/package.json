@@ -27,7 +27,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "hid-hd-wallet": "git+https://github.com/hypersign-protocol/hid-hd-wallet.git#ssi-integration",
-    "hs-ssi-sdk": "^6.1.0",
+    "hs-ssi-sdk": "^6.1.1",
     "hypersign-auth-node-sdk": "^6.0.2",
     "jsonwebtoken": "^8.5.1",
     "lds-sdk": "^4.0.1",
@@ -37,7 +37,8 @@
     "sha.js": "^2.4.11",
     "simple-node-logger": "^18.12.24",
     "sqlite3": "^5.0.0",
-    "uuid": "^8.2.0"
+    "uuid": "^8.2.0",
+    "uuidv4": "^6.2.13"
   },
   "devDependencies": {
     "@types/express": "^4.17.6",

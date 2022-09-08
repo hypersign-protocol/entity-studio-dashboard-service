@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import HIDWallet from 'hid-hd-wallet'
+import PresentationTemplateSchema from "../models/presentationTemplateSchema";
 
+import HIDWallet from 'hid-hd-wallet'
 import HypersignSsiSDK from "hs-ssi-sdk";
 import { walletOptions, mnemonic } from '../config'
-import PresentationTemplateSchema from "../models/presentationTemplateSchema";
+
 const verifyPresentation = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const hidWalletInstance = new HIDWallet(walletOptions);
@@ -11,7 +12,7 @@ const verifyPresentation = async (req: Request, res: Response, next: NextFunctio
 
         const { vc, issuerDid, holderDid } = req.body
         hidWalletInstance.generateWallet({ mnemonic }).then(async () => {
-            hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, walletOptions.hidNodeRPCUrl, walletOptions.hidNodeRestUrl)
+            hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, walletOptions.hidNodeRPCUrl, walletOptions.hidNodeRestUrl, 'devnet')
             return hsSdk.init()
         }).then(async () => {
             console.log(req.body);
@@ -36,7 +37,7 @@ const verifyPresentation = async (req: Request, res: Response, next: NextFunctio
 
 
 }
-const presentationTempalateById=async (req:Request,res:Response,next:NextFunction) => {
+const presentationTempalateById = async (req:Request,res:Response,next:NextFunction) => {
     try {
         const {data}=req.body.hypersign
         // const query_template={

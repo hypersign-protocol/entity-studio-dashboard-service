@@ -40,7 +40,7 @@ const getSchemaById = async (req: Request, res: Response, next: NextFunction) =>
         res.setHeader('X-Accel-Buffering', 'no')
 
         // res.json(schema)
-        send(res, getSchemaData,id, timer,DELAY,STOP,"SchemaController")
+        send(res, getSchemaData, id, timer, DELAY, STOP, "SchemaController")
     } catch (error) {
         logger.error("==========SchemaController ::getSchemaById Ends================")
 
