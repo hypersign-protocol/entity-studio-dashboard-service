@@ -2,6 +2,7 @@
 import PresentationRequestSchema , { IPresentationRequest } from "../models/PresentationRequest";
 import PresentationTemplateSchema, {IPresentationTemplate} from "../models/presentationTemplateSchema";
 import OrgSchema, { IOrg } from "../models/OrgSchema";
+import { studioServerBaseUrl} from '../config';
 
 import { uuid } from 'uuidv4';
 
@@ -120,7 +121,6 @@ export async function getChallenge(req, res, next) {
                 expiresTime,
                 status: 0
             }).save();
-    
         // For the QR Data
         // Insert a new challenge in db
         const QR_DATA =  {
@@ -128,7 +128,7 @@ export async function getChallenge(req, res, next) {
             "data":
             {
                 "QRType":"REQUEST_CRED",
-                "serviceEndpoint":"http://localhost:9000/api/v1/tp/verify/",
+                "serviceEndpoint": `${studioServerBaseUrl}/api/v1/presentation/request/verify/`,
                 "schemaId": "ssi/schema/"+ schemaId,
                 "appDid": templateOwnerDid,
                 "appName": name,
