@@ -17,7 +17,7 @@ You can eiter render a button or QR code or both.
 ```js
 <script
   type="module"
-  src="index.js"
+  src="https://cdn.jsdelivr.net/gh/hypersign-protocol/studio@implement-org/js-sdk/build/index.js"
   data-button-text="Present Presentation" // Inner text of the button
   data-hs-wallet-base-url="https://wallet-stage.hypersign.id" // Identity Wallet URL
   data-presentation-request-endpoint="https://stage.hypermine.in/studioserver/api/v1/ presentation/request/" // Presentation request endpoint; See Entity Studio API documentation
