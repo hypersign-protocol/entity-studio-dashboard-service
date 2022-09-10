@@ -3,27 +3,31 @@ import Router from 'vue-router'
 import PKIIdLogin from './views/PKIIdLogin.vue'
 import Register from './views/Register.vue'
 import config from './config'
-// import AppDetails from './views/AppDetails.vue'
-// import IssueCredential from './views/IssueCredential.vue'
 import Credential from './views/Credential.vue'
 import Presentation from './views/Presentation.vue'
 import Dashboard from './views/Dashboard.vue'
-// import Profile from './views/Profile.vue'
 import fetch from 'node-fetch'
 import Schema from './views/Schema.vue'
+import Org from './views/Org.vue'
 
 Vue.use(Router)
 
 const router =  new Router({
-  mode: 'history',
+  mode: 'hash',
   routes: [
+    {
+      path: '/',
+      redirect: '/studio',
+      requiresAuth:true,
+    },
     {
       path: '/login',
       redirect: '/studio/login'
     },
     {
       path: '/studio',
-      redirect: '/studio/login'
+      redirect: '/studio/dashboard',
+      requiresAuth:true
     },
     {
       path: '/studio/login',
@@ -34,6 +38,14 @@ const router =  new Router({
       path: '/studio/dashboard',
       name: 'dashboard',
       component: Dashboard,
+      meta: {
+        requiresAuth: true
+      } 
+    },
+    {
+      path: '/studio/org',
+      name: 'Org',
+      component: Org,
       meta: {
         requiresAuth: true
       } 
@@ -57,7 +69,7 @@ const router =  new Router({
       component: Schema,
       meta: {
         requiresAuth: true
-      } 
+           } 
     },
     // {
     //   path: '/studio/apps/:appId',
@@ -98,13 +110,13 @@ router.beforeEach((to, from, next) => {
   if(to.matched.some(record => record.meta.requiresAuth)){
     const authToken = localStorage.getItem('authToken')
     if(authToken){
-      const url = `${config.studioServer.BASE_URL}api/auth/verify`
+      const url = `${config.studioServer.BASE_URL}protected`
       console.log(url)
       fetch(url,{
         headers: {
-          'x-auth-token': authToken
-        },
-        method: 'POST'
+          Authorization: `Bearer ${authToken}`,
+      },
+      method: "POST",
       }).then(res => res.json())
       .then(json => {
         if(json.status == 403){
@@ -113,10 +125,13 @@ router.beforeEach((to, from, next) => {
             params: { nextUrl:  to.fullPath}
           })  
         }else{
+          localStorage.setItem("user", JSON.stringify(json.message));
+          console.log(json);
           next()
         }
       })
       .catch((e)=> {
+        console.log(e);
         next({
           path: '/studio/login',
           params: { nextUrl:  to.fullPath}

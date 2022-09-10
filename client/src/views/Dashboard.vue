@@ -1,4 +1,9 @@
 <style scoped>
+.home{
+    margin-left: auto;
+    margin-right: auto;
+    width: 1500px;
+  }
 .addmargin {
   margin-top: 10px;
   margin-bottom: 10px;
@@ -35,10 +40,10 @@
 </style>
 <template>
    <div class="home marginRight marginLeft">
-     <h3 class="leftAlign">Welcome, {{user.fname}} !</h3>
+     <h3 class="leftAlign">Welcome, {{user.name}} !</h3>
      <div class="row">
       <div class="col-md-6">
-          <Profile/>
+        <Profile/>
       </div>
       <div class="col-md-6">
         <Dashboard/>
@@ -53,8 +58,6 @@ import Dashboard from '@/components/Dashboard.vue'
 import Profile from '@/components/Profile.vue'
 export default {
   name: "PanelPage",
-  mounted() {
-  },
   components: { 
     Dashboard,
     Profile
@@ -69,42 +72,9 @@ export default {
   },
   created() {
     const usrStr = localStorage.getItem('user')
-    //console.log(usrStr)
     this.user = JSON.parse(usrStr);
-    //console.log(this.user)
-    // this.userKeys = Object.keys(this.user)
-    // const url = `http://${location.hostname}:9000/api/app/list`;
-    // fetch(url,{
-    //     headers: {
-    //       'x-auth-token': this.authToken
-    //     },
-    //     method: 'POST'
-    //   })
-    // .then(res => res.json())
-    // .then(json => {
-    //   if(json.status == 200){
-    //     this.appList = json.message.list
-    //   }
-    // })
-    // .catch(e => this.notifyErr(`${e.message}`))
   },
   methods: {
-    notifySuccess(msg){
-      this.$notify({
-          group: 'foo',
-          title: 'Information',
-          type: 'success',
-          text: msg
-        });
-    },
-    notifyErr(msg){
-      this.$notify({
-          group: 'foo',
-          title: 'Error',
-          type: 'error',
-          text: msg
-        });
-    },
     gotosubpage: id => {
       this.$router.push(`${id}`);
     },
@@ -120,36 +90,6 @@ export default {
         this.$router.push('/login')
                 }
     },
-    // createApp(){
-    //   if(!this.appName) this.notifyErr('AppName can not be blank')
-    //   const url = `http://${location.hostname}:9000/api/app/register`;
-    //   const appData = {
-    //     name: this.appName
-    //   }
-    //   fetch(url,{
-    //       body: JSON.stringify(appData),
-    //       method: 'POST',
-    //       headers: {
-    //         'x-auth-token': this.authToken,
-    //         'Accept': 'application/json',
-    //         'Content-Type': 'application/json'
-    //       }
-    //     })
-    //   .then(res => res.json())
-    //   .then(json => {
-    //     if(json.status == 200){
-    //       this.appList.push(json.message)
-    //       this.notifySuccess("App successfully created")
-    //     }
-    //   })
-    //   .catch(e => {
-    //     this.notifyErr(e.message)
-    //   })
-    // },
-    // goToDetailsPage: function(id) {
-    //     this.$router.push("/studio/apps/"+id);
-    // }
-
-  }
+  },
 };
 </script>

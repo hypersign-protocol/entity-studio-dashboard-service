@@ -58,7 +58,6 @@
 
 </style>
 
-
 <template>  
   <div class="row">
     <div class="col-md-12" style="margin-top:2%; margin-bottom:7%">
@@ -66,13 +65,13 @@
         <div class="col-md-5">
           <div class="card">
             <div class="card-body tile">{{schemaCount}}</div>
-            <div class="card-header">Authored Schemas</div>
+            <div class="card-header">AUTHORED SCHEMAS</div>
           </div>
         </div>
         <div class="col-md-5">
           <div class="card">
-            <div class="card-body tile">{{credentialCount}}</div>
-            <div class="card-header">Issued Credentials</div>
+            <div class="card-body tile">{{ credentialCount}}</div>
+            <div class="card-header">ISSUED CREDENTIALS</div>
           </div>
         </div>
       </div>
@@ -90,8 +89,8 @@
             </div>
             <div class="col-md-8" style="flex-wrap: wrap; padding:20px">
               <p>DID</p>
-              <p class="fVal"><a :href="`${$config.nodeServer.BASE_URL}${$config.nodeServer.DID_RESOLVE_EP}`+user.id" target="_blank">{{user.id}}</a></p>
-              <p>Email</p>
+              <p class="fVal"><a :href="`${$config.nodeServer.BASE_URL_REST}${$config.nodeServer.DID_RESOLVE_EP}${user.id}:`" target="_blank">{{user.id}}</a></p>
+              <p>EMAIL</p>
               <p class="fVal">{{user.email}}</p>
               <p v-if="user.phoneNumber">Phone Number: {{user.phoneNumber}}</p>
               <!-- <p>PUBLIC KEY</p>
@@ -110,13 +109,19 @@ export default {
   name: "Profile",
   mounted() {},
   components: {},
+  computed:{
+    credentialCount(){
+      return this.$store.getters.totalCredentials;
+    },
+    schemaCount(){
+      return this.$store.getters.totalSchemas;
+    }
+  },
   data() {
     return {
       active: 0,
       userKeys: [],
       appList: [],
-      schemaCount: 0,
-      credentialCount: 0,
       user: {
         id: "",
         publicKey: "",
@@ -129,11 +134,8 @@ export default {
   },
   created() {
     const usrStr = localStorage.getItem("user");
-    //console.log(usrStr);
     this.user = { ...JSON.parse(usrStr) };
-    //console.log(this.user);
     this.userKeys = Object.keys(this.user);
-    this.pollData()
   },
   methods: {
     fetchData(url,options){

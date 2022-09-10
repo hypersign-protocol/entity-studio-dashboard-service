@@ -1,4 +1,10 @@
 <style scoped>
+.home {
+  margin-left: auto;
+  margin-right: auto;
+  width: 1500px;
+}
+
 .addmargin {
   margin-top: 10px;
   margin-bottom: 10px;
@@ -19,149 +25,182 @@
 .floatLeft {
   float: left;
 }
+
 .floatRight {
   float: right;
 }
+
 .card-header {
   background: aliceblue;
   padding: 0px;
 }
-.sm-tiles{
+
+.sm-tiles {
   float: left;
-padding: 5px;
-border: 1px solid #8080807d;
-margin: 1%;
-border-radius: 5px;
-background: #f5dda71c;
-color: #888b8f;
-}
-.sm-tiles:hover{
-    float: left;
-padding: 5px;
-border: 1px solid #8080807d;
-margin: 1%;
-border-radius: 5px;
-background: #f5dda7a3;;
-font-style: bold ;
-color: #888b8f;
+  padding: 5px;
+  border: 1px solid #8080807d;
+  margin: 1%;
+  border-radius: 5px;
+  background: #f5dda71c;
+  color: #888b8f;
 }
 
+.sm-tiles:hover {
+  float: left;
+  padding: 5px;
+  border: 1px solid #8080807d;
+  margin: 1%;
+  border-radius: 5px;
+  background: #f5dda7a3;
+  ;
+  font-style: bold;
+  color: #888b8f;
+}
 
-.card{
+.word-wrap {
+  word-wrap: anywhere;
+}
+
+.card {
   border-radius: 10px;
 }
 
+.container {
+    padding: 20px;
+    text-align: left;
+  }
+
+  .tile{
+    max-height:150px;
+    overflow: auto
+  }
 </style>
 <template>
-  <div class="home marginLeft marginRight">
-    <loading :active.sync="isLoading" 
-        :can-cancel="true" 
-        :is-full-page="fullPage"></loading>
+  <div class="home">
+    <loading :active.sync="isLoading" :can-cancel="true" :is-full-page="fullPage"></loading>
 
     <div class="row">
       <div class="col-md-12" style="text-align: left">
-        <Info :message="description"/>
-        <div class="card">
-          <div class="card-header">
-            <b-button v-b-toggle.collapse-1 variant="link">Create Schema</b-button>
+        <Info :message="description" />
+          <div class="form-group" style="text-align: right">
+            <button @click="openSlider()" class="btn btn-primary">+ Schema</button>
           </div>
-          <b-collapse id="collapse-1" class="mt-2">
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="form-group form-inline">
-                    <label style="margin-right: 8%">Schema Name:</label>
-                    <input
-                      type="text"
-                      v-model="credentialName"
-                      size="30"
-                      placeholder="Enter schema name"
-                      class="form-control"
-                    />
-                  </div>
-                  <div class="form-group form-inline">
-                    <label style="margin-right: 12%">Description:</label>
-                    <textarea
-                      v-model="credentialDescription"
-                      rows="5"
-                      cols="29"
-                      placeholder="Enter description"
-                      class="form-control"
-                    ></textarea>
-                  </div>
+          <StudioSideBar title="Create Schema">
+              <div class="container">
+                <div class="form-group">
+                  <label for="schemaName"><strong>Schema Name:</strong></label>
+                  <input type="text" class="form-control" id="schemaName" v-model="credentialName" aria-describedby="schemaNameHelp">
                 </div>
-                <div class="col-md-6">
-                  <div class="form-group form-inline">
-                    <label style="margin-right: 5%">Add attribute:</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      size="30"
-                      v-model="attributeName"
-                      placeholder="Enter attribute name"
-                    />
-                    <a
-                      class="btn btn-primary"
-                      style="margin-left: 2%; border-radius:30px; color:white"
-                      v-on:click="addBlankAttrBox()"
-                    >+</a>
+                <div class="form-group">
+                  <label for="schDescription"><strong>Description:</strong></label>
+                  <textarea type="text" class="form-control" id="schDescription" v-model="credentialDescription"  rows="5" cols="20" aria-describedby="orgNameHelp"></textarea>
+                </div>
+                <div class="form-group card">
+                  <div class="card-header">
+                    <b-button v-b-toggle.collapse-1 variant="link">Fields Configurations</b-button>
                   </div>
-                  <div class="form-group" style="min-height:150px;max-height:150px;overflow: auto">
-                    <div v-for="attr in attributes" :key="attr">
-                      <div class="sm-tiles">
-                        {{attr}}
-                        <span>x</span>
+                  <b-collapse id="collapse-1" class="mt-2" style="padding:10px">
+                    <div class="form-group tile" v-if="attributes.length > 0">
+                      <div v-for="attr in attributes" :key="attr.type">
+                        <div class="sm-tiles">
+                          {{ attr.name }}
+                          <span>x</span>
+                        </div>
                       </div>
                     </div>
+                    <div class="form-group row">
+                      <label for="ipattributeName" class="col-sm-2 col-form-label">Name</label>
+                      <div class="col-sm-10">
+                        <input type="text" class="form-control"  v-model="attributeName" id="ipattributeName" placeholder="">
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label for="type" class="col-sm-2 col-form-label">Type</label>
+                      <div class="col-sm-10">
+                        <input type="text" class="form-control"  v-model="attributeTypes" id="type" placeholder="">
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label for="type" class="col-sm-2 col-form-label">Format</label>
+                      <div class="col-sm-10">
+                        <input type="text" class="form-control"  v-model="attributeFormat" id="type" placeholder="Enter attribute Format (eg email)">
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label for="required" class="col-sm-2 col-form-label">Required?</label>
+                      <div class="col-sm-10">
+                        <input type="checkbox" v-model="attributeRequired" id="required" >
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <div class="col-sm-10">
+                        <a class="btn btn-primary" style="color:white; " v-on:click="addBlankAttrBox()">Add +</a>
+                      </div>
+                    </div>
+                  </b-collapse>
+                </div>
+                <div class="form-group">
+                  <label for="schDescription"><strong>Additional Properties?:</strong></label>
+                  <input v-model="additionalProperties" type="checkbox" />
+                </div>
+                <div class="form-group row">
+                  <div class="col-md-12">
+                    <hr/>
+                    <button class="btn btn-outline-primary btn-sm" @click="createSchema()">Create</button>
                   </div>
                 </div>
               </div>
-              <div class="row">
-                <div class="col-md-12">
-                  <hr/>
-                  <button class="btn btn-outline-primary btn-sm" @click="createSchema()">Create</button>
-                </div>
-              </div>
-            </div>
-          </b-collapse>
-        </div>
+          </StudioSideBar>
       </div>
     </div>
-    <div class="row" style="margin-top: 2%;">
-      <div class="col-md-12">        
+    <div class="row" style="margin-top: 2%;" v-if="schemaList.length > 0">
+      <div class="col-md-12">
         <table class="table table-bordered" style="background:#FFFF">
           <thead class="thead-light">
             <tr>
-              <th>id</th>
-              <th>credentialName</th>
-              <th>attributes</th>
-              <th>version</th>
-              <th>owner</th>
+              <th>Schema Id</th>
+              <th>Name</th>
+              <th>Model Version</th>
+              <th>Description</th>
+              <th>Properties</th>
+              <th>Created At</th>
+              <th>Transaction Hash</th>
+              <th>Status</th>
             </tr>
           </thead>
 
           <tbody>
-            <tr v-for="row in schemaList" :key="row">
-              <th>
-                <div class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" :id="row.id" />
-                  <label class="custom-control-label" :for="row.id"><a :href="`${$config.nodeServer.BASE_URL}${$config.nodeServer.SCHEMA_GET_EP}/`+row.id" target="_blank">{{row.id}}</a></label>
-                </div>
-              </th>
-              <td>{{row.credentialName}}</td>
-              <!-- <td>{{row.attributes}}</td> -->
-              <td
-                style="word-wrap: break-word;min-width: 200px;max-width: 200px;"
-              >{{row.attributes}}</td>
-              <td>{{row.version}}</td>
-              <td>{{row.owner}}</td>
+            <tr v-for="row in schemaList" :key="row._id">
+              <td>
+                <a :href="`${$config.nodeServer.BASE_URL_REST}${$config.nodeServer.SCHEMA_GET_REST}${row.schemaId}:`"
+                  target="_blank">{{ row.schemaId ? shorten(row.schemaId) : "-" }}</a>
+              </td>
+
+              <td>{{ row.schemaDetails ? row.schemaDetails.name : "-" }}</td>
+              <td>{{ row.schemaDetails ? row.schemaDetails.modelVersion : "-" }}</td>
+              <td class="word-wrap">{{ row.schemaDetails ? row.schemaDetails.schema.description : "-" }}</td>
+              <td class="word-wrap">{{ row.schemaDetails ? Object.keys(row.schemaDetails.schema.properties).toString() :
+                  "-"
+              }}</td>
+
+              <td>{{ row.schemaDetails ? row.schemaDetails.authored : "-" }}</td>
+
+              <td style="word-wrap: break-word;min-width: 200px;max-width: 200px;">
+                <a target="_blank"
+                  :href="`${$config.explorer.BASE_URL}explorer/txdetails?hash=0x${row.transactionHash}`"
+                  v-if="row.transactionHash">{{ shorten('0x' + row.transactionHash) }}</a>
+                <span v-else>-</span>
+              </td>
+              <td>{{ row.status }}</td>
             </tr>
           </tbody>
         </table>
-        <!-- </div> -->
-        <!-- </div> -->
+        <!-- <button  @click="fetchSchemasPrev()" class="btn btn-outline-warning btn-sm">Prev</button> 
+        <button class="btn btn-outline-warning btn-sm"  @click="fetchSchemasNext()"  > Next </button> -->
       </div>
-      <!-- </div> -->
+    </div>
+    <div class="form-group" v-else>
+      <h2>Create your first schema!</h2>
     </div>
   </div>
 </template>
@@ -169,46 +208,62 @@ color: #888b8f;
 <script>
 import fetch from "node-fetch";
 import QrcodeVue from "qrcode.vue";
-import Info from '@/components/Info.vue'
+import Info from '@/components/Info.vue';
+import UtilsMixin from '../mixins/utils';
+import Loading from "vue-loading-overlay";
+import config from "../config";
+import StudioSideBar from "../components/element/StudioSideBar.vue";
+
 export default {
   name: "IssueCredential",
-  components: { QrcodeVue, Info },
+  components: { QrcodeVue, Info, Loading, StudioSideBar },
+  computed: {
+    schemaList() {
+      return this.$store.state.schemaList;
+    },
+    selectedOrg() {
+      return this.$store.getters.getSelectedOrg;
+    }
+  },
   data() {
     return {
       description: "Credential Schema defines what information will go inside a verifiable credential. For example: Directorate General of Civil Aviation (DGCA) can define a schema (or format) for flights tickets, being issued by all airline companies in India.",
       active: 0,
       host: location.hostname,
       user: {},
+      page: 1,
       prevRoute: null,
       attributeName: "",
+      attributeTypes: "",
+      attributeFormat: "",
+      attributeRequired: false,
       attributes: [],
       issueCredAttributes: [],
+      additionalProperties: false,
       showSchema: true,
       radioSelected: "create",
       credentialName: "",
       isCredentialIssued: false,
       signedVerifiableCredential: "",
-      credentials: JSON.parse(localStorage.getItem("credentials")),
-      subjectDid: "did:hs:AmitKumar",
-      radioOptions: [
-        { text: "Create new schema", value: "create" },
-        { text: "Select existing schema", value: "existing" },
-      ],
-      selected: null,
-      attributeValues: {},
       authToken: localStorage.getItem("authToken"),
-      selectOptions: [{ value: null, text: "Please select a schema" }],
-      schemaMap: {},
-      schemaList: [],
       credentialDescription: "",
       fullPage: true,
-      isLoading: false
+      isLoading: false,
+      QrData: {
+        "QRType": "ISSUE_SCHEMA",
+        "serviceEndpoint": "",
+        "schemaId": "",
+        "appDid": "",
+        "appName": "Hypersign Studio",
+        "challenge": "",
+        "provider": "",
+        "data": ""
+      }
     };
   },
   created() {
     const usrStr = localStorage.getItem("user");
     this.user = JSON.parse(usrStr);
-    this.fetchSchemas();
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -216,128 +271,121 @@ export default {
     });
   },
   methods: {
-    notifySuccess(msg){
-        this.$notify({
-          group: 'foo',
-          title: 'Information',
-          type: 'success',
-          text: msg
-        });
-    },
-    notifyErr(msg){
-      this.$notify({
-          group: 'foo',
-          title: 'Error',
-          type: 'error',
-          text: msg
-        });
-    },
-    fetchSchemas() {
-      const url = `${this.$config.nodeServer.BASE_URL}${this.$config.nodeServer.SCHEMA_LIST_EP}`;
-      fetch(url)
-        .then((res) => res.json())
-        .then((j) => {
-          if (j.status != 200) throw new Error(j.error);
-          this.schemaList = j.message;
-          if (this.schemaList && this.schemaList.length > 0) {
-            this.schemaList = this.schemaList.filter(
-              (x) => x.owner === this.user.id
-            );
-          }
-        })
-        .catch((e) => this.notifyErr(`Error: ${e.message}`));
-    },
-    fetchData(url, option) {
-      fetch(url)
-        .then((res) => res.json())
-        .then((j) => {
-          if (j.status != 200) throw new Error(j.error);
-          return j.message;
-        })
-        .catch((e) => this.notifyErr(`Error: ${e.message}`));
+    openSlider() {
+      this.$root.$emit("bv::toggle::collapse", "sidebar-right");
     },
     gotosubpage: (id) => {
       this.$router.push(`${id}`);
     },
+
     addBlankAttrBox() {
-      if (this.attributeName != " ") {
-        this.attributes.push(this.attributeName);
-        this.attributeName = " ";
-      }
-    },
-    onSchemaOptionChange(event) {
-      this.attributes = [];
-      this.issueCredAttributes = [];
-      this.selected = null;
-      this.credentialName = "";
-    },
-    OnSchemaSelectDropDownChange(event) {
-      if (event) {
-        this.issueCredAttributes = [];
-        this.schemaMap[event].forEach((e) => {
-          this.issueCredAttributes.push({
-            type: "text",
-            name: e,
-            value: "",
-          });
-        });
+      console.log(this.attributeName, this.attributeTypes);
+      if (this.attributeName !== "" && this.attributeTypes !== "") {
+        let obj = {
+          name: this.attributeName,
+          type: this.attributeTypes,
+          format: this.attributeFormat,
+          isRequired: this.attributeRequired
+
+        }
+        console.log(obj);
+        this.attributes.push(obj)
+        this.attributeName = "";
+        this.attributeTypes = "";
+        this.attributeFormat = "";
+        this.attributeRequired = false;
       } else {
-        this.issueCredAttributes = [];
+        this.notifyErr("Name or Type Cannot be blank")
       }
     },
-    forceFileDownload(data, fileName) {
-      const url = window.URL.createObjectURL(new Blob([data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", fileName);
-      document.body.appendChild(link);
-      link.click();
+    ssePopulateSchema(id, store) {
+      const sse = new EventSource(`${this.$config.studioServer.SCHEMA_SSE}${id}`);
+    
+      
+      sse.onmessage = function (e) {
+        const data = JSON.parse(e.data)
+         console.log(data);
+        if (data.status === "Registered" || data.status === "Failed") {
+          sse.close();
+          store.dispatch("insertAschema", data)
+        }
+      }
+      sse.onopen = function (e) {
+        console.log("Connection to server opened.",e);
+      };
+
+      sse.onerror = function (e) {
+        console.log(e)
+        sse.close();
+      }
+      return
     },
-    downloadCredentials() {
-      this.forceFileDownload(
-        JSON.stringify(this.signedVerifiableCredential),
-        "vc.json"
-      );
+    openWallet(url) {
+      if (url != "") {
+        this.walletWindow = window.open(
+          `${url}`,
+          "popUpWindow",
+          `height=800,width=400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes`
+        );
+      }
     },
+
     createSchema() {
-        
-      this.isLoading = true
-      if (this.credentialName == "")
-        return this.notifyErr("Error: SchemaName can not be blank");
-      if (this.attributes.length == 0)
-        return this.notifyErr("Error: Atleast one attribute is required");
-      const url = `${this.$config.nodeServer.BASE_URL}${this.$config.nodeServer.SCHEMA_CREATE_EP}`;
-      const schemaData = {
-        name: this.credentialName,
-        owner: this.user.id,
-        attributes: this.attributes,
-        description: this.credentialDescription,
-      };
-      let headers = {
-        "Content-Type": "application/json",
-      };
-      fetch(url, {
-        method: "POST",
-        body: JSON.stringify(schemaData),
-        headers,
-      })
-        .then((res) => res.json())
-        .then((j) => {
-          if (j.status === 200) {
-            this.notifySuccess("Credential successfull created");
-            this.credentialName = j.message.credentialName;
-            this.schemaList.push({
-              ...j.message,
-            });
-            this.schemaMap[j.message.id] = this.attributes;
-            this.isLoading = false
-          } else {
-            this.isLoading = false
-            this.notifyErr(`Error: ${j.error}`);
-          }
-        });
+      try {
+        this.isLoading = true
+        if (this.credentialName == "")
+          throw new Error("SchemaName can not be blank");
+        if (this.attributes.length == 0)
+          throw new Error("Atleast one attribute is required");
+
+        const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.SAVE_SCHEMA_EP}`;
+        const schemaData = {
+          name: this.credentialName,
+          author: this.user.id,
+          fields: this.attributes,
+          description: this.credentialDescription,
+          additionalProperties: this.additionalProperties,
+          orgDid: this.$store.state.selectedOrgDid
+        };
+        this.QrData.data = schemaData
+        let headers = {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${this.authToken}`
+        };
+        fetch(url, {
+          method: "POST",
+          body: JSON.stringify({ QR_DATA: this.QrData }),
+          headers,
+        })
+          .then((res) => res.json())
+          .then((j) => {
+            const { QR_DATA } = j
+            if (j.status === 200) {
+              this.notifySuccess("Schema creation initiated. Please approve the transaction from your wallet");
+              // TODO: Why this is hardcoded?
+              this.credentialName = 'Schema';
+
+              // Store the information in store.
+              this.$store.dispatch('insertAschema', j.schema);
+
+              // Open the wallet for trasanctional approval.
+              const URL = `${this.$config.webWalletAddress}/deeplink?url=${JSON.stringify(QR_DATA)}`
+              this.openWallet(URL)
+              this.ssePopulateSchema(j.schema._id, this.$store)
+              this.openSlider();
+            } else {
+              throw new Error(`${j.error}`);
+            }
+          });
+      } catch (e) {
+        console.error(e)
+        this.notifyErr(`Error: ${e.message}`);
+      } finally {
+        this.isLoading = false;
+      }
     },
   },
+  mixins: [UtilsMixin],
 };
 </script>
 

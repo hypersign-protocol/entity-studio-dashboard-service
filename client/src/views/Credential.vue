@@ -1,141 +1,137 @@
 <style scoped>
-.addmargin {
-  margin-top: 10px;
-  margin-bottom: 10px;
+.home{
+    margin-left: auto;
+    margin-right: auto;
+    width: 1500px;
 }
-
-.vue-logo-back {
-  background-color: black;
-}
-
-.logo {
-  width: 144px;
-}
-
-.fullbody {
-  width: 100%;
-}
-
-.floatLeft {
-  float: left;
-}
-.floatRight {
-  float: right;
-}
-
 .card-header {
   background: aliceblue;
   padding: 0px;
 }
 
-.card{
+.card {
   border-radius: 10px;
 }
-
 </style>
 <template>
-  <div class="home marginLeft marginRight">
-    <loading :active.sync="isLoading" 
-        :can-cancel="true"        
-        :is-full-page="fullPage"></loading>
+  <div class="home">
+    <loading :active.sync="isLoading" :can-cancel="true" :is-full-page="fullPage"></loading>
 
     <div class="row">
       <div class="col-md-12" style="text-align: left">
-        <Info :message="description"/>
-        <div class="card">
-          <div class="card-header">
-            <b-button v-b-toggle.collapse-1 variant="link">Issue Credential</b-button>
-          </div>
-          <b-collapse id="collapse-1" class="mt-2">
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-6">
-                  <form style="max-height:300px; overflow:auto; padding: 5px">
+        <Info :message="description" />
+        <div class="form-group" style="text-align: right">
+            <button @click="openSlider()" class="btn btn-primary">+ Credential</button>
+          </div>          
+            <StudioSideBar title="Issue Credential">
+              <div class="container">
+                <div class="form-group row">
+                  <div class="col-md-12">
+                    <form style="max-height:300px; overflow:auto; padding: 5px">
                     <div class="form-group">
-                      <input type="text" class="form-control" placeholder="Issued To (did:hs:...)" v-model="holderDid"/>
+                      <label for="fordid"><strong>Subject Did</strong></label>
+                      <input type="text" class="form-control" placeholder="Issued To (did:hs:...)"
+                        v-model="holderDid" />
                     </div>
                     <div class="form-group">
-                      <b-form-select
-                        v-model="selected"
-                        :options="selectOptions"
-                        @change="OnSchemaSelectDropDownChange($event)"
-                        size="md"
-                        class="mt-3"
-                      ></b-form-select>
+                      <label for="forselectschema"><strong>Select Schema</strong></label>
+                      <b-form-select v-model="selected" :options="selectOptions"
+                        @change="OnSchemaSelectDropDownChange($event)" size="md" class="mt-3">
+                      </b-form-select>
+
                     </div>
                     <div class="form-group" v-for="attr in issueCredAttributes" :key="attr.name">
-                      <label>{{attr.name}}</label>
-                      <input
-                        text
-                        v-model="attr.value"
-                        class="form-control"
-                        placeholder="Enter attribute value"
-                      />
+                      <label for="schDescription"><strong>{{ attr.name }}</strong></label>
+                      <input type="text" class="form-control" id="schemaName" v-model="attr.value" aria-describedby="schemaNameHelp" placeholder="Enter attribute value">
                     </div>
                   </form>
-                  <hr />
-                  <button class="btn btn-outline-primary btn-sm" @click="issueCredential()">Issue</button>
-                </div>
-                <div class="col-md-6" style="padding: 30px" v-if="isCredentialIssued">
-                  <div class="form-group" style="text-align:center">
-                    <qrcode-vue :value="signedVerifiableCredential" :size="200" level="H"></qrcode-vue>
-                    <label class="title">Scan the QR code using Hypersign Wallet!</label>
                   </div>
-                  <div class="form-group" style="text-align:center">
-                    <p></p>
-                    <h5>OR</h5>
-                    <button class="btn btn-link" @click="downloadCredentials()">Download Credential</button>
+                </div>
+                <div class="form-group row">
+                  <div class="col-md-12">
+                    <hr />
+                    <button class="btn btn-outline-primary btn-sm" @click="issueCredential()">Issue</button>
                   </div>
                 </div>
               </div>
-            </div>
-          </b-collapse>
-        </div>
+              </StudioSideBar>
       </div>
     </div>
-    <div class="row" style="margin-top: 2%;">
+    <div class="row" style="margin-top: 2%;" v-if="vcList.length > 0">
       <div class="col-md-12">
         <table class="table table-bordered" style="background:#FFFF">
           <thead class="thead-light">
             <tr>
-              <th>id</th>
-              <th>schemaId</th>
-              <th>issuer</th>
-              <th>subject</th>
-              <th>dataHash</th>
+              <th>VC Id</th>
+              <th>Schema Id</th>
+              <th>Holder DID</th>
+              <th>Issuance Date</th>
+              <th>Expiration Date</th>
+              <!-- <th>Credential Hash</th> -->
+              <th>Status</th>
+              <th>Status Reason</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="row in vcList" :key="row">
-              <th scope="row">
-                <div class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" :id="row.id" />
-                  <label class="custom-control-label" :for="row.id">{{row.id}}</label>
-                </div>
-              </th>
-              <td>{{row.schemaId}}</td>
-              <td>{{row.issuer}}</td>
-              <td>{{row.subject}}</td>
-              <td>{{row.dataHash}}</td>
+            <tr v-for="row in vcList" :key="row.vc_id">
+            
+              <td>
+                <a :href="`${row.vc_id}:`" target="_blank>" v-if="row.vc_id">{{ shorten(row.vc_id) }}</a>
+                <span>-</span>
+              </td>
+              <td>
+                <a :href="`${$config.nodeServer.BASE_URL_REST}${$config.nodeServer.SCHEMA_GET_REST}${row.schemaId}:`" target="_blank">{{ shorten(row.schemaId) }}</a>
+              </td>
+              <td>{{ row.subjectDid }}</td>
+              <td>{{ row.credStatus ? row.credStatus.issuanceDate: "-"}}</td>
+              <td>{{ row.credStatus ? row.credStatus.expirationDate : "-"}}</td>
+              <!-- <td>{{ row.credStatus ?  row.credStatus.credentialHash : "-"}}</td>  -->
+              <td> {{ row.credStatus ? row.credStatus.claim.currentStatus : row.status}}</td>
+              <td>{{ row.credStatus ? row.credStatus.claim.statusReason  : "-"}}</td>
+              <td> 
+                <button type="button" class="btn btn-primary" @click="generateCred(`${row._id}`)" v-if="row.credStatus">Send</button>
+                <span v-else>-</span>
+              </td>
             </tr>
           </tbody>
         </table>
+        <hf-pop-up Header="Accept Credential URL"> 
+            <Info message="Copy and send this URL to the credential owner so that they can accept in their wallet" />
+            <p style="max-width: 500px; word-wrap: break-word;">{{ credUrl}}</p>
+        </hf-pop-up>
       </div>
+    </div>
+    <div class="form-group" v-else>
+      <h2>Issue your first credential!</h2>
     </div>
   </div>
 </template>
 
 <script>
 import fetch from "node-fetch";
-import conf from '../config';
-const { hypersignSDK } = conf;
-import QrcodeVue from "qrcode.vue";
 import Info from '@/components/Info.vue'
+import UtilsMixin from '../mixins/utils';
+import HfPopUp from "../components/element/hfPopup.vue";
+import Loading from "vue-loading-overlay";
+import StudioSideBar from "../components/element/StudioSideBar.vue";
 export default {
   name: "IssueCredential",
-  components: { QrcodeVue, Info },
+  components: { Info, HfPopUp, Loading, StudioSideBar },
+  computed: {
+    vcList(){
+      return this.$store.state.vcList;
+    },
+    selectOptions(){
+      return this.$store.getters.listOfAllSchemaOptions;
+    },
+    selectedOrg(){
+      return this.$store.getters.getSelectedOrg;
+    }
+  },
   data() {
     return {
+      authToken: localStorage.getItem('authToken'),
       description: "An issuer can issue a credential to a subject (or holder) which can be verfied by the verifier independently, without having him to connect with the issuer. They are a part of our daily lives; driver's licenses are used to assert that we are capable of operating a motor vehicle, university degrees can be used to assert our level of education, and government-issued passports enable us to travel between countries.  For example: an airline company can issue a flight ticket (\"verfiable credential\") using schema (issued by DGCA) to the passenger.",
       active: 0,
       host: location.hostname,
@@ -157,21 +153,28 @@ export default {
       selected: null,
       attributeValues: {},
       authToken: localStorage.getItem("authToken"),
-      selectOptions: [{ value: null, text: "Please select a schema" }],
-      schemaMap: {},
-      vcList : [],
+      vcCredStatusMap: {}, 
       schemaList: [],
       fullPage: true,
       isLoading: false,
-      holderDid: ""
+      holderDid: "",
+      schema_page: 1,
+      credUrl:"",
+      QrData: {
+        "QRType": "ISSUE_CREDENTIAL",
+        "serviceEndpoint": "",
+        "schemaId": "",
+        "appDid": "",
+        "appName": "Hypersign Studio",
+        "challenge": "",
+        "provider": "",
+        "data": ""
+      }
     };
   },
   created() {
     const usrStr = localStorage.getItem("user");
     this.user = JSON.parse(usrStr);
-    //console.log(this.user)
-    this.getList('SCHEMA')
-    this.getList('CREDENTIAL')
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -179,97 +182,79 @@ export default {
     });
   },
   methods: {
-    notifySuccess(msg){
-      this.$notify({
-          group: 'foo',
-          title: 'Information',
-          type: 'success',
-          text: msg
-        });
+    openSlider() {
+      this.$root.$emit("bv::toggle::collapse", "sidebar-right");
     },
-    notifyErr(msg){
-      this.$notify({
-          group: 'foo',
-          title: 'Error',
-          type: 'error',
-          text: msg
-        });
-    },
-    async getList(type) {
-      let url = "";
-      let options = {}
-      if(type === "SCHEMA"){
-        url = `${this.$config.nodeServer.BASE_URL}${this.$config.nodeServer.SCHEMA_LIST_EP}`;
-        options  = {
-          method: "GET"
+    ssePopulateCredStatus(id,store){
+      const sse = new EventSource(`${this.$config.studioServer.CRED_SSE}${id}`);
+      sse.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log(data);
+        if (data.status === "Registered" || data.status === "Failed") {
+          
+          sse.close();
+          store.dispatch("insertAcredential", data)
         }
-      }else{
-        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_LIST_EP}`;
-        options  = {
-          method: "GET",
-          headers: {'x-auth-token': this.authToken}
-        }
+        // store.commit("updateCredStatus", data);
+      };
+
+      sse.onopen = function (e) {
+        console.log("Connection to server opened.",e);
+      };
+
+      sse.onerror = function (e) {
+        console.log(e)
+        sse.close();
       }
+      return
+
+
+    },
       
-      const resp = await fetch(url, options);
-      const j = await resp.json();
-      if (j && j.status == 500) {
-        return this.notifyErr(`Error:  ${j.error}`);
+    
+    async  generateCred(id) {
+
+      const body = {
+        id,
       }
-      if(type === "SCHEMA"){
-        const schemaList = j.message
-        if(schemaList && schemaList.length > 0){
-          schemaList.forEach(s => {
-            if(s.owner != this.user.id) return
-            this.schemaMap[s.id] = JSON.parse(s.attributes)
-            this.selectOptions.push({
-              value: s.id,
-              text: `${s.credentialName} | ${s.id}`
-            })
-          });
-        }
-      }else{
-        this.vcList = j.message.list;
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body)
       }
+      const URL = this.$config.studioServer.BASE_URL + this.$config.studioServer.ACCPCT_CRED_EP
+      const res = await fetch(URL, options)
+      const resp =await res.json()
+      this.credUrl = resp.url;
+      this.$root.$emit('modal-show')
+      this.notifySuccess("Cred Url Generated Successfully")
     },
-    fetchData(url, option) {
-      fetch(url)
-        .then((res) => res.json())
-        .then((j) => {
-          if (j.status != 200) throw new Error(j.error);
-          return j.message;
-        })
-        .catch((e) => this.notifyErr(`Error: ${e.message}`));
-    },
-    gotosubpage: (id) => {
-      this.$router.push(`${id}`);
-    },
-    addBlankAttrBox() {
-      if (this.attributeName != " ") {
-        this.attributes.push(this.attributeName);
-        this.attributeName = " ";
+    openWallet(url) {
+      if (url != "") {
+        this.walletWindow = window.open(
+          `${url}`,
+          "popUpWindow",
+          `height=800,width=400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes`
+        );
       }
-    },
-    onSchemaOptionChange(event) {
-      //console.log(event);
-      this.attributes = [];
-      this.issueCredAttributes = [];
-      this.selected = null;
-      this.credentialName = "";
     },
     OnSchemaSelectDropDownChange(event) {
-      //console.log(event);
       if (event) {
         this.issueCredAttributes = [];
         const id = this.issueCredAttributes.length;
-        this.schemaMap[event].forEach((e) => {
+        const selectedSchema = this.$store.getters.findSchemaBySchemaID(event);
+        const schemaMap =  selectedSchema.schemaDetails.schema.properties;
+        for (const e in schemaMap) {
           this.issueCredAttributes.push({
             id: id + event,
-            type: "text",
+            type: e.type,
             name: e,
+            required: e.required === true ? true : false,
             value: "",
           });
-        });
+        }
       } else {
         this.issueCredAttributes = [];
       }
@@ -295,84 +280,65 @@ export default {
           attributesMap[e.name] = e.value;
         });
       }
+      console.log(attributesMap);
       return attributesMap;
     },
-
-    getCredentials(attributesMap) {
-      const schemaUrl = `${this.$config.nodeServer.BASE_URL}${this.$config.nodeServer.SCHEMA_GET_EP}/${this.selected}`;
-      return hypersignSDK.credential.generateCredential(schemaUrl, {
-        subjectDid: this.holderDid,
-        issuerDid: this.user.publicKey,
-        expirationDate: new Date().toISOString(),
-        attributesMap,
-      }).then((signedCred) => {
-        return signedCred;
-      });
-    },
-
-    signCredentials(credential) {
-      return hypersignSDK.credential.signCredential(credential, this.user.publicKey, this.user.privateKey).then(
-        (signedCredential) => {
-          return signedCredential;
-        }
-      );
-    },
-    async issueCredential() { 
-      try{
+    async issueCredential() {
+      try {
         this.isLoading = true
-        if(this.holderDid == "") throw new Error("Please enter the holder did")
-        if(this.selected == null) throw new Error("Please select a schema")
+        if (this.holderDid == "") throw new Error("Please enter the holder did")
+        if (this.selected == null) throw new Error("Please select a schema")
 
-      // generateAttributeMap
-      const attributeMap = await this.generateAttributeMap();
+        // generateAttributeMap
+        const attributeMap = await this.generateAttributeMap();
 
-      const verifiableCredential = await this.getCredentials(attributeMap);
-      // signCredentials
-      const signedVerifiableCredential = await this.signCredentials(
-        verifiableCredential
-      );
-      this.signedVerifiableCredential = signedVerifiableCredential;
+        const fields = Object.assign({}, attributeMap)
+        const schemaId = this.selected
+        const issuerDid = this.user.id
+        const subjectDid = this.holderDid
 
-      const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_ISSUE_EP}`;
-      const headers = {
-        "Content-Type": "application/json",
-        "x-auth-token": this.authToken,
-      };
-      const body = {
-        subject: this.subjectDid,
-        schemaId: this.selected,
-        dataHash: signedVerifiableCredential,
-        appId: "appI123",
-      };
+        const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_ISSUE_EP}`;
 
-      fetch(url, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(body),
-      })
-        .then((res) => res.json())
-        .then((j) => {
-          if (j.status != 200) throw new Error(`Error: ${j.error}`);
-          if (j.status === 200) {
-            this.isCredentialIssued = true;
-            this.onSchemaOptionChange(null);
-            this.vcList.push({
-              ...j.message
-            })
-            this.isLoading = false
-            this.notifySuccess("Credential successfully issued")
-          }
-        })
-        .catch((e) => {
-          this.isLoading = false
-          this.notifyErr(`Error: ${e.message}`)
-        });
-      } catch(e){
+        const headers = {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${this.authToken}`
+        };
+        const creadData = {
+          fields,
+          schemaId,
+          issuerDid,
+          subjectDid,
+          orgDid:this.$store.state.selectedOrgDid
+        };
+        this.QrData.data = creadData
+        fetch(url, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ QR_DATA: this.QrData }),
+        }).then((res) => res.json())
+          .then(json => {
+            const { QR_DATA,creadRecord } = json
+            
+
+            this.$store.dispatch("insertAcredential", creadRecord)
+
+
+           const URL = `${this.$config.webWalletAddress}/deeplink?url=${JSON.stringify(QR_DATA)}`
+            this.openWallet(URL)
+
+             this.ssePopulateCredStatus(creadRecord._id,this.$store)
+             this.openSlider();
+          })
+      } catch (e) {
         this.isLoading = false
         this.notifyErr(`Error: ${e.message}`)
+      } finally {
+        this.isLoading = false;
       }
     },
   },
+  mixins: [UtilsMixin],
+
 };
 </script>
 
