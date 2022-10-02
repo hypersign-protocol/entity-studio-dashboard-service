@@ -84,8 +84,8 @@ const hypersignSDK = {
 
 const mnemonic = "retreat seek south invite fall eager engage endorse inquiry sample salad evidence express actor hidden fence anchor crowd two now convince convince park bag"
 const walletOptions = {
-    hidNodeRPCUrl: 'https://jagrat.hypersign.id/node1/rpc/',
-    hidNodeRestUrl: 'https://jagrat.hypersign.id/node1/rest/',
+    hidNodeRPCUrl: 'https://jagrat.hypersign.id/rpc/',
+    hidNodeRestUrl: 'https://jagrat.hypersign.id/rest/',
 };
 const pathToIssueCred = process.env.PATH_TO_ISSUE_CRED;
 export {
