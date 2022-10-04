@@ -4,6 +4,7 @@ import Org from '../models/OrgSchema';
 import { logger, WALLET_WEB_HOOK_ORG_DID,ORG_SERVICE_ENDPOINT_GET_STATUS, sse_client } from '../config'
 import { Interface } from "readline";
 import { send } from "../services/sse";
+import ApiResonse from "../response/apiResponse";
 
 const CreateOrg = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -44,13 +45,9 @@ const CreateOrg = async (req: Request, res: Response, next: NextFunction) => {
         // QrData.data.logo = org.logo
         // QrData.data.status = org.status
         QrData.data.serviceEndpoint=`${ORG_SERVICE_ENDPOINT_GET_STATUS}`
-
-        console.log(QrData);
-        
-        res.status(200).json({ org, QrData, status: 200 })
-
+       return next(ApiResonse.success({org, QrData}))
     } catch (e) {
-        res.status(500).send({ status: 500, message: null, error: e })
+        return next(ApiResonse.internal(null, e))
     }
 }
 

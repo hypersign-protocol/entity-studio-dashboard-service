@@ -129,7 +129,7 @@ export async function getChallenge(req, res, next) {
             {
                 "QRType":"REQUEST_CRED",
                 "serviceEndpoint": `${studioServerBaseUrl}/api/v1/presentation/request/verify/`,
-                "schemaId": "ssi/schema/"+ schemaId,
+                "schemaId": schemaId,
                 "appDid": templateOwnerDid,
                 "appName": name,
                 challenge
