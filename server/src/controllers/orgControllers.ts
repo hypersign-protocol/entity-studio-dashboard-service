@@ -77,9 +77,10 @@ const GetOrgsByUserDid = async (req: Request, res: Response, next: NextFunction)
     try {
         const { hypersign } = req.body;
         const org = await Org.find({ userDid: hypersign.data.id }).exec()
-        res.status(200).json({ org, status: 200 })
+        return next(ApiResonse.success({ org }))
     } catch (e) {
-        res.status(500).send({ status: 500, message: null, error: e })
+        return next(ApiResonse.internal(null, e))
+
     }
 }
 const deleteOrg = async (req: Request, res: Response, next: NextFunction) => {
