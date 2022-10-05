@@ -150,9 +150,9 @@ const sendCredentialDetail = async (req: Request, res: Response, next: NextFunct
 
 }
 
-const accpctWalletCredential = async (req: Request, res: Response, next: NextFunction) => {
+const acceptCredentials = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        logger.info("==========CredController ::accpctWalletCredential Starts ================")
+        logger.info("==========CredController ::acceptCredentials Starts ================")
 
         let vc_data;
         const { token, did } = req.query
@@ -164,7 +164,7 @@ const accpctWalletCredential = async (req: Request, res: Response, next: NextFun
                 vc_data = await creadSchema.findOne({ _id: dbId })
                 res.json(vc_data.vc)
 
-                logger.info("==========CredController ::accpctWalletCredential Ends ================")
+                logger.info("==========CredController ::acceptCredentials Ends ================")
 
             })
         }
@@ -172,7 +172,7 @@ const accpctWalletCredential = async (req: Request, res: Response, next: NextFun
 
 
     } catch (error) {
-        logger.error("==========CredController ::accpctWalletCredential Ends ================")
+        logger.error("==========CredController ::acceptCredentials Ends ================")
 
         res.status(500).json(error)
     }
@@ -180,5 +180,5 @@ const accpctWalletCredential = async (req: Request, res: Response, next: NextFun
 export {
     issueCredential,
     getCredentialList,
-    setCredentialStatus, sendCredentialDetail, accpctWalletCredential,getCredentialById
+    setCredentialStatus, sendCredentialDetail, acceptCredentials,getCredentialById
 }

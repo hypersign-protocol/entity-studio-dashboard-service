@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import PresentationTemplateSchema from "../models/presentationTemplateSchema";
+import PresentationTemplateSchema, { IPresentationTemplate } from "../models/presentationTemplateSchema";
 
 import HIDWallet from 'hid-hd-wallet'
 import HypersignSsiSDK from "hs-ssi-sdk";
@@ -81,7 +81,7 @@ const presentationTempalateAll= async (req: Request, res: Response, next: NextFu
         logger.info('presentationCtrl:: presentationTempalateAll() method start...')
         const {data}=req.body.hypersign
         const orgDid=req.params.orgDid
-        const allTemplate= await PresentationTemplateSchema.find({templateOwnerDid:data.id,orgDid})
+        const allTemplate:  Array<IPresentationTemplate>= await PresentationTemplateSchema.find({templateOwnerDid:data.id,orgDid})
         logger.info('presentationCtrl:: presentationTempalateAll() method ends...')
         return next(ApiResponse.success(allTemplate))
     } catch (error) {
@@ -103,7 +103,7 @@ const presentationTempalate = async (req: Request, res: Response, next: NextFunc
             const {data}=req.body.hypersign
         logger.info('presentationControllers:: presentationTempalate() saving template data to DB')
             
-        const presentationTemplateObj = await PresentationTemplateSchema.create({
+        const presentationTemplateObj: IPresentationTemplate = await PresentationTemplateSchema.create({
             queryType,
             orgDid,
             domain,
