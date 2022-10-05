@@ -12,3 +12,7 @@ export const credentialSchemaBody = [
     body('QR_DATA.data.orgDid').trim().exists({ checkFalsy: true}).withMessage("orgDid can not be null or empty.")
 
 ]
+
+export const checkIfIdExists= [
+    body('id').trim().exists({checkFalsy: true}).withMessage('id can not be null or empty')
+]

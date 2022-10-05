@@ -112,10 +112,10 @@ const getCredentialList = async (req: Request, res: Response, next: NextFunction
     }
 }
 
-const accepctCredential = async (req: Request, res: Response, next: NextFunction) => {
+const sendCredentialDetail = async (req: Request, res: Response, next: NextFunction) => {
 
     try {
-        logger.info("==========CredController ::accepctCredential Starts ================")
+        logger.info("==========CredController ::sendCredentialDetail Starts ================")
 
         const dbRowId = req.body.id
 
@@ -139,13 +139,12 @@ const accepctCredential = async (req: Request, res: Response, next: NextFunction
 
         const deeplink = `${studioServerBaseUrl}deeplink.html?deeplink=hypersign:deeplink?url=${QRData}`
 
-        logger.info("==========CredController ::accepctCredential Ends ================")
-
-        res.json({ url: deeplink })
+        logger.info("==========CredController ::sendCredentialDetail Ends ================")
+        return next (ApiResponse.success({url: deeplink}))
 
     } catch (error) {
-        logger.Error("==========CredController ::accepctCredential Ends ================")
-
+        logger.Error("==========CredController ::sendCredentialDetail Ends ================")
+         logger.error('CredController ::sendCredentialDetail: Error', error)
         res.status(500).json({ error })
     }
 
@@ -181,5 +180,5 @@ const accpctWalletCredential = async (req: Request, res: Response, next: NextFun
 export {
     issueCredential,
     getCredentialList,
-    setCredentialStatus, accepctCredential, accpctWalletCredential,getCredentialById
+    setCredentialStatus, sendCredentialDetail, accpctWalletCredential,getCredentialById
 }
