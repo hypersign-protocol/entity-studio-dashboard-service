@@ -3,7 +3,8 @@ import PresentationTemplateSchema from "../models/presentationTemplateSchema";
 
 import HIDWallet from 'hid-hd-wallet'
 import HypersignSsiSDK from "hs-ssi-sdk";
-import { walletOptions, mnemonic } from '../config'
+import { walletOptions, mnemonic, logger } from '../config'
+import ApiResponse from "../response/apiResponse";
 
 const verifyPresentation = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -76,19 +77,21 @@ const presentationTempalateById = async (req:Request,res:Response,next:NextFunct
 }
 
 const presentationTempalateAll= async (req: Request, res: Response, next: NextFunction) => {
-
-
     try {
+        logger.info('presentationCtrl:: presentationTempalateAll() method start...')
         const {data}=req.body.hypersign
         const orgDid=req.params.orgDid
         const allTemplate= await PresentationTemplateSchema.find({templateOwnerDid:data.id,orgDid})
-        res.json(allTemplate)
+        logger.info('presentationCtrl:: presentationTempalateAll() method ends...')
+        return next(ApiResponse.success(allTemplate))
     } catch (error) {
-        res.status(500).json(error)
+        logger.error('presentationCtrl:: presentationTempalateAll() : Error ', error)
+        return next(ApiResponse.internal(null, error))
     }
 }
 const presentationTempalate = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        logger.info('presentationControllers:: presentationTempalate() method start...')
         const { queryType,
             domain,
             name,
@@ -98,6 +101,7 @@ const presentationTempalate = async (req: Request, res: Response, next: NextFunc
             required,
             callbackUrl ,orgDid} = req.body
             const {data}=req.body.hypersign
+        logger.info('presentationControllers:: presentationTempalate() saving template data to DB')
             
         const presentationTemplateObj = await PresentationTemplateSchema.create({
             queryType,
@@ -111,14 +115,11 @@ const presentationTempalate = async (req: Request, res: Response, next: NextFunc
             callbackUrl,
             templateOwnerDid:data.id
         })
-
-res.json(presentationTemplateObj)
-
-
-
-
+        logger.info('presentationControllers:: presentationTempalate() method ends...')
+        return next(ApiResponse.success({presentationTemplateObj}));
     } catch (error) {
-        res.status(500).json(error)
+        logger.error('presentationControllers:: presentationTemplate: Error '+ error)
+        return next(ApiResponse.internal(null, error))
     }
 }
 
