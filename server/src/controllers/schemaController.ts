@@ -75,6 +75,7 @@ const getSchema = async (req: Request, res: Response, next: NextFunction) => {
 
     } catch (error) {
         logger.error("==========SchemaController ::getSchema Ends================")
+        logger.error('SchemaCtrl:: getSchema() Error: ' + error )
         return next(ApiResonse.internal(null, error))
 
     }
