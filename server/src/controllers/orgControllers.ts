@@ -4,12 +4,11 @@ import Org from '../models/OrgSchema';
 import { logger, WALLET_WEB_HOOK_ORG_DID,ORG_SERVICE_ENDPOINT_GET_STATUS, sse_client } from '../config'
 import { Interface } from "readline";
 import { send } from "../services/sse";
+import ApiResonse from "../response/apiResponse";
 
 const CreateOrg = async (req: Request, res: Response, next: NextFunction) => {
-
-
     try {
- 
+        logger.info('OrgCtrl:: CreateOrg() method start...');
         const QrData = {
             QRType: "ISSUE_DID",
             serviceEndpoint: "",
@@ -44,13 +43,11 @@ const CreateOrg = async (req: Request, res: Response, next: NextFunction) => {
         // QrData.data.logo = org.logo
         // QrData.data.status = org.status
         QrData.data.serviceEndpoint=`${ORG_SERVICE_ENDPOINT_GET_STATUS}`
-
-        console.log(QrData);
-        
-        res.status(200).json({ org, QrData, status: 200 })
-
+        logger.info('OrgCtrl:: CreateOrg() method ends...');
+       return next(ApiResonse.success({org, QrData}))
     } catch (e) {
-        res.status(500).send({ status: 500, message: null, error: e })
+        logger.error('OrgCtrl:: CreateOrg(): Error ' + e);
+        return next(ApiResonse.internal(null, e))
     }
 }
 
@@ -78,11 +75,15 @@ const GetOrgByDid =async (req: Request, res: Response, next: NextFunction) => {
 }
 const GetOrgsByUserDid = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        logger.info('OrgCtrl:: GetOrgsByUserDid() method start...');
         const { hypersign } = req.body;
         const org = await Org.find({ userDid: hypersign.data.id }).exec()
-        res.status(200).json({ org, status: 200 })
+        logger.info('OrgCtrl:: GetOrgsByUserDid() method ends...');
+        return next(ApiResonse.success({ org }))
     } catch (e) {
-        res.status(500).send({ status: 500, message: null, error: e })
+        logger.error('OrgCtrl:: GetOrgsByUserDid(): Error ' + e);
+        return next(ApiResonse.internal( null, e))
+
     }
 }
 const deleteOrg = async (req: Request, res: Response, next: NextFunction) => {
