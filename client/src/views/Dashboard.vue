@@ -37,30 +37,27 @@
   font-size: 18px;
 }
 
+
 </style>
 <template>
-   <div class="home marginRight marginLeft">
-     <h3 class="leftAlign">Welcome, {{user.name}} !</h3>
-     <div class="row">
-      <div class="col-md-6">
-        <Profile/>
-      </div>
-      <div class="col-md-6">
-        <Dashboard/>
-      </div>
-     </div>    
+   <div class="home">
+     <h3>Welcome, {{user.name}} !</h3>
+        <Metrics/>
+    <org-sidebar/>
    </div>
 </template>
 
 
 <script>
 import Dashboard from '@/components/Dashboard.vue'
-import Profile from '@/components/Profile.vue'
+import Metrics from '@/components/Metrics.vue'
+import OrgSidebar from './OrgSidebar.vue';
 export default {
   name: "PanelPage",
   components: { 
     Dashboard,
-    Profile
+    Metrics,
+    OrgSidebar,
   },
   data() {
     return {

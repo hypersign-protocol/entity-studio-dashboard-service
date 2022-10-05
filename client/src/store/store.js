@@ -10,8 +10,9 @@ export default new Vuex.Store({
         templateList: [],
         orgList: [
         ],
-        selectedOrgDid: ""
-
+        selectedOrgDid: "",
+        showSideNavbar:false,
+        showNabar:false
     },
     getters: {
         isAnyOrgSelected(state) {
@@ -22,6 +23,12 @@ export default new Vuex.Store({
         },
         totalCredentials(state) {
             return state.vcList.length;
+        },
+        totalTemplateCount(state) {
+            return state.templateList.length;
+        },
+        totalOrgList(state) {
+            return state.orgList.length;
         },
         findSchemaBySchemaID: (state) => (schemaId) => {
             return state.schemaList.find(x => x.schemaId === schemaId);
@@ -51,15 +58,17 @@ export default new Vuex.Store({
     },
     mutations: {
         resetStore(state){
-            console.log('resetting store');
             state.orgList=[]
             state.schemaList=[]
             state.vcList=[]
             state.templateList=[]
             state.selectedOrgDid=""
+            state.showSideNavbar=false
+            state.showNabar=false
         },
         selectAnOrg(state, orgDid) {
             state.selectedOrgDid = orgDid;
+            state.showSideNavbar = true
 
         },
         insertAschema(state, payload) {
@@ -82,7 +91,6 @@ export default new Vuex.Store({
             }
         },
         updateAschema(state, payload) {
-            console.log('updating schema');
             let index = state.schemaList.findIndex(x => x._id === payload._id);
            Object.assign(state.schemaList[index], {...payload});
            // state.schemaList[index] = payload;
@@ -105,11 +113,16 @@ export default new Vuex.Store({
             }
         },
         updateAcredential(state, payload) {
-            console.log("updating a credential" ,payload);
             let index = state.vcList.findIndex(x => x._id === payload._id);
             Object.assign(state.vcList[index], {...payload});
+        },
+        updateNavbarStatus(state,payload) {
+            state.showNabar = payload
+        },
+        updateSidebarStatus(state,payload) {
+            state.showSideNavbar = payload
         }
-        
+
         //     fetchAllOrgDataOnOrgSelect(state, payload) {
         //         console.log(state , payload);
         // }
@@ -185,8 +198,8 @@ export default new Vuex.Store({
 
                 fetch(url, {
                     headers: options.headers
-                }).then(response => response.json()).then(json => {
-                   
+                }).then(response => response.json()).then(json => {       
+
                     if (json && json.schemaList.length!==0) {
                         this.state.schemaList = []
                         json.schemaList.forEach(schema => {

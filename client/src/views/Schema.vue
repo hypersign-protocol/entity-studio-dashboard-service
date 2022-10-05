@@ -288,7 +288,6 @@ export default {
           isRequired: this.attributeRequired
 
         }
-        console.log(obj);
         this.attributes.push(obj)
         this.attributeName = "";
         this.attributeTypes = "";

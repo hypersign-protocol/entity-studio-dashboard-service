@@ -82,7 +82,7 @@ h5 span {
           <h5><span>Or</span></h5>
         </div>
         <div class="form-group center">
-            <a v-if="this.value != ''" class="btn btn-hypersign  button-theme" :style="buttonThemeCss" href="#"
+            <a v-if="this.value != ''" class="btn btn-hypersign  button-theme" href="#"
                   @click.prevent="openWallet()">
                   <div style="font-size: smaller; padding: 10px;">
                     Click To Login
@@ -192,7 +192,7 @@ export default {
             // console.log(_this.$router);
             // window.location.href =
             //   window.location.origin + "/dashboard";
-            _this.$router.push("org");
+            _this.$router.push("dashboard");
           }
         }
       } else if (messageData.op == "reload") {
