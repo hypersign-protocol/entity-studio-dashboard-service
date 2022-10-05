@@ -7,10 +7,8 @@ import { send } from "../services/sse";
 import ApiResonse from "../response/apiResponse";
 
 const CreateOrg = async (req: Request, res: Response, next: NextFunction) => {
-
-
     try {
- 
+        logger.info('OrgCtrl:: CreateOrg() method start...');
         const QrData = {
             QRType: "ISSUE_DID",
             serviceEndpoint: "",
@@ -45,8 +43,10 @@ const CreateOrg = async (req: Request, res: Response, next: NextFunction) => {
         // QrData.data.logo = org.logo
         // QrData.data.status = org.status
         QrData.data.serviceEndpoint=`${ORG_SERVICE_ENDPOINT_GET_STATUS}`
+        logger.info('OrgCtrl:: CreateOrg() method ends...');
        return next(ApiResonse.success({org, QrData}))
     } catch (e) {
+        logger.error('OrgCtrl:: CreateOrg(): Error ' + e);
         return next(ApiResonse.internal(null, e))
     }
 }
@@ -75,11 +75,14 @@ const GetOrgByDid =async (req: Request, res: Response, next: NextFunction) => {
 }
 const GetOrgsByUserDid = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        logger.info('OrgCtrl:: GetOrgsByUserDid() method start...');
         const { hypersign } = req.body;
         const org = await Org.find({ userDid: hypersign.data.id }).exec()
+        logger.info('OrgCtrl:: GetOrgsByUserDid() method ends...');
         return next(ApiResonse.success({ org }))
     } catch (e) {
-        return next(ApiResonse.internal(null, e))
+        logger.error('OrgCtrl:: GetOrgsByUserDid(): Error ' + e);
+        return next(ApiResonse.internal( null, e))
 
     }
 }
