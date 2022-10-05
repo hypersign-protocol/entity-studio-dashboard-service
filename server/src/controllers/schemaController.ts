@@ -2,8 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import Schema, { ISchema } from '../models/Schema';
 import { logger, sse_client, WALLET_WEBHOOK } from '../config'
 import { send } from '../services/sse';
-
-
+import ApiResonse from "../response/apiResponse";
 
 const saveSchema = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -14,12 +13,13 @@ const saveSchema = async (req: Request, res: Response, next: NextFunction) => {
 
         QR_DATA.serviceEndpoint = `${WALLET_WEBHOOK}/${SchemaObj._id}`;
         logger.info("==========SchemaController ::saveSchema Ends ================")
+        return next (ApiResonse.success({ QR_DATA, schema: SchemaObj}))
 
-        res.status(200).json({ QR_DATA, schema: SchemaObj, status: 200 })
 
     } catch (error) {
         logger.error("==========SchemaController ::saveSchema Ends ================")
-        res.status(500).json(error)
+        logger.error('SchemaCtrl:: saveSchema() Error: ' + error )
+        return next(ApiResonse.internal(null, error))
     }
 
 }
@@ -69,14 +69,14 @@ const getSchema = async (req: Request, res: Response, next: NextFunction) => {
         }
         const pageInt = page ? parseInt(page.toString()) : 1;
         const skip = (pageInt - 1) * limitInt;
-
-
-        const schemaList = await Schema.find({ did: hypersign.data.id, orgDid }).sort({ createdAt: -1 })
+        const schemaList = await Schema.find({ did: hypersign.data.id, orgDid }).sort({ createdAt: -1 }).skip(skip).limit(limitInt)
         logger.info("==========SchemaController ::getSchema Ends================")
-        res.status(200).json({ schemaList, status: 200 })
+        return next(ApiResonse.success({schemaList}))
+
     } catch (error) {
         logger.error("==========SchemaController ::getSchema Ends================")
-        res.status(500).json(error)
+        return next(ApiResonse.internal(null, error))
+
     }
 
 }
