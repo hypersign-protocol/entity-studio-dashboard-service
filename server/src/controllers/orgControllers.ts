@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import Team from "../models/TeamSchema";
-import Org from '../models/OrgSchema';
+import Org, { IOrg } from '../models/OrgSchema';
 import { logger, WALLET_WEB_HOOK_ORG_DID,ORG_SERVICE_ENDPOINT_GET_STATUS, sse_client } from '../config'
 import { Interface } from "readline";
 import { send } from "../services/sse";
@@ -29,7 +29,7 @@ const CreateOrg = async (req: Request, res: Response, next: NextFunction) => {
 
         }
         const { orgData, hypersign } = req.body;
-        const org = await new Org({ userDid: hypersign.data.id, orgDid: orgData.orgDid, region: orgData.region, name: orgData.name, domain: orgData.domain, logo: orgData.logo ,status:'Initiated' }).save()
+        const org : IOrg= await new Org({ userDid: hypersign.data.id, orgDid: orgData.orgDid, region: orgData.region, name: orgData.name, domain: orgData.domain, logo: orgData.logo ,status:'Initiated' }).save()
 
         const team = await new Team({ orgDid: org._id, userDid: hypersign.data.id }).save()
         
@@ -77,7 +77,7 @@ const GetOrgsByUserDid = async (req: Request, res: Response, next: NextFunction)
     try {
         logger.info('OrgCtrl:: GetOrgsByUserDid() method start...');
         const { hypersign } = req.body;
-        const org = await Org.find({ userDid: hypersign.data.id }).exec()
+        const org:Array<IOrg> = await Org.find({ userDid: hypersign.data.id }).exec()
         logger.info('OrgCtrl:: GetOrgsByUserDid() method ends...');
         return next(ApiResonse.success({ org }))
     } catch (e) {
@@ -123,12 +123,25 @@ const orgStatusByid=async (id)=>{
 }
 const updateOrg = async (req: Request, res: Response, next: NextFunction) => {
     try {
-
+        logger.info('orgCtrl:: updateOrg() method start...')
         const { orgData } = req.body;
-        const org = await Org.findOneAndUpdate({ _id: orgData._id }, { orgDid: orgData.orgDid, region: orgData.region, name: orgData.name, domain: orgData.domain, logo: orgData.logo }).exec()
-        res.status(200).json({ org, status: 200 })
+        let org
+        try{
+         org = await Org.findOneAndUpdate({ _id: orgData._id }, { orgDid: orgData.orgDid, region: orgData.region, name: orgData.name, domain: orgData.domain, logo: orgData.logo }, { returnDocument: 'after'}).exec()
+        if(!org)  return next(ApiResonse.badRequest(null, `No org detail exists for orgId ${orgData._id}`))
+          
+        }catch(e){
+            logger.error('orgCtrl:: updateOrg() : Error', e)
+            return next(ApiResonse.badRequest(null, 'Invalid orgId'))
+
+        }
+        logger.info('orgCtrl:: updateOrg() method end...')
+        return next(ApiResonse.success({ org }))
     } catch (e) {
-        res.status(500).send({ status: 500, message: null, error: e })
+
+        logger.error('orgCtrl:: updateOrg() : Error', e)
+
+        return next(ApiResonse.internal(null, e))
     }
 }
 const setOrgStatus =async (req: Request, res: Response, next: NextFunction) => {
