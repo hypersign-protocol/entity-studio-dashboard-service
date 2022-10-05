@@ -1,10 +1,10 @@
 import Router from 'express';
 import { CreateOrg, deleteOrg, GetOrgByDid, GetOrgById, GetOrgByIdSSE, GetOrgsByUserDid, setOrgStatus, updateOrg } from '../controllers/orgControllers';
-
-
+import { OrgSchemaBody } from '../middleware/org';
+import { validateRequestSchema } from '../middleware/validateRequestSchema'
 export const orgRoutes = (hypersign) => {
     const router = Router();
-    router.post('/', hypersign.authorize.bind(hypersign),CreateOrg);
+    router.post('/', hypersign.authorize.bind(hypersign), OrgSchemaBody, validateRequestSchema, CreateOrg);
 
     router.post('/status/:id', setOrgStatus)
     router.put('/update', hypersign.authorize.bind(hypersign),updateOrg)
