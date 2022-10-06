@@ -59,7 +59,7 @@ export const walletAuthRoutes = (hypersign) => {
   // Any resource which you want to protect
   // Must pass Authorization: Bearer <accessToken>  as header
   // Doc: https://github.com/hypersign-protocol/hypersign-auth-js-sdk/blob/master/docs.md#hypersignauthorize
-  router.post('/protected', hypersign.authorize.bind(hypersign), (req, res) => {
+  router.post('/api/v2/protected', hypersign.authorize.bind(hypersign), (req, res) => {
     try {
       const user = req.body.hypersign.data;
       // Do whatever you want to do with it
