@@ -14,6 +14,7 @@ import http from 'http';
 import { schemaRoutes } from './routes/schemaRoutes';
 import { presentationRoute } from './routes/presentationRoutes';
 import apiResponseHandler from './response/apiResponseHandler';
+import { profileRoute } from './routes/userProfile';
 
 import { orgRoutes } from './routes/orgRoutes';
 const HypersignAuth = require('hypersign-auth-node-sdk');
@@ -77,6 +78,7 @@ export default function app() {
       app.use('/api/v1/presentation', presentationRoute(hypersign));
       app.use('/api/v1/org', orgRoutes(hypersign));
       app.use(walletAuthRoutes(hypersign));
+      app.use('/api/v1/user', profileRoute(hypersign));
       app.use(apiResponseHandler);
 
       server.listen(port, () => logger.info(`The server is running on port ${port}`));
@@ -88,6 +90,6 @@ export default function app() {
       });
     })
     .catch((e) => {
-      console.error(e);
+      logger.error(e);
     });
 }
