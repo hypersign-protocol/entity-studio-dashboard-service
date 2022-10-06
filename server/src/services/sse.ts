@@ -14,7 +14,7 @@ const send = async (res, func, id, timer, DELAY, STOP, log, func2?) => {
         return;
       }
       if (timer > STOP || timer === STOP) {
-        console.log('timer', timer);
+        logger.info('timer', timer);
 
         if (data.status !== 'Registered') {
           logger.info(`===========${log} SSE:: Ends================`);

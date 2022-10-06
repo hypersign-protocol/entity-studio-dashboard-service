@@ -1,6 +1,6 @@
 import IVerifiableCredential from '../models/IVerifiableCredentials';
 import { DBService, SchemaType } from './db.service';
-import { hypersignSDK } from '../config';
+import { hypersignSDK, logger } from '../config';
 
 export class VerifiableCredentials implements IVerifiableCredential {
   id: string;
@@ -44,7 +44,7 @@ export class VerifiableCredentials implements IVerifiableCredential {
     props.forEach((e) => {
       if (e == 'dbSerice') return;
       if (e == 'prefix') return;
-      console.log(this[e]);
+      logger.info(this[e]);
       if (this[e] != '' && this[e]) queryParams[e] = this[e];
     });
     const users = await this.dbSerice.getAll(SchemaType.VerifiableCredential, queryParams);

@@ -1,3 +1,5 @@
+import { logger } from '../config';
+
 const { Router } = require('express');
 
 const authRoutes = (hypersign) => {
@@ -7,7 +9,6 @@ const authRoutes = (hypersign) => {
   router.post('/hs/api/v2/auth', hypersign.authenticate.bind(hypersign), (req, res) => {
     try {
       const { user } = req.body.hypersign.data;
-      console.log(req.body.hypersign.data);
       // Do something with the user data.
       // The hsUserData contains userdata and authorizationToken
       res.status(200).send({ status: 200, message: 'Success', error: null });
@@ -21,7 +22,7 @@ const authRoutes = (hypersign) => {
   // Doc: https://github.com/hypersign-protocol/hypersign-auth-js-sdk/blob/master/docs.md#hypersignregister
   router.post('/hs/api/v2/register', hypersign.register.bind(hypersign), (req, res) => {
     try {
-      console.log('Register success');
+      logger.info('Register success');
       // You can store userdata (req.body) but this user is not yet activated since he has not
       // validated his email.
       res.status(200).send({ status: 200, message: req.body.hypersign.data, error: null });
@@ -35,10 +36,9 @@ const authRoutes = (hypersign) => {
   // Doc: https://github.com/hypersign-protocol/hypersign-auth-js-sdk/blob/master/docs.md#hypersignissuecredential
   router.get('/hs/api/v2/credential', hypersign.issueCredential.bind(hypersign), (req, res) => {
     try {
-      console.log('Credential success');
+      logger.info('Credential success');
       const { hypersign } = req.body;
       const { data } = hypersign;
-      console.log(hypersign);
       res.status(200).send({ ...data });
     } catch (e) {
       res.status(500).send({ status: 500, message: null, error: e });
@@ -51,7 +51,6 @@ const authRoutes = (hypersign) => {
   router.post('/protected', hypersign.authorize.bind(hypersign), (req, res) => {
     try {
       const user = req.body.hypersign.data;
-      console.log(user);
       // Do whatever you want to do with it
       res.status(200).send({ status: 200, message: user, error: null });
     } catch (e) {

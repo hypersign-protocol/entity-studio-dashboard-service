@@ -8,7 +8,6 @@ import { hypersignSDK } from '../config';
 const registerApp = async (req: Request, res: Response) => {
   try {
     const { id } = res.locals.data;
-    console.log(req.body);
     const { name } = req.body;
     if (!name) throw new Error('App name is required!');
     const appObj = new Application({ name, userId: id });
@@ -88,7 +87,6 @@ const login = (req: Request, res: Response) => {
 };
 
 const getAppList = async (req: Request, res: Response) => {
-  console.log(res.locals.data);
   const { name } = req.body;
   const { id } = res.locals.data;
   if (!id) throw new Error('UserId is required!');
@@ -105,11 +103,8 @@ const getAppList = async (req: Request, res: Response) => {
 };
 
 const getOne = async (req: Request, res: Response) => {
-  console.log(res.locals.data);
   const { id } = res.locals.data;
   if (!id) throw new Error('UserId is required!');
-  console.log(req.params.appId);
-  console.log({ userID: id });
   const appObj = new Application({ appId: req.params.appId, userId: id });
   const list = await appObj.fetch();
 

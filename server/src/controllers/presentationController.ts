@@ -24,8 +24,6 @@ const verifyPresentation = async (req: Request, res: Response, next: NextFunctio
         return hsSdk.init();
       })
       .then(async () => {
-        console.log(req.body);
-
         return hsSdk.vp.verifyPresentation({
           signedPresentation: vc,
           challenge: vc.proof.challenge,
@@ -35,7 +33,6 @@ const verifyPresentation = async (req: Request, res: Response, next: NextFunctio
         });
       })
       .then(async (resut) => {
-        console.log(resut);
         res.json(resut);
       });
   } catch (error) {

@@ -52,7 +52,7 @@ export default function app() {
     } else {
       corsOptions = { origin: false }; // disable CORS for this request
     }
-    console.log(req.header('Origin'));
+    logger.info(req.header('Origin'));
     callback(null, corsOptions); // callback expects two parameters: error and options
   }
 
