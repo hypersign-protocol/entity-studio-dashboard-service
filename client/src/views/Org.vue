@@ -73,6 +73,9 @@ export default {
     }
   },
   components: { HfPopUp, Loading, StudioSideBar, OrgContent },
+  created() {
+    this.$store.commit('updateSideNavStatus',true)
+  },
   methods: {
     ssePopulateOrg(id, store) {
       const sse = new EventSource(`${this.$config.studioServer.ORG_SSE}${id}`);

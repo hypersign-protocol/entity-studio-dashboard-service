@@ -1,7 +1,9 @@
 <template>
   <div class="home">
-    <div class="form-group" style="text-align: right; padding-top:20px;">
-      <button @click="openSlider()" class="btn btn-primary">+ Organization</button>
+    <div class="form-group" style="display:flex">
+      <h4 class="mt-4" style="text-align: left;">Organizations</h4>
+      <button @click="openSlider()" style="text-align: right;" class="btn btn-primary ml-auto mt-4">+ Organization</button>
+      
     </div>
     <StudioSideBar title="Add Organization">
       <div class="container">
@@ -92,18 +94,16 @@
             </li>
             </ul>
             </div>
-           
-              <small>
-              <span @click="editOrg(eachOrg._id)" title="Click to edit this event" style="cursor: pointer">
-                Edit
-              </span> |
-              <span @click="switchOrg(eachOrg._id)" title="Click to edit this event" style="cursor: pointer">
-                Switch
-              </span>
-            </small>
-            </div>
-           
-            
+                <div class="pt-1 pl-2">            
+                <i class="fas fa-pencil-alt"
+                @click="editOrg(eachOrg._id)" title="Click to edit this event" style="cursor: pointer"
+                ></i>
+                <span class="ml-3"></span>
+                <i class="fas fa-sync" aria-hidden="true"
+                @click="switchOrg(eachOrg._id)" title="Click to switch to org" style="cursor: pointer"
+                ></i>
+                </div>
+            </div> 
           </footer>
         </b-card>
       </div>
@@ -224,9 +224,9 @@ export default {
     },
     switchOrg(orgDid) {
       localStorage.setItem('selectedOrg',orgDid)
-      this.$store.commit('updateNavbarStatus',false)
+      this.$store.commit('updateSideNavStatus',true)
       this.$store.commit('selectAnOrg', orgDid)
-      this.$router.push('/studio/schema')
+      this.$router.push('/studio/credential')
       this.$store.dispatch('fetchAllOrgDataOnOrgSelect', orgDid)
       
     },

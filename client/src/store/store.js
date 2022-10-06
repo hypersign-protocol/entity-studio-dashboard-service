@@ -12,9 +12,11 @@ export default new Vuex.Store({
         ],
         selectedOrgDid: "",
         showSideNavbar:false,
-        showNabar:false
     },
     getters: {
+        sideNavStatus(state) {
+            return state.showSideNavbar
+        },
         isAnyOrgSelected(state) {
             return state.selectedOrgDid != "" ? true : false
         },
@@ -64,12 +66,12 @@ export default new Vuex.Store({
             state.templateList=[]
             state.selectedOrgDid=""
             state.showSideNavbar=false
-            state.showNabar=false
         },
         selectAnOrg(state, orgDid) {
             state.selectedOrgDid = orgDid;
-            state.showSideNavbar = true
-
+        },
+        updateSideNavStatus(state,payload) {
+            state.showSideNavbar = payload
         },
         insertAschema(state, payload) {
             if (!state.schemaList.find(x => x._id === payload._id)) {
@@ -115,9 +117,6 @@ export default new Vuex.Store({
         updateAcredential(state, payload) {
             let index = state.vcList.findIndex(x => x._id === payload._id);
             Object.assign(state.vcList[index], {...payload});
-        },
-        updateNavbarStatus(state,payload) {
-            state.showNabar = payload
         },
         updateSidebarStatus(state,payload) {
             state.showSideNavbar = payload

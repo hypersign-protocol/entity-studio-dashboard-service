@@ -13,17 +13,6 @@
   position:absolute;
   z-index: 0;
 }
-.nav-style {
-  background: #FFFFFF;
-  margin-bottom: 1%;
-  padding: 5px;
-  padding-left: 1.5%;
-  text-align: left;
-  box-shadow:
-    rgba(0, 0, 0, 0.1) 0px 2px 2px 0px,
-    rgba(0, 0, 0, 0.02) 0px 3px 1px -2px,
-    rgba(0, 0, 0, 0.01) 0px 1px 5px 0px;
-}
 
 .rightAlign {
   text-align: end;
@@ -48,10 +37,6 @@
   min-height: 100vh;
   background: #F6F6F687;
 }
-.position {
-  display: inline-flex;
-  left: 1000px;
-}
 .subtitle {
   padding-left: 10px;
   color: gray;
@@ -61,59 +46,56 @@
 .container-collapsed {
   padding-left: 150px;
 }
-/* .v-sidebar-menu{
-  min-width: 200px;
-} */
-.v-sidebar-menu.vsm_white-theme {
-  background-color: white !important;
-  color: grey !important;
-}
-.v-sidebar-menu.vsm_white-theme .vsm--link {
-  color: #fff !important;
-}
-.action{
-  z-index: 12;
-}
 </style>
 <template>
   <div id="app">
-    <div class="row nav-style">
-        <div class="form-group form-inline">
-          <img class="logo-style"
-            src="https://thumb.tildacdn.com/tild3065-3765-4865-b331-393637653931/-/resize/150x/-/format/webp/hypersign_Yellow.png">
-          <h4 class="subtitle"> <span style="opacity:0.4">|</span> {{ $config.app.name }} ({{ $config.app.version }})</h4>
-        <div class="col-md-5 position" style="padding-top:12px;"
-        v-if="navStatus">
-        <button type="button" @click="goToNextPage(m.name)" class="btn btn-light btn-sm" v-for="m in getMenu()"
-          :key="m.name" v-if="m.isShow">{{ m.name }}</button>
-     </div>
-     <div v-if="showSideNavbar === true" class="col-md-2 form-inline   rightAlign" style="padding-top:12px">
+   <b-navbar toggleable="lg" type="dark" variant="white" class="navStyle" v-if="showIcon">
+    <b-navbar-brand href="#" style="display:flex;">
+      <img src="https://thumb.tildacdn.com/tild3065-3765-4865-b331-393637653931/-/resize/150x/-/format/webp/hypersign_Yellow.png" alt="">
+      <h4 class="subtitle">| {{ $config.app.name }} ({{ $config.app.version }})</h4>
+    </b-navbar-brand>
 
-      <div class="action">
-      <div class="profile" @click="menuToggle()">
-        <i class="fas fa-user"></i>
-      </div>
-      <div class="menu">
-        <h3>Your Profile<br />
-        <span>{{user.name}}</span><br>
-        <span>Network</span>
-        </h3>
-       <b-button class="btnforLogout" @click="logoutAll()">Logout</b-button>
-      </div>
-    </div>
-     </div>
-      </div>
-      </div>
+    <b-navbar-toggle target="nav-collapse" type="dark" style="background-color:grey;">
+    </b-navbar-toggle>
+
+    <b-collapse id="nav-collapse" is-nav>
+      <b-navbar-nav class="ml-auto" style="padding-right:100px; position:static;">
+
+        <b-nav-item-dropdown right v-if="showIcon">
+          <template #button-content>
+            <b-iconstack font-scale="3">
+            <b-icon stacked icon="circle" variant="info"></b-icon>
+            <b-icon stacked icon="person" scale="0.6" variant="info"></b-icon>
+          </b-iconstack>
+          </template>
+          <b-dropdown-item disabled href="#">Profile <br><span>{{user.name}}</span>
+          <br><span>Jagrat Network</span></b-dropdown-item>
+          <b-dropdown-item href="#" @click="logoutAll()">Logout</b-dropdown-item>
+        </b-nav-item-dropdown>
+      </b-navbar-nav>
+    </b-collapse>
+  </b-navbar>
+
    <div :class="[
       isSidebarCollapsed 
           ? 'container-collapsed-not'
           : 'container-collapsed',
     ]">
       <sidebar-menu class="sidebar-wrapper" v-if="showSideNavbar" @toggle-collapse="onToggleCollapse" :collapsed="isSidebarCollapsed" :theme="'white-theme'" width="220px"
-      :menu="getSideMenu()">
+      :menu="getSideMenu()"
+      >
+      <div slot="header" style="background:#363740">
+          <div class="mt-3">
+            <div>
+            <center><img v-if="!isSidebarCollapsed" :src="`${getProfileIcon(selectedOrg.name)}`" alt="avatar" width="130px" style="" /></center>
+            <center><img v-if="isSidebarCollapsed" :src="`${getProfileIcon(selectedOrg.name)}`" class="mr-1" alt="center" width="35px"/></center>
+            </div>
+            <center><p class="mt-3 orgNameCss">{{ selectedOrg.name }}</p></center>
+          </div>
+        </div>
       </sidebar-menu>
-      <router-view />
-   </div>
+    <router-view />
+  </div>
     <notifications group="foo" />
   </div>
 </template>
@@ -137,73 +119,33 @@ font-weight: 400;
 line-height: 1.42857142857143;
 text-decoration-skip-ink: auto;
 }
-.action {
-  position: fixed;
-  /* top: 20px; */
-  right: 30px;
-  padding-right:200px;
+.v-sidebar-menu .vsm--link_level-1 .vsm--icon {
+  font-size: 16px;
+  width: 40px !important;
 }
-.btnforLogout {
-  margin-right:60px ;
-  margin-bottom:20px ;
-  margin-top: -10px;
-}
-.action .profile {
-  position: relative;
-  width: 90px;
-  height: 90px;
-  /* overflow: hidden; */
-  cursor: pointer;
-}
-
-.action .profile img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.action .menu {
-  
-  position: absolute;
-  top: 120px;
-  right: 60px;
-  left: 5px;
-  /* padding: 10px; */
-  background: whitesmoke;
-  width: 200px;
-  box-sizing: 0 5px 25px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  transition: 0.3s;
-  visibility: hidden;
-  opacity: 0;
-}
-
-.action .menu.active {
-  top: 80px;
-  visibility: visible;
-  opacity: 1;
-}
-
-.action .menu h3 {
-  width: 100%;
+.dropdown-menu.show {
   text-align: center;
-  font-size: 18px;
-  padding: 20px 0;
-  font-weight: 500;
-  color: #555;
+}
+.navbar {
+  padding: 0px !important;
+}
+.navStyle {
+  background: #FFFFFF;
+  margin-bottom: 1%;
+  padding: 5px !important;
+  padding-left: 1.5%;
+  text-align: left;
+  box-shadow:
+    rgba(0, 0, 0, 0.1) 0px 2px 2px 0px,
+    rgba(0, 0, 0, 0.02) 0px 3px 1px -2px,
+    rgba(0, 0, 0, 0.01) 0px 1px 5px 0px;
+}
+.orgNameCss {
+  overflow-wrap: break-word;
+  color: white;
+  font-weight: bold;
 }
 
-.action .menu h3 span {
-  font-size: 14px;
-  color: black;
-  font-weight: 300;
-}
-
-.action .menu a:hover {
-  color: #ff5d94;
-}
 
 #nav {
   padding: 30px;
@@ -246,11 +188,8 @@ text-decoration-skip-ink: auto;
   padding-left: 350px;
 }
 .sidebar-wrapper {
-  margin-top: 5%;
-  padding-top: 10%;
-  padding-bottom: 0%;
-  width: 20%;
-  height: 80%;
+  min-width: 70px;
+  margin-top: 70px;
   box-shadow: 0 0 15px 0 rgba(34,41,47,.05);
 }
 .v-sidebar-menu.vsm_white-theme .vsm--mobile-bg{
@@ -258,64 +197,52 @@ text-decoration-skip-ink: auto;
 }
 .v-sidebar-menu.vsm_white-theme {
   background-color: white !important;
-  color: grey !important;
+  color: #000 !important;
+}
+.v-sidebar-menu.vsm_white-theme .vsm--header {
+  color: #000 !important;
 }
 .v-sidebar-menu.vsm_white-theme .vsm--link{
-  color: grey !important;
+  color: #000 !important;
 }
-.v-sidebar-menu .vsm-arrow:after {
-    font-family: FontAwesome;
-}
-.v-sidebar-menu .collapse-btn:after {
-    content: "\f07e";
-    font-family: FontAwesome;
+.v-sidebar-menu.vsm_white-theme .vsm--link_level-1 .vsm--icon {
+  background-color: transparent !important;
+  color: #000 !important;
 }
 </style>
 
 
 <script>
 import UtilsMixin from './mixins/utils';
-import OrgDropDown from './components/element/OrgDropDown.vue'
 import EventBus from './eventbus'
 export default {
-  components: { OrgDropDown },
+  components: {},
   computed: {
-    navStatus() {
-   if(this.showNavbar === true && this.showSideNavbar!=true){
-      return true
-     } else {
-      return false
-     }
-    },
-    isShow() {
-  
-      return this.$store.getters.isAnyOrgSelected;
-
-    },
     selectedOrg() {
       return this.$store.getters.getSelectedOrg;
     },
     showSideNavbar() {
       return this.$store.state.showSideNavbar
     },
-    showNavbar() {
-      return this.$store.state.showNabar
-    }
   },
   data() {
     return {
       collapsed:true,
+      showIcon:false,
       isSidebarCollapsed:true,
       authToken: localStorage.getItem('authToken'),
       schema_page: 1,
       authRoutes: ['register', 'PKIIdLogin'],
-      user:null
+      user: {}
     }
   },
 
    mounted() {
+    console.log(localStorage.getItem('user'))
+    if(localStorage.getItem('user')){
     const usrStr = localStorage.getItem('user')
     this.user = JSON.parse(usrStr);
+    }
    if(localStorage.getItem('selectedOrg')){
     const selectedOrgId = localStorage.getItem('selectedOrg')
     this.$store.commit('selectAnOrg', selectedOrgId)
@@ -326,13 +253,13 @@ export default {
    this.initializeStore()
   },
   methods: {
+    getProfileIcon(name) {
+      return "https://avatars.dicebear.com/api/identicon/"+name+".svg"
+    },
     logoutAll() {
+      this.showIcon = false
       this.$router.push('/login')
       this.logout()
-    },
-    menuToggle() {
-      const toggleMenu = document.querySelector(".menu");
-        toggleMenu.classList.toggle("active");
     },
     onToggleCollapse(collapsed) {
       if (collapsed) {
@@ -344,7 +271,7 @@ export default {
      initializeStore() {
       this.authToken = localStorage.getItem('authToken'); 
       if (this.authToken) {
-       this.$store.commit('updateNavbarStatus',true)
+       this.showIcon = true
        this.fetchAllOrgs()
     }else{
       console.log("else");
@@ -353,82 +280,32 @@ export default {
     getSideMenu() {
       const menu = [
         {
-          header:true,
-          title:`${this.selectedOrg.name}`
-        },
-        {
           href: "/studio/dashboard",
           title: "Dashboard",
-          icon: "fas fa-home-alt",
+          icon: "fas fa-tachometer-alt",
         },
         {
           href: "/studio/org",
-          title: "Org",
+          title: "Organization",
           icon: "fa fa-university",
         },
         {
           href: "/studio/schema",
           title: "Schema",
-          icon: "fas fa-credit-card",
+          icon: "fa fa-table",
         },
         {
           href: "/studio/credential",
           title: "Credentials",
-          icon: "fas fa-calendar-alt",
+          icon: "fa fa-id-card",
         },
         {
           href: "/studio/presentation",
-          title: "Presentations",
-          icon: "fas fa-calendar-alt",
+          title: "Presentation",
+          icon: "fa fa-desktop",
         },
       ]
       return menu
-    },
-    getMenu() {
-      const menu = [
-        {
-          name: "Dashboard",
-          path: "/studio/dashboard",
-          isShow: true,
-        },
-        {
-          name: "Organization",
-          path: "/studio/org",
-          isShow: true,
-        },
-        // {
-        //   name: "Schema",
-        //   path: "/studio/schema",
-        //   isShow: this.isShow,
-        // },
-        // {
-        //   name: "Credentials",
-        //   path: "/studio/credential",
-        //   isShow: this.isShow,
-        // },
-        // {
-        //   name: "Presentation",
-        //   path: "/studio/presentation",
-        //   isShow: this.isShow,
-        // },
-        {
-          name: "Logout",
-          path: "/login",
-          isShow: true,
-        },
-      ]
-      return menu;
-
-    },
-    vcStatus(vcId) {
-      return fetch(vcId + ':')
-        .then(resp => {
-          return resp.json()
-        }).then(data => {
-          return data
-        }).catch(e => {
-          Promise.reject(e.message)
-        })
     },
     fetchAllOrgs() {
       // TODO: Get list of orgs 
@@ -572,21 +449,6 @@ export default {
      
       this.$store.commit('resetStore')
     },
-    goToNextPage(route) {
-      const r = this.getMenu().find(x => x.name === route)
-      if (r.name === "Logout") {
-        this.$store.commit('updateNavbarStatus',false)
-        this.$store.commit('updateSidebarStatus',false)
-        this.$router.push(r.path)
-        this.logout()
-      }
-      this.$router.push(r.path)
-      if (this.$route.params.nextUrl != null) {
-        this.$router.push(this.$route.params.nextUrl)
-      } else {
-        this.$router.push(r.path)
-      }
-    }
   },
   mixins: [UtilsMixin]
 }
