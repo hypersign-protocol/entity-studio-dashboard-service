@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import creadSchema from '../models/CreadSchema';
 import { WALLET_WEB_HOOK_CREAD } from '../config'
 import { send } from '../services/sse';
+import ApiResponse from '../response/apiResponse';
 
 const setCredentialStatus = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -67,16 +68,14 @@ const issueCredential = async (req: Request, res: Response, next: NextFunction) 
         QR_DATA.data.expirationDate = new Date('12/12/2027')
         QR_DATA.serviceEndpoint = `${WALLET_WEB_HOOK_CREAD}/${creadObj._id}`;
 
-
-
         logger.info("==========CredController ::issueCredential Ends ================")
-
-        res.json({ QR_DATA, creadRecord: creadObj, status: 200 })
+        return next(ApiResponse.success({QR_DATA, creadRecord: creadObj}))
 
     } catch (error) {
         logger.error("==========CredController ::issueCredential Ends ================")
+        logger.error("CredController ::issueCredential : Error " + error)
+        return next(ApiResponse.internal(null, error))
 
-        res.json(error)
     }
 }
 
@@ -105,19 +104,18 @@ const getCredentialList = async (req: Request, res: Response, next: NextFunction
         const orgDid = req.params.orgDid
         const credList = await creadSchema.find({ issuerDid: hypersign.data.id ,orgDid }).sort({ createdAt: -1 })
         logger.info("==========CredController ::getCredentialList Ends ================")
-
-        res.json({
-            credList, status: 200
-        })
+        return next(ApiResponse.success({credList}));
     } catch (error) {
+        logger.error("CredController ::issueCredential : Error " + error)
+        return next(ApiResponse.internal(null, error));
 
     }
 }
 
-const accepctCredential = async (req: Request, res: Response, next: NextFunction) => {
+const sendCredentialDetail = async (req: Request, res: Response, next: NextFunction) => {
 
     try {
-        logger.info("==========CredController ::accepctCredential Starts ================")
+        logger.info("==========CredController ::sendCredentialDetail Starts ================")
 
         const dbRowId = req.body.id
 
@@ -141,21 +139,20 @@ const accepctCredential = async (req: Request, res: Response, next: NextFunction
 
         const deeplink = `${studioServerBaseUrl}deeplink.html?deeplink=hypersign:deeplink?url=${QRData}`
 
-        logger.info("==========CredController ::accepctCredential Ends ================")
-
-        res.json({ url: deeplink })
+        logger.info("==========CredController ::sendCredentialDetail Ends ================")
+        return next (ApiResponse.success({url: deeplink}))
 
     } catch (error) {
-        logger.Error("==========CredController ::accepctCredential Ends ================")
-
+        logger.Error("==========CredController ::sendCredentialDetail Ends ================")
+         logger.error('CredController ::sendCredentialDetail: Error', error)
         res.status(500).json({ error })
     }
 
 }
 
-const accpctWalletCredential = async (req: Request, res: Response, next: NextFunction) => {
+const acceptCredentials = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        logger.info("==========CredController ::accpctWalletCredential Starts ================")
+        logger.info("==========CredController ::acceptCredentials Starts ================")
 
         let vc_data;
         const { token, did } = req.query
@@ -167,7 +164,7 @@ const accpctWalletCredential = async (req: Request, res: Response, next: NextFun
                 vc_data = await creadSchema.findOne({ _id: dbId })
                 res.json(vc_data.vc)
 
-                logger.info("==========CredController ::accpctWalletCredential Ends ================")
+                logger.info("==========CredController ::acceptCredentials Ends ================")
 
             })
         }
@@ -175,7 +172,7 @@ const accpctWalletCredential = async (req: Request, res: Response, next: NextFun
 
 
     } catch (error) {
-        logger.error("==========CredController ::accpctWalletCredential Ends ================")
+        logger.error("==========CredController ::acceptCredentials Ends ================")
 
         res.status(500).json(error)
     }
@@ -183,5 +180,5 @@ const accpctWalletCredential = async (req: Request, res: Response, next: NextFun
 export {
     issueCredential,
     getCredentialList,
-    setCredentialStatus, accepctCredential, accpctWalletCredential,getCredentialById
+    setCredentialStatus, sendCredentialDetail, acceptCredentials,getCredentialById
 }

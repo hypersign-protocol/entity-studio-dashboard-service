@@ -9,7 +9,7 @@ export interface ISchema extends Document {
 }
 
 export const SchemaDbSchema = new Schema({
-    orgDid: { reqired: false, type: String },
+    orgDid: {  type: String, reqired: false },
     did: { type: String, required: true },
     transactionHash: {
         type: String, required: false,
