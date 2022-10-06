@@ -86,7 +86,7 @@ const register = async (req: Request, res: Response) => {
 const getCredential = (req, res) => {
   try {
     const token = req.query.token;
-    //console.log(token);
+    console.log(token);
     if (!token) {
       throw new Error('Token is not passed');
     }
@@ -130,7 +130,7 @@ async function verifyVP(vp, challenge) {
     issuerDid: vc.issuer,
     holderDid: vc.credentialSubject.id,
   })) as any;
-  //console.log(isVerified);
+  console.log(isVerified);
   if (isVerified.verified) {
     return true;
   } else {
@@ -186,7 +186,7 @@ const recover = (req: Request, res: Response) => {
 };
 
 const getNewChallenge = (req: Request, res: Response) => {
-  // console.log('In the challenge api');
+  console.log('In the challenge api');
   const challenge = hypersignSDK.did.getChallange();
   jwt.sign({ challenge }, jwtSecret, { expiresIn: jwtExpiryInMilli }, (err, token) => {
     if (err) throw new Error(err);
