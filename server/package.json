@@ -14,7 +14,9 @@
     "dev": "nodemon src/index.ts",
     "build": "rimraf ./dist && tsc -p . && mkdir ./dist/temp",
     "bootstrap": "npm run start -- --bootstrap",
-    "test": "mocha -r ts-node/register src/tests/**/*.test.ts"
+    "test": "mocha -r ts-node/register src/tests/**/*.test.ts",
+    "prettier": "prettier --config .prettierrc.json --write src/**/*.ts"
+
   },
   "author": "Vishwas Anand Bhushan",
   "license": "MIT",
