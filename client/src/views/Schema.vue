@@ -264,6 +264,7 @@ export default {
   created() {
     const usrStr = localStorage.getItem("user");
     this.user = JSON.parse(usrStr);
+    this.$store.commit('updateSideNavStatus',true)
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -288,7 +289,6 @@ export default {
           isRequired: this.attributeRequired
 
         }
-        console.log(obj);
         this.attributes.push(obj)
         this.attributeName = "";
         this.attributeTypes = "";

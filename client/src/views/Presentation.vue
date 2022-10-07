@@ -31,44 +31,51 @@
               <div class="form-group row container">
                 <div class="col-md-12">
                   <form>
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                       <label class="floatLeft">Domain :</label>
                       <input class="form-control" type="url" v-model="presentationTemplate.domain" />
 
 
-                    </div>
+                    </div> -->
                     <div class="form-group">
-                      <label class="floatLeft">Name (optional):</label>
+                      <label class="floatLeft"><strong>Name (optional):</strong></label>
                       <input class="form-control" type="text" v-model="presentationTemplate.name" />
 
 
                     </div>
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                       <label class="floatLeft">IssuerDid</label>
                       <input class="form-control" type="text" v-model="presentationTemplate.issuerDid" />
 
 
-                    </div>
-                    <div class="form-group">
+                    </div> -->
+                    <!-- <div class="form-group">
                       <label class="floatLeft">Schema Id :</label>
                       <input class="form-control" type="text" v-model="presentationTemplate.schemaId" />
 
 
+                    </div> -->
+                    <div class="form-group">
+                      <label for="forselectschema"><strong>Select Schema</strong></label>
+                      <b-form-select v-model="selected" :options="selectOptions"
+                        @change="OnSchemaSelectDropDownChange($event)" size="md" class="mt-3">
+                      </b-form-select>
+
                     </div>
                     <div class="form-group">
-                      <label class="floatLeft">Reason :</label>
+                      <label class="floatLeft"><strong>Reason :</strong></label>
                       <input class="form-control" type="text" v-model="presentationTemplate.reason" />
 
 
                     </div>
                     <div class="form-group">
-                      <label class="floatLeft">Callback URI</label>
+                      <label class="floatLeft"><strong>Callback URI</strong></label>
                       <input class="form-control" type="url" v-model="presentationTemplate.callbackUrl" />
 
 
                     </div>
                     <div class="form-group">
-                      <label class="floatLeft ">Required :</label>
+                      <label class="floatLeft "><strong>Required :</strong></label>
                       <input type="checkbox" v-model="presentationTemplate.required" />
                     </div>
 
@@ -140,7 +147,10 @@ export default {
     },
     selectedOrg(){
       return this.$store.getters.getSelectedOrg;
-    }
+    },
+    selectOptions(){
+      return this.$store.getters.listOfAllSchemaOptions;
+    },
   },
   data() {
     return {
@@ -157,14 +167,15 @@ export default {
       show at the security check.",
       presentationTemplate: {
         queryType: 'QueryByExample',
-        domain: '',
+        domain: this.$store.getters.getSelectedOrg.domain,
         name: '',
-        issuerDid: '',
+        issuerDid:JSON.parse(localStorage.getItem("user")).id,
         schemaId: '',
         reason: '',
         required: true,
         callbackUrl: '',
       },
+      selected:null,
       active: 0,
       host: location.hostname,
       user: {},
@@ -185,7 +196,7 @@ export default {
       selected: null,
       attributeValues: {},
       authToken: localStorage.getItem("authToken"),
-      selectOptions: [{ value: null, text: "Please select a schema" }],
+   
       schemaMap: {},
       vcList: [],
       schemaList: [],
@@ -202,7 +213,8 @@ export default {
   created() {
     const usrStr = localStorage.getItem("user");
     this.user = JSON.parse(usrStr);
-    this.fetchTemplates()
+    this.$store.commit('updateSideNavStatus',true)
+    // this.fetchTemplates()
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -210,6 +222,13 @@ export default {
     });
   },
   methods: {
+    OnSchemaSelectDropDownChange(event) {
+      if (event) {     
+        this.presentationTemplate.schemaId=this.selected
+      } else {
+        this.schemaId = '';
+      }
+    },
     openSlider() {
       this.$root.$emit("bv::toggle::collapse", "sidebar-right");
     },
@@ -287,6 +306,7 @@ export default {
     async generatePresentation() {
       this.isLoading = true
       try {
+        
         const issuerDid = this.presentationTemplate.issuerDid.split(',')
         const headers = {
           "Content-Type": "application/json",

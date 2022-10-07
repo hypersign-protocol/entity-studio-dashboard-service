@@ -13,7 +13,7 @@ import Org from './views/Org.vue'
 Vue.use(Router)
 
 const router =  new Router({
-  mode: 'hash',
+  mode: 'history',
   routes: [
     {
       path: '/',
@@ -111,7 +111,6 @@ router.beforeEach((to, from, next) => {
     const authToken = localStorage.getItem('authToken')
     if(authToken){
       const url = `${config.studioServer.BASE_URL}protected`
-      console.log(url)
       fetch(url,{
         headers: {
           Authorization: `Bearer ${authToken}`,
@@ -126,7 +125,6 @@ router.beforeEach((to, from, next) => {
           })  
         }else{
           localStorage.setItem("user", JSON.stringify(json.message));
-          console.log(json);
           next()
         }
       })
