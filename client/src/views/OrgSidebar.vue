@@ -244,10 +244,10 @@ export default {
       let method
       if (this.edit) {
         method = "PUT"
-        url = `${this.$config.studioServer.BASE_URL}api/v1/org/update`
+        url = `${this.$config.studioServer.BASE_URL}api/v1/org`
 
       } else {
-        url = `${this.$config.studioServer.BASE_URL}api/v1/org/create`
+        url = `${this.$config.studioServer.BASE_URL}api/v1/org`
         method = "POST"
 
       }
@@ -267,24 +267,24 @@ export default {
         headers,
       }).then((res) => res.json())
         .then((j) => {
-
-          const { org } = j
+  
+          const { org } = j.data
           if (!this.edit) {
-            let QR_DATA = j.QrData
+            let QR_DATA = j.data.QrData
             let URL = `${this.$config.webWalletAddress}/deeplink?url=${JSON.stringify(QR_DATA)}`
 
             this.openWallet(URL)
           }
           if (j.status === 200) {
 
-            this.$store.commit('insertAnOrg', j.org);
-            this.$store.commit('selectAnOrg', j.org._id)
+            this.$store.commit('insertAnOrg', j.data.org);
+            this.$store.commit('selectAnOrg', j.data.org._id)
             this.isProcessFinished = true;
             this.openSlider();
 
             this.notifySuccess("Org Created successfull");
             if (this.edit) {
-              this.$store.commit('updateAnOrg', j.org)
+              this.$store.commit('updateAnOrg', j.data.org)
               this.notifySuccess("Org Edited successfull");
             }
 

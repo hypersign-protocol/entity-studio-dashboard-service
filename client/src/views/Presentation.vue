@@ -31,26 +31,26 @@
               <div class="form-group row container">
                 <div class="col-md-12">
                   <form>
-                    <!-- <div class="form-group">
-                      <label class="floatLeft">Domain :</label>
+                    <div class="form-group">
+                      <label class="floatLeft"><strong> Domain :</strong></label>
                       <input class="form-control" type="url" v-model="presentationTemplate.domain" />
 
 
-                    </div> -->
+                    </div>
                     <div class="form-group">
-                      <label class="floatLeft"><strong>Name (optional):</strong></label>
+                      <label class="floatLeft"><strong>Name (optional) :</strong></label>
                       <input class="form-control" type="text" v-model="presentationTemplate.name" />
 
 
                     </div>
-                    <!-- <div class="form-group">
-                      <label class="floatLeft">IssuerDid</label>
+                    <div class="form-group">
+                      <label class="floatLeft"><strong> IssuerDid :</strong></label>
                       <input class="form-control" type="text" v-model="presentationTemplate.issuerDid" />
 
 
-                    </div> -->
+                    </div>
                     <!-- <div class="form-group">
-                      <label class="floatLeft">Schema Id :</label>
+                      <label class="floatLeft"><strong>Schema Id :<strong></label>
                       <input class="form-control" type="text" v-model="presentationTemplate.schemaId" />
 
 
@@ -167,9 +167,9 @@ export default {
       show at the security check.",
       presentationTemplate: {
         queryType: 'QueryByExample',
-        domain: this.$store.getters.getSelectedOrg.domain,
+        domain: "",
         name: '',
-        issuerDid:JSON.parse(localStorage.getItem("user")).id,
+        issuerDid:'',
         schemaId: '',
         reason: '',
         required: true,
@@ -230,6 +230,8 @@ export default {
       }
     },
     openSlider() {
+      this.presentationTemplate.issuerDid = JSON.parse(localStorage.getItem("user")).id
+      this.presentationTemplate.domain = this.selectedOrg.domain;
       this.$root.$emit("bv::toggle::collapse", "sidebar-right");
     },
     showClaims() {
@@ -329,7 +331,7 @@ export default {
           method: "POST",
           headers: headers,
         }).then((res) => res.json()).then(json => {
-          this.$store.commit('insertApresentationTemplate', json)
+          this.$store.commit('insertApresentationTemplate', json.data)
           this.notifySuccess('Template Successfully created')
           this.openSlider();
         })

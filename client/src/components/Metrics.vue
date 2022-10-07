@@ -75,26 +75,26 @@ display: flex;
      
         <div class="col-lg-3">
           <div class="card">
-            <div class="card-body tile">{{schemaCount}}</div>
+            <div class="card-body tile">{{allMetricsData.schemasCount}}</div>
             <div class="card-header">AUTHORED SCHEMAS</div>
           </div>
         </div>
         <div class="col-lg-3">
           <div class="card">
-            <div class="card-body tile">{{ credentialCount}}</div>
+            <div class="card-body tile">{{ allMetricsData.credentialsCount }}</div>
             <div class="card-header">ISSUED CREDENTIALS</div>
           </div>
         </div>
         <div class="col-lg-3">
           <div class="card">
-            <div class="card-body tile">{{ orgListCount}}</div>
+            <div class="card-body tile">{{ allMetricsData.orgsCount }}</div>
             <div class="card-header">ORGANIZATIONS</div>
           </div>
         </div>
         
         <div class="col-lg-3">
           <div class="card">
-            <div class="card-body tile">{{ templateListCount}}</div>
+            <div class="card-body tile">{{ allMetricsData.templatesCount }}</div>
             <div class="card-header">PRESENTATION TEMPLATES</div>
           </div>
         </div>
@@ -108,18 +108,10 @@ export default {
   mounted() {},
   components: {},
   computed:{
-    credentialCount(){
-      return this.$store.getters.totalCredentials;
-    },
-    schemaCount(){
-      return this.$store.getters.totalSchemas;
-    },
-    orgListCount() {
-      return this.$store.getters.totalOrgList;
-    },
-    templateListCount() {
-      return this.$store.getters.totalTemplateCount;
-    },
+    allMetricsData() {
+      return this.$store.getters.allMetricsData;
+    }
+
   },
   data() {
     return {

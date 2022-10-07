@@ -68,7 +68,7 @@
             <b-icon stacked icon="person" scale="0.6" variant="info"></b-icon>
           </b-iconstack>
           </template>
-          <b-dropdown-item disabled href="#">Profile <br><span>{{user.name}}</span>
+          <b-dropdown-item disabled href="#">Profile <br><span>{{userDetails.name}}</span>
           <br><span>Jagrat Network</span></b-dropdown-item>
           <b-dropdown-item href="#" @click="logoutAll()">Logout</b-dropdown-item>
         </b-nav-item-dropdown>
@@ -218,6 +218,9 @@ import EventBus from './eventbus'
 export default {
   components: {},
   computed: {
+    userDetails() {
+      return this.$store.getters.userDetails;
+    },
     selectedOrg() {
       return this.$store.getters.getSelectedOrg;
     },
@@ -248,6 +251,7 @@ export default {
     this.$store.commit('selectAnOrg', selectedOrgId)
     this.getList(selectedOrgId)
     this.getCredList(selectedOrgId)
+    this.fetchTemplates(selectedOrgId)
    }
    EventBus.$on("initializeStore",this.initializeStore)
    this.initializeStore()
@@ -273,9 +277,25 @@ export default {
       if (this.authToken) {
        this.showIcon = true
        this.fetchAllOrgs()
+       this.profile()
     }else{
       console.log("else");
      }
+    },
+    async profile() {
+      let url = "";
+      let options = {}
+        url = `${this.$config.studioServer.BASE_URL}api/v1/user/profile`
+        options = {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${this.authToken}`
+          }
+        }
+      const resp = await fetch(url, options);
+      const j = await resp.json();
+     this.$store.commit('addCountDataToProfile',j.data)
     },
     getSideMenu() {
       const menu = [
@@ -309,7 +329,7 @@ export default {
     },
     fetchAllOrgs() {
       // TODO: Get list of orgs 
-      const url = `${this.$config.studioServer.BASE_URL}api/v1/org/all`
+      const url = `${this.$config.studioServer.BASE_URL}api/v1/org`
       const headers = {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${this.authToken}`
@@ -318,7 +338,7 @@ export default {
       fetch(url, {
         headers
       }).then(response => response.json()).then(json => {
-        const data = json.org
+        const data = json.data.org
         // TODO: iterate through them
         if (data) {
           data.forEach(org => {
@@ -335,8 +355,8 @@ export default {
       })
     },
 
-    fetchTemplates() {
-      const url = `${this.$config.studioServer.BASE_URL}api/v1/presentation/template/${this.selectedOrg._id}/`
+    fetchTemplates(selectedOrgDid) {
+      const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.PRESENTATION_TEMPLATE_EP}/org/${selectedOrgDid}/`
       const headers = {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${this.authToken}`
@@ -345,7 +365,7 @@ export default {
       fetch(url, {
         headers
       }).then(response => response.json()).then(json => {
-        json.forEach(template => {
+        json.data.forEach(template => {
           this.$store.commit('insertApresentationTemplate', template)
         })
       })
@@ -368,7 +388,7 @@ export default {
         if (j && j.status == 500) {
         return this.notifyErr(`Error:  ${j.error}`);
       }
-      const schemaList = j.schemaList
+      const schemaList = j.data.schemaList
         schemaList.forEach(schema => {
           this.$store.dispatch('insertAschema', schema)
         })
@@ -391,7 +411,7 @@ export default {
         if (j && j.status == 500) {
         return this.notifyErr(`Error:  ${j.error}`);
       }
-      const credList = j.credList
+      const credList = j.data.credList
       credList.forEach(credential => {
           this.$store.dispatch('insertAcredential', credential)
         })

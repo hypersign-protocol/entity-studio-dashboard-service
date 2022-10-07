@@ -228,7 +228,7 @@ export default {
       const URL = this.$config.studioServer.BASE_URL + this.$config.studioServer.ACCPCT_CRED_EP
       const res = await fetch(URL, options)
       const resp =await res.json()
-      this.credUrl = resp.url;
+      this.credUrl = resp.data.url;
       this.$root.$emit('modal-show')
       this.notifySuccess("Cred Url Generated Successfully")
     },
@@ -318,7 +318,7 @@ export default {
           body: JSON.stringify({ QR_DATA: this.QrData }),
         }).then((res) => res.json())
           .then(json => {
-            const { QR_DATA,creadRecord } = json
+            const { QR_DATA,creadRecord } = json.data
             
 
             this.$store.dispatch("insertAcredential", creadRecord)

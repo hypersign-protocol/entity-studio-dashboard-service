@@ -133,10 +133,10 @@ export default {
       let method
       if (this.edit) {
         method = "PUT"
-        url = `${this.$config.studioServer.BASE_URL}api/v1/org/update`
+        url = `${this.$config.studioServer.BASE_URL}api/v1/org`
 
       } else {
-        url = `${this.$config.studioServer.BASE_URL}api/v1/org/create`
+        url = `${this.$config.studioServer.BASE_URL}api/v1/org`
         method = "POST"
 
       }
