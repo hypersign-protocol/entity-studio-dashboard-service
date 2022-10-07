@@ -264,6 +264,7 @@ export default {
   created() {
     const usrStr = localStorage.getItem("user");
     this.user = JSON.parse(usrStr);
+    this.$store.commit('updateSideNavStatus',true)
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -288,7 +289,6 @@ export default {
           isRequired: this.attributeRequired
 
         }
-        console.log(obj);
         this.attributes.push(obj)
         this.attributeName = "";
         this.attributeTypes = "";
@@ -359,19 +359,19 @@ export default {
         })
           .then((res) => res.json())
           .then((j) => {
-            const { QR_DATA } = j
-            if (j.status === 200) {
+            const { QR_DATA } = j.data
+            if (j.message === 'success') {
               this.notifySuccess("Schema creation initiated. Please approve the transaction from your wallet");
               // TODO: Why this is hardcoded?
               this.credentialName = 'Schema';
 
               // Store the information in store.
-              this.$store.dispatch('insertAschema', j.schema);
+              this.$store.dispatch('insertAschema', j.data.schema);
 
               // Open the wallet for trasanctional approval.
               const URL = `${this.$config.webWalletAddress}/deeplink?url=${JSON.stringify(QR_DATA)}`
               this.openWallet(URL)
-              this.ssePopulateSchema(j.schema._id, this.$store)
+              this.ssePopulateSchema(j.data.schema._id, this.$store)
               this.openSlider();
             } else {
               throw new Error(`${j.error}`);

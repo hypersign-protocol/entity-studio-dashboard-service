@@ -9,17 +9,9 @@
   border-bottom: 1px solid #8080809e;
   font-weight: bold;
 }
-
-.nav-style {
-  background: #FFFFFF;
-  margin-bottom: 1%;
-  padding: 5px;
-  padding-left: 1.5%;
-  text-align: left;
-  box-shadow:
-    rgba(0, 0, 0, 0.1) 0px 2px 2px 0px,
-    rgba(0, 0, 0, 0.02) 0px 3px 1px -2px,
-    rgba(0, 0, 0, 0.01) 0px 1px 5px 0px;
+.row .nav-style {
+  position:absolute;
+  z-index: 0;
 }
 
 .rightAlign {
@@ -45,36 +37,65 @@
   min-height: 100vh;
   background: #F6F6F687;
 }
-
 .subtitle {
   padding-left: 10px;
   color: gray;
   font-size: larger;
   margin-top: auto;
 }
+.container-collapsed {
+  padding-left: 150px;
+}
 </style>
 <template>
   <div id="app">
-    <div class="row nav-style">
-      <div class="col-md-3">
-        <!-- <h5 class="leftAlign">{{$config.app.name}}</h5>  -->
-        <div class="form-group form-inline">
-          <img class="logo-style"
-            src="https://thumb.tildacdn.com/tild3065-3765-4865-b331-393637653931/-/resize/150x/-/format/webp/hypersign_Yellow.png">
-          <h4 class="subtitle"> <span style="opacity:0.4">|</span> {{ $config.app.name }} ({{ $config.app.version }})</h4>
-          
+   <b-navbar toggleable="lg" type="dark" variant="white" class="navStyle" v-if="showIcon">
+    <b-navbar-brand href="#" style="display:flex;">
+      <img src="https://thumb.tildacdn.com/tild3065-3765-4865-b331-393637653931/-/resize/150x/-/format/webp/hypersign_Yellow.png" alt="">
+      <h4 class="subtitle">| {{ $config.app.name }} ({{ $config.app.version }})</h4>
+    </b-navbar-brand>
+
+    <b-navbar-toggle target="nav-collapse" type="dark" style="background-color:grey;">
+    </b-navbar-toggle>
+
+    <b-collapse id="nav-collapse" is-nav>
+      <b-navbar-nav class="ml-auto" style="padding-right:100px; position:static;">
+
+        <b-nav-item-dropdown right v-if="showIcon">
+          <template #button-content>
+            <b-iconstack font-scale="3">
+            <b-icon stacked icon="circle" variant="info"></b-icon>
+            <b-icon stacked icon="person" scale="0.6" variant="info"></b-icon>
+          </b-iconstack>
+          </template>
+          <b-dropdown-item disabled href="#">Profile <br><span>{{userDetails.name}}</span>
+          <br><span>Jagrat Network</span></b-dropdown-item>
+          <b-dropdown-item href="#" @click="logoutAll()">Logout</b-dropdown-item>
+        </b-nav-item-dropdown>
+      </b-navbar-nav>
+    </b-collapse>
+  </b-navbar>
+
+   <div :class="[
+      isSidebarCollapsed 
+          ? 'container-collapsed-not'
+          : 'container-collapsed',
+    ]">
+      <sidebar-menu class="sidebar-wrapper" v-if="showSideNavbar" @toggle-collapse="onToggleCollapse" :collapsed="isSidebarCollapsed" :theme="'white-theme'" width="220px"
+      :menu="getSideMenu()"
+      >
+      <div slot="header" style="background:#363740">
+          <div class="mt-3">
+            <div>
+            <center><img v-if="!isSidebarCollapsed" :src="`${getProfileIcon(selectedOrg.name)}`" alt="avatar" width="130px" style="" /></center>
+            <center><img v-if="isSidebarCollapsed" :src="`${getProfileIcon(selectedOrg.name)}`" class="mr-1" alt="center" width="35px"/></center>
+            </div>
+            <center><p class="mt-3 orgNameCss">{{ selectedOrg.name }}</p></center>
+          </div>
         </div>
-      </div>
-      <div class="col-md-3">
-        <OrgDropDown v-if="isShow" style="padding-top:12px"></OrgDropDown>
-      </div>
-      <div class="col-md-6   rightAlign" style="padding-top:12px"
-        v-if="!(authRoutes.includes($router.history.current.name))">
-        <button type="button" @click="goToNextPage(m.name)" class="btn btn-light btn-sm" v-for="m in getMenu()"
-          :key="m.name" v-if="m.isShow">{{ m.name }}</button>
-      </div>
-    </div>
+      </sidebar-menu>
     <router-view />
+  </div>
     <notifications group="foo" />
   </div>
 </template>
@@ -98,6 +119,33 @@ font-weight: 400;
 line-height: 1.42857142857143;
 text-decoration-skip-ink: auto;
 }
+.v-sidebar-menu .vsm--link_level-1 .vsm--icon {
+  font-size: 16px;
+  width: 40px !important;
+}
+.dropdown-menu.show {
+  text-align: center;
+}
+.navbar {
+  padding: 0px !important;
+}
+.navStyle {
+  background: #FFFFFF;
+  margin-bottom: 1%;
+  padding: 5px !important;
+  padding-left: 1.5%;
+  text-align: left;
+  box-shadow:
+    rgba(0, 0, 0, 0.1) 0px 2px 2px 0px,
+    rgba(0, 0, 0, 0.02) 0px 3px 1px -2px,
+    rgba(0, 0, 0, 0.01) 0px 1px 5px 0px;
+}
+.orgNameCss {
+  overflow-wrap: break-word;
+  color: white;
+  font-weight: bold;
+}
+
 
 #nav {
   padding: 30px;
@@ -133,104 +181,155 @@ text-decoration-skip-ink: auto;
 .marginRight {
   margin-right: 12%
 }
+#view.collapsed {
+  padding-left: 50px;
+}
+#view {
+  padding-left: 350px;
+}
+.sidebar-wrapper {
+  min-width: 70px;
+  margin-top: 70px;
+  box-shadow: 0 0 15px 0 rgba(34,41,47,.05);
+}
+.v-sidebar-menu.vsm_white-theme .vsm--mobile-bg{
+  background: #ffc107;
+}
+.v-sidebar-menu.vsm_white-theme {
+  background-color: white !important;
+  color: #000 !important;
+}
+.v-sidebar-menu.vsm_white-theme .vsm--header {
+  color: #000 !important;
+}
+.v-sidebar-menu.vsm_white-theme .vsm--link{
+  color: #000 !important;
+}
+.v-sidebar-menu.vsm_white-theme .vsm--link_level-1 .vsm--icon {
+  background-color: transparent !important;
+  color: #000 !important;
+}
 </style>
 
 
 <script>
 import UtilsMixin from './mixins/utils';
-import OrgDropDown from './components/element/OrgDropDown.vue'
 import EventBus from './eventbus'
 export default {
-  components: { OrgDropDown },
+  components: {},
   computed: {
-    isShow() {
-  
-      return this.$store.getters.isAnyOrgSelected;
-
+    userDetails() {
+      return this.$store.getters.userDetails;
     },
     selectedOrg() {
       return this.$store.getters.getSelectedOrg;
-    }
+    },
+    showSideNavbar() {
+      return this.$store.state.showSideNavbar
+    },
   },
   data() {
     return {
+      collapsed:true,
+      showIcon:false,
+      isSidebarCollapsed:true,
       authToken: localStorage.getItem('authToken'),
       schema_page: 1,
       authRoutes: ['register', 'PKIIdLogin'],
-      menu: [
-
-      ]
+      user: {}
     }
   },
 
-  async mounted() {
-    console.log('Initiating mounted with schema and credentials');
+   mounted() {
+    console.log(localStorage.getItem('user'))
+    if(localStorage.getItem('user')){
+    const usrStr = localStorage.getItem('user')
+    this.user = JSON.parse(usrStr);
+    }
+   if(localStorage.getItem('selectedOrg')){
+    const selectedOrgId = localStorage.getItem('selectedOrg')
+    this.$store.commit('selectAnOrg', selectedOrgId)
+    this.getList(selectedOrgId)
+    this.getCredList(selectedOrgId)
+    this.fetchTemplates(selectedOrgId)
+   }
    EventBus.$on("initializeStore",this.initializeStore)
-   this.initializeStore('login')
+   this.initializeStore()
   },
   methods: {
-     initializeStore(login){
-      console.log(login);    
+    getProfileIcon(name) {
+      return "https://avatars.dicebear.com/api/identicon/"+name+".svg"
+    },
+    logoutAll() {
+      this.showIcon = false
+      this.$router.push('/login')
+      this.logout()
+    },
+    onToggleCollapse(collapsed) {
+      if (collapsed) {
+        this.isSidebarCollapsed = true;
+      } else {
+        this.isSidebarCollapsed = false;
+      }
+    },
+     initializeStore() {
       this.authToken = localStorage.getItem('authToken'); 
-     // console.log(this.authToken);
-      if (this.authToken) {    
-        
+      if (this.authToken) {
+       this.showIcon = true
        this.fetchAllOrgs()
-      console.log('Fetched all orgs');
+       this.profile()
     }else{
       console.log("else");
      }
     },
-    getMenu() {
+    async profile() {
+      let url = "";
+      let options = {}
+        url = `${this.$config.studioServer.BASE_URL}api/v1/user/profile`
+        options = {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${this.authToken}`
+          }
+        }
+      const resp = await fetch(url, options);
+      const j = await resp.json();
+     this.$store.commit('addCountDataToProfile',j.data)
+    },
+    getSideMenu() {
       const menu = [
         {
-          name: "Dashboard",
-          path: "/studio/dashboard",
-          isShow: true,
+          href: "/studio/dashboard",
+          title: "Dashboard",
+          icon: "fas fa-tachometer-alt",
         },
         {
-          name: "Organization",
-          path: "/studio/org",
-          isShow: true,
+          href: "/studio/org",
+          title: "Organization",
+          icon: "fa fa-university",
         },
         {
-          name: "Schema",
-          path: "/studio/schema",
-          isShow: this.isShow,
+          href: "/studio/schema",
+          title: "Schema",
+          icon: "fa fa-table",
         },
         {
-          name: "Credentials",
-          path: "/studio/credential",
-          isShow: this.isShow,
+          href: "/studio/credential",
+          title: "Credentials",
+          icon: "fa fa-id-card",
         },
         {
-          name: "Presentation",
-          path: "/studio/presentation",
-          isShow: this.isShow,
-        },
-        {
-          name: "Logout",
-          path: "/login",
-          isShow: true,
+          href: "/studio/presentation",
+          title: "Presentation",
+          icon: "fa fa-desktop",
         },
       ]
-      console.log(this.isShow)
-      return menu;
-
-    },
-    vcStatus(vcId) {
-      return fetch(vcId + ':')
-        .then(resp => {
-          return resp.json()
-        }).then(data => {
-          return data
-        }).catch(e => {
-          Promise.reject(e.message)
-        })
+      return menu
     },
     fetchAllOrgs() {
       // TODO: Get list of orgs 
-      const url = `${this.$config.studioServer.BASE_URL}api/v1/org/all`
+      const url = `${this.$config.studioServer.BASE_URL}api/v1/org`
       const headers = {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${this.authToken}`
@@ -239,7 +338,7 @@ export default {
       fetch(url, {
         headers
       }).then(response => response.json()).then(json => {
-        const data = json.org
+        const data = json.data.org
         // TODO: iterate through them
         if (data) {
           data.forEach(org => {
@@ -248,18 +347,16 @@ export default {
           })
         }
         if (data && data.length > 0) {
-
-          console.log(data);
-          this.$store.commit('selectAnOrg', data[0]._id)
-          this.$store.dispatch('fetchAllOrgDataOnOrgSelect', data[0]._id)
+          // this.$store.commit('selectAnOrg', data[0]._id)    //no need to do this
+          // this.$store.dispatch('fetchAllOrgDataOnOrgSelect', data[0]._id)
         }
 
 
       })
     },
 
-    fetchTemplates() {
-      const url = `${this.$config.studioServer.BASE_URL}api/v1/presentation/template/${this.selectedOrg._id}/`
+    fetchTemplates(selectedOrgDid) {
+      const url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.PRESENTATION_TEMPLATE_EP}/org/${selectedOrgDid}/`
       const headers = {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${this.authToken}`
@@ -268,16 +365,16 @@ export default {
       fetch(url, {
         headers
       }).then(response => response.json()).then(json => {
-        json.forEach(template => {
+        json.data.forEach(template => {
           this.$store.commit('insertApresentationTemplate', template)
         })
       })
     },
-    async getList(type) {
+
+    async getList(selectedOrgDid) {
       let url = "";
       let options = {}
-      if (type === "SCHEMA") {
-        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.SCHEMA_LIST_EP}/${this.selectedOrg._id}/?page=${this.schema_page}&limit=10`
+        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.SCHEMA_LIST_EP}/${selectedOrgDid}/?page=${this.schema_page}&limit=10`
 
         options = {
           method: "GET",
@@ -286,54 +383,92 @@ export default {
             "Authorization": `Bearer ${this.authToken}`
           }
         }
-      } else {
-        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_LIST_EP}/${this.selectedOrg._id}`;
-        options = {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${this.authToken}`
-          }
-        }
-      }
-
       const resp = await fetch(url, options);
       const j = await resp.json();
-      if (j && j.status == 500) {
+        if (j && j.status == 500) {
         return this.notifyErr(`Error:  ${j.error}`);
       }
-      if (type === "SCHEMA") {
-        console.log(j);
-        const schemaList = j.schemaList
+      const schemaList = j.data.schemaList
         schemaList.forEach(schema => {
           this.$store.dispatch('insertAschema', schema)
         })
-      } else {
-        j.credList.forEach(credential => {
+    },
+
+    async getCredList(selectedOrgDid) {
+      let url = "";
+      let options = {}
+        url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_LIST_EP}/${selectedOrgDid}`;
+
+        options = {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${this.authToken}`
+          }
+        }
+      const resp = await fetch(url, options);
+      const j = await resp.json();
+        if (j && j.status == 500) {
+        return this.notifyErr(`Error:  ${j.error}`);
+      }
+      const credList = j.data.credList
+      credList.forEach(credential => {
           this.$store.dispatch('insertAcredential', credential)
         })
-      }
     },
+    // async getList(type) {
+    //   let url = "";
+    //   let options = {}
+    //   if (type === "SCHEMA") {
+    //     url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.SCHEMA_LIST_EP}/${this.selectedOrg._id}/?page=${this.schema_page}&limit=10`
+
+    //     options = {
+    //       method: "GET",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //         "Authorization": `Bearer ${this.authToken}`
+    //       }
+    //     }
+    //   } else {
+    //     url = `${this.$config.studioServer.BASE_URL}${this.$config.studioServer.CRED_LIST_EP}/${this.selectedOrg._id}`;
+    //     options = {
+    //       method: "GET",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //         "Authorization": `Bearer ${this.authToken}`
+    //       }
+    //     }
+    //   }
+
+    //   const resp = await fetch(url, options);
+    //   const j = await resp.json();
+    //   console.log(j)
+    //   if (j && j.status == 500) {
+    //     return this.notifyErr(`Error:  ${j.error}`);
+    //   }
+    //   if (type === "SCHEMA") {
+    //     console.log(j);
+    //     const schemaList = j.schemaList
+    //     schemaList.forEach(schema => {
+    //       this.$store.dispatch('insertAschema', schema)
+    //     })
+    //   } else {
+    //     j.credList.forEach(credential => {
+    //       this.$store.dispatch('insertAcredential', credential)
+    //     })
+    //   }
+    // },
 
     logout() {
       localStorage.removeItem('authToken')
       localStorage.removeItem('user')
       localStorage.removeItem("credentials")
       localStorage.removeItem("userData")
-      
+      this.isSidebarCollapsed=true,
+      this.collapsed= true
      
       this.$store.commit('resetStore')
     },
-    goToNextPage(route) {
-      const r = this.getMenu().find(x => x.name === route)
-      if (r.name === "Logout") this.logout()
-      this.$router.push(r.path)
-      if (this.$route.params.nextUrl != null) {
-        this.$router.push(this.$route.params.nextUrl)
-      } else {
-        this.$router.push(r.path)
-      }
-    }
   },
   mixins: [UtilsMixin]
 }
