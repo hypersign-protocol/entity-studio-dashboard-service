@@ -29,10 +29,12 @@
                   <div class="col-md-12">
                     <form style="max-height:300px; overflow:auto; padding: 5px">
                     <div class="form-group">
+                      <label for="fordid"><strong>Subject Did</strong></label>
                       <input type="text" class="form-control" placeholder="Issued To (did:hs:...)"
                         v-model="holderDid" />
                     </div>
                     <div class="form-group">
+                      <label for="forselectschema"><strong>Select Schema</strong></label>
                       <b-form-select v-model="selected" :options="selectOptions"
                         @change="OnSchemaSelectDropDownChange($event)" size="md" class="mt-3">
                       </b-form-select>
