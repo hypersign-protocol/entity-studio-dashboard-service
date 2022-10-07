@@ -132,8 +132,26 @@ export default {
     const usrStr = localStorage.getItem("user");
     this.user = { ...JSON.parse(usrStr) };
     this.userKeys = Object.keys(this.user);
+    if(this.authToken) {
+      this.profile();
+    }
   },
   methods: {
+    async profile() {
+      let url = "";
+      let options = {}
+        url = `${this.$config.studioServer.BASE_URL}api/v1/user/profile`
+        options = {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${this.authToken}`
+          }
+        }
+      const resp = await fetch(url, options);
+      const j = await resp.json();
+     this.$store.commit('addCountDataToProfile',j.data)
+    },
     // fetchData(url,options){
     //   return fetch(url, options)
     //         .then((res) => res.json())

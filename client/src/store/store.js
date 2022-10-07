@@ -85,7 +85,19 @@ export default new Vuex.Store({
             state.templateList=[]
             state.selectedOrgDid=""
             state.showSideNavbar=false
-            state.userProfile = {}
+            state.userProfile = {
+                details:{
+                  name: '',
+                  email: '',
+                  did: '',
+                },
+                count: {
+                    credentialsCount:0,
+                    orgsCount:0,
+                    schemasCount:0,
+                    templatesCount:0,
+                }
+            }
         },
         addUserDetailsToProfile(state,payload) {
             state.userProfile.details.name = payload.name;

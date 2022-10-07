@@ -254,7 +254,6 @@ export default {
     this.fetchTemplates(selectedOrgId)
    }
    EventBus.$on("initializeStore",this.initializeStore)
-   this.initializeStore()
   },
   methods: {
     getProfileIcon(name) {
@@ -277,26 +276,11 @@ export default {
       if (this.authToken) {
        this.showIcon = true
        this.fetchAllOrgs()
-       this.profile()
     }else{
       console.log("else");
      }
     },
-    async profile() {
-      let url = "";
-      let options = {}
-        url = `${this.$config.studioServer.BASE_URL}api/v1/user/profile`
-        options = {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${this.authToken}`
-          }
-        }
-      const resp = await fetch(url, options);
-      const j = await resp.json();
-     this.$store.commit('addCountDataToProfile',j.data)
-    },
+    
     getSideMenu() {
       const menu = [
         {
