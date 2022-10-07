@@ -288,11 +288,11 @@ export default {
           title: "Dashboard",
           icon: "fas fa-tachometer-alt",
         },
-        {
-          href: "/studio/org",
-          title: "Organization",
-          icon: "fa fa-university",
-        },
+        // {
+        //   href: "/studio/org",
+        //   title: "Organization",
+        //   icon: "fa fa-university",
+        // },
         {
           href: "/studio/schema",
           title: "Schema",

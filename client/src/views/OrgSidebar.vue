@@ -275,8 +275,8 @@ export default {
 
             this.openWallet(URL)
           }
-          if (j.status === 200) {
-
+          if (j.error === false) {
+            
             this.$store.commit('insertAnOrg', j.data.org);
             this.$store.commit('selectAnOrg', j.data.org._id)
             this.isProcessFinished = true;
