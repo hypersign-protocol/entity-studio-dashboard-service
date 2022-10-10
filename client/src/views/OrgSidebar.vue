@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div class="form-group" style="display:flex">
-      <h4 class="mt-4" style="text-align: left;">Organizations</h4>
+      <h4 v-if="orgList.length > 0" class="mt-4" style="text-align: left;">Organizations</h4>
       <button @click="openSlider()" style="text-align: right;" class="btn btn-primary ml-auto mt-4">+ Organization</button>
       
     </div>
@@ -193,6 +193,7 @@ export default {
 
           sse.close();
           store.commit("insertAnOrg", data)
+          store.commit('increaseOrgCount')
         }
         // store.commit("updateCredStatus", data);
       };

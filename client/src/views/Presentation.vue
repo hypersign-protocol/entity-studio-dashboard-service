@@ -331,7 +331,7 @@ export default {
           method: "POST",
           headers: headers,
         }).then((res) => res.json()).then(json => {
-          this.$store.commit('insertApresentationTemplate', json.data)
+          this.$store.commit('insertApresentationTemplate', json.data.presentationTemplateObj)
           this.notifySuccess('Template Successfully created')
           this.openSlider();
         })

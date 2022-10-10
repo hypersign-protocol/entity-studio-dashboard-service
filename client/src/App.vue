@@ -254,6 +254,7 @@ export default {
     this.fetchTemplates(selectedOrgId)
    }
    EventBus.$on("initializeStore",this.initializeStore)
+   this.initializeStore()
   },
   methods: {
     getProfileIcon(name) {
@@ -450,7 +451,7 @@ export default {
       localStorage.removeItem("userData")
       this.isSidebarCollapsed=true,
       this.collapsed= true
-     
+      localStorage.removeItem('selectedOrg')
       this.$store.commit('resetStore')
     },
   },

@@ -99,6 +99,9 @@ export default new Vuex.Store({
                 }
             }
         },
+        increaseOrgCount(state) {
+            state.userProfile.count.orgsCount +=1;
+        },
         addUserDetailsToProfile(state,payload) {
             state.userProfile.details.name = payload.name;
             state.userProfile.details.email = payload.email;
