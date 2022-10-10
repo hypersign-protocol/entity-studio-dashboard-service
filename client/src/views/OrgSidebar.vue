@@ -1,11 +1,17 @@
 <template>
   <div class="home">
     <div class="form-group" style="display:flex">
-      <h4 v-if="orgList.length > 0" class="mt-4" style="text-align: left;">Organizations</h4>
-      <button @click="openSlider()" style="text-align: right;" class="btn btn-primary ml-auto mt-4">+ Organization</button>
-      
+      <h3 v-if="orgList.length > 0" class="mt-4" style="text-align: left;">Organizations</h3>
+      <h3 v-else class="mt-4" style="text-align: left;">Create your first organization!</h3>
+
+      <hf-buttons 
+      name="+ Organization"
+      style="text-align: right;"
+      class="btn btn-primary ml-auto mt-4"
+      @executeAction="openSlider()"
+      ></hf-buttons>
     </div>
-    <StudioSideBar title="Add Organization">
+    <StudioSideBar :title="edit? 'Edit Organization' : 'Add Organization'">
       <div class="container">
         <div class="form-group" v-if="orgStore.orgDid">
           <label for="orgName"><strong>Org DID:</strong></label>
@@ -26,7 +32,7 @@
           <label for="orgName"><strong>Organization Name:</strong></label>
           <input type="text" class="form-control" id="orgName" v-model="orgStore.name" aria-describedby="orgNameHelp"
             placeholder="Enter your org name">
-          <small id="orgNameHelp" class="form-text text-muted">Some help text</small>
+          <!-- <small id="orgNameHelp" class="form-text text-muted">Some help text</small> -->
         </div>
         <div class="form-group">
           <label for="domain"><strong>Domain:</strong></label>
@@ -48,11 +54,10 @@
                       <input type="text" class="form-control" id="region" v-model="orgStore.network" aria-describedby="regionHelp" placeholder="Select your region">
                   </div> -->
         <div class="form-group" v-if="edit">
-          <button class="btn btn-primary" @click="createAnOrg()"> Edit</button>
-
+         <hf-buttons name="Update" class="btn btn-primary" @executeAction="createAnOrg()"></hf-buttons>
         </div>
         <div class="form-group" v-else>
-          <button class="btn btn-primary" @click="createAnOrg()"> Save</button>
+          <hf-buttons name="Save" class="btn btn-primary" @executeAction="createAnOrg()"></hf-buttons>
         </div>
       </div>
     </StudioSideBar>
@@ -108,9 +113,6 @@
         </b-card>
       </div>
     </div>
-    <div class="form-group" v-else>
-      <h2>Create your first organization!</h2>
-    </div>
   </div>
 </template>
   <style scoped>
@@ -152,8 +154,10 @@ import StudioSideBar from "../components/element/StudioSideBar.vue";
 import UtilsMixin from '../mixins/utils';
 import 'vue-loading-overlay/dist/vue-loading.css';
 import Loading from "vue-loading-overlay";
+import HfButtons from '../components/element/HfButtons.vue'
 
 export default {
+  comments: { HfButtons },
   computed: {
     orgList() {
       return this.$store.state.orgList;
@@ -183,7 +187,7 @@ export default {
       }
     }
   },
-  components: { HfPopUp, Loading, StudioSideBar },
+  components: { HfPopUp, Loading, StudioSideBar, HfButtons },
   methods: {
     ssePopulateOrg(id, store) {
       const sse = new EventSource(`${this.$config.studioServer.ORG_SSE}${id}`);
@@ -232,12 +236,14 @@ export default {
       
     },
     openSlider() {
+      this.edit = false
+      this.clearAll();
       this.$root.$emit("bv::toggle::collapse", "sidebar-right");
     },
     editOrg(orgDid) {
       this.edit = true
+      this.$root.$emit("bv::toggle::collapse", "sidebar-right");
       Object.assign(this.orgStore, { ...this.$store.getters.findOrgByOrgID(orgDid) })
-      this.openSlider();
     },
     createAnOrg() {
 
@@ -277,23 +283,21 @@ export default {
             this.openWallet(URL)
           }
           if (j.error === false) {
-            
+            if(!this.edit) {
             this.$store.commit('insertAnOrg', j.data.org);
             this.$store.commit('selectAnOrg', j.data.org._id)
             this.isProcessFinished = true;
             this.openSlider();
 
             this.notifySuccess("Org Created successfull");
-            if (this.edit) {
+            this.ssePopulateOrg(org._id, this.$store)
+            }
+            
+            if (this.edit === true) {
               this.$store.commit('updateAnOrg', j.data.org)
               this.notifySuccess("Org Edited successfull");
+              this.$root.$emit("bv::toggle::collapse", "sidebar-right");
             }
-
-          }
-          if (!this.edit) {
-            console.log(org)
-            this.ssePopulateOrg(org._id, this.$store)
-
           }
 
 
@@ -310,7 +314,19 @@ export default {
       // Once the ORG is created just store the org in store
       //this.$store.commit('insertAnOrg', payload);
       // Close the sideba
-    }
+    },
+    clearAll() {
+      this.orgStore = {
+        name: "",
+        domain: "",
+        logo: "",
+        region: "",
+        network: "",
+        orgDid: "",
+        userDid: "",
+        status: "",
+      }
+    },
   },
   mixins: [UtilsMixin]
 }

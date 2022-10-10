@@ -68,9 +68,11 @@
             <b-icon stacked icon="person" scale="0.6" variant="info"></b-icon>
           </b-iconstack>
           </template>
-          <b-dropdown-item disabled href="#">Profile <br><span>{{userDetails.name}}</span>
-          <br><span>Jagrat Network</span></b-dropdown-item>
-          <b-dropdown-item href="#" @click="logoutAll()">Logout</b-dropdown-item>
+          <b-dropdown-item disabled><br>
+          <span>{{shorten(userDetails.email)}}</span><br>
+          <span>{{shorten(userDetails.did)}}</span>
+          </b-dropdown-item>
+          <hf-buttons name="Logout" class="btn btn-primary" @executeAction="logoutAll()"></hf-buttons>
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-collapse>
@@ -215,8 +217,9 @@ text-decoration-skip-ink: auto;
 <script>
 import UtilsMixin from './mixins/utils';
 import EventBus from './eventbus'
+import HfButtons from "./components/element/HfButtons.vue"
 export default {
-  components: {},
+  components: { HfButtons },
   computed: {
     userDetails() {
       return this.$store.getters.userDetails;

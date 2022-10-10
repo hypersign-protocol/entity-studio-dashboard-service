@@ -14,6 +14,13 @@
   background: aliceblue;
   padding: 0px;
 }
+.goschema{
+  color: #339af0;
+}
+.goschema:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
 </style>
 <template>
   <div class="home">
@@ -23,9 +30,16 @@
       <div class="col-md-12" style="text-align: left">
         <Info :message="description" />
         
-          <div class="form-group" style="text-align: right">
-            <button @click="openSlider()" class="btn btn-primary">+ Presentation Template</button>
-          </div>  
+          <div class="form-group" style="display:flex">
+           <h3 v-if="templateList.length > 0" class="mt-4" style="text-align: left;">Schema</h3>
+            <h3 v-else class="mt-4" style="text-align: left;">Create your first presentation template!</h3>            
+            <hf-buttons 
+              name="+ Presentation Template"
+              style="text-align: right;"
+              class="btn btn-primary ml-auto mt-4"
+              @executeAction="openSlider()"
+            ></hf-buttons>
+          </div>
           <StudioSideBar title="Create Presentation Template">
 
               <div class="form-group row container">
@@ -60,8 +74,8 @@
                       <b-form-select v-model="selected" :options="selectOptions"
                         @change="OnSchemaSelectDropDownChange($event)" size="md" class="mt-3">
                       </b-form-select>
-
-                    </div>
+                      <span class="goschema" v-if="selectOptions.length === 1" @click="goToSchema()">Create Schema</span>              
+                    </div>              
                     <div class="form-group">
                       <label class="floatLeft"><strong>Reason :</strong></label>
                       <input class="form-control" type="text" v-model="presentationTemplate.reason" />
@@ -81,7 +95,11 @@
 
                   </form>
                   <hr />
-                  <button class="btn btn-outline-primary btn-sm" @click="generatePresentation()">Generate</button>
+                  <hf-buttons 
+                    name="Generate"            
+                    class="btn btn-primary"
+                    @executeAction="generatePresentation()"
+                  ></hf-buttons>
                 </div>
               </div>
             </StudioSideBar>
@@ -122,9 +140,6 @@
       </div>
       <!-- </div> -->
     </div>
-    <div class="form-group" v-else>
-      <h2>Create your first presentation template!</h2>
-    </div>
 
   </div>
 </template>
@@ -133,14 +148,14 @@
 import fetch from "node-fetch";
 import UtilsMixin from '../mixins/utils';
 import StudioSideBar from "../components/element/StudioSideBar.vue";
-
+import HfButtons from "../components/element/HfButtons.vue"
 import conf from '../config';
 const { hypersignSDK } = conf;
 import QrcodeVue from "qrcode.vue";
 import Info from '@/components/Info.vue'
 export default {
   name: "Presentation",
-  components: { QrcodeVue, Info , StudioSideBar},
+  components: { QrcodeVue, Info , StudioSideBar, HfButtons},
   computed:{
     templateList(){
       return this.$store.state.templateList;
@@ -222,6 +237,9 @@ export default {
     });
   },
   methods: {
+    goToSchema() {
+      this.$router.push('schema')
+    },
     OnSchemaSelectDropDownChange(event) {
       if (event) {     
         this.presentationTemplate.schemaId=this.selected
@@ -229,7 +247,17 @@ export default {
         this.schemaId = '';
       }
     },
+    clearAll() {
+      this.presentationTemplate.issuerDid = ''
+      this.presentationTemplate.domain = ''
+      this.presentationTemplate.name = ''
+      this.presentationTemplate.required = true
+      this.presentationTemplate.callbackUrl = ''
+      this.presentationTemplate.reason = ''
+      this.selected = null
+    },
     openSlider() {
+      this.clearAll()
       this.presentationTemplate.issuerDid = JSON.parse(localStorage.getItem("user")).id
       this.presentationTemplate.domain = this.selectedOrg.domain;
       this.$root.$emit("bv::toggle::collapse", "sidebar-right");
