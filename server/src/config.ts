@@ -87,6 +87,7 @@ const walletOptions = {
   hidNodeRestUrl: 'https://jagrat.hypersign.id/rest/',
 };
 const pathToIssueCred = process.env.PATH_TO_ISSUE_CRED;
+const whitelistedCors = process.env.WHITELISTED_CORS || ['*'];
 export {
   port,
   host,
@@ -109,4 +110,5 @@ export {
   mnemonic,
   walletOptions,
   sse_client,
+  whitelistedCors,
 };

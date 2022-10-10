@@ -15,7 +15,7 @@ import { schemaRoutes } from './routes/schemaRoutes';
 import { presentationRoute } from './routes/presentationRoutes';
 import apiResponseHandler from './response/apiResponseHandler';
 import { profileRoute } from './routes/userProfile';
-
+import { corsOptionsDelegate } from './utils/https';
 import { orgRoutes } from './routes/orgRoutes';
 const HypersignAuth = require('hypersign-auth-node-sdk');
 export default function app() {
@@ -29,32 +29,6 @@ export default function app() {
   const app = express();
   let hypersign;
   const server = http.createServer(app);
-
-  const whitelistedUrls = [
-    'http://localhost:9000',
-    'http://192.168.29.12:9001',
-    'https://localhost:9001',
-    'http://192.168.29.209:9001',
-    'http://entity.hypersign.id',
-    'https://entity.hypersign.id',
-    'http://localhost:9001',
-    'https://wallet-stage.hypersign.id',
-    'undefined',
-    '*',
-    'http://localhost:4999',
-  ];
-
-  function corsOptionsDelegate(req, callback) {
-    let corsOptions;
-
-    if (whitelistedUrls.indexOf(req.header('Origin')) !== -1) {
-      corsOptions = { origin: true }; // reflect (enable) the requested origin in the CORS response
-    } else {
-      corsOptions = { origin: false }; // disable CORS for this request
-    }
-    logger.info(req.header('Origin'));
-    callback(null, corsOptions); // callback expects two parameters: error and options
-  }
 
   const hidWalletInstance = new HIDWallet(walletOptions);
   hidWalletInstance
