@@ -46,6 +46,15 @@
 .container-collapsed {
   padding-left: 150px;
 }
+.copyDiv {
+padding: 20px;
+}
+.far{
+cursor: pointer;
+color: grey;
+display: inline;
+padding-left: 5px;
+}
 </style>
 <template>
   <div id="app">
@@ -68,10 +77,13 @@
             <b-icon stacked icon="person" scale="0.6" variant="info"></b-icon>
           </b-iconstack>
           </template>
-          <b-dropdown-item disabled><br>
+          <div class="copyDiv">
           <span>{{shorten(userDetails.email)}}</span><br>
           <span>{{shorten(userDetails.did)}}</span>
-          </b-dropdown-item>
+          <span
+          @click="copyToClip(userDetails.did,'DID')"
+          ><i class="far fa-copy"></i></span>
+          </div>
           <hf-buttons name="Logout" class="btn btn-primary" @executeAction="logoutAll()"></hf-buttons>
         </b-nav-item-dropdown>
       </b-navbar-nav>
@@ -244,6 +256,9 @@ export default {
   },
 
    mounted() {
+    EventBus.$on('closeSideNav',()=>{
+      this.isSidebarCollapsed = true
+    })
     console.log(localStorage.getItem('user'))
     if(localStorage.getItem('user')){
     const usrStr = localStorage.getItem('user')
@@ -260,6 +275,23 @@ export default {
    this.initializeStore()
   },
   methods: {
+    copyToClip(textToCopy,contentType) {
+        if (textToCopy) {
+            navigator.clipboard
+                .writeText(textToCopy)
+                .then(() => {
+                    this.notifySuccess(
+                        `${contentType} copied!`
+                    );
+                })
+                .catch((err) => {
+                    this.notifyErr(
+                        'Error while copying',
+                        err
+                    );
+                });
+        }
+    },
     getProfileIcon(name) {
       return "https://avatars.dicebear.com/api/identicon/"+name+".svg"
     },
