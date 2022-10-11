@@ -41,7 +41,7 @@
 </style>
 <template>
    <div class="home">
-     <h3>Welcome, {{user.name}} !</h3>
+     <h2>Welcome, {{user.name}} !</h2>
         <Metrics/>
     <org-sidebar/>
    </div>
@@ -52,6 +52,7 @@
 import Dashboard from '@/components/Dashboard.vue'
 import Metrics from '@/components/Metrics.vue'
 import OrgSidebar from './OrgSidebar.vue';
+import EventBus from '../eventbus'
 export default {
   name: "PanelPage",
   components: { 
@@ -73,6 +74,7 @@ export default {
     this.$store.commit('updateSideNavStatus',false)
     this.$store.commit('selectAnOrg', '')
     localStorage.removeItem('selectedOrg')
+    EventBus.$emit('closeSideNav')
   },
   methods: {
     gotosubpage: id => {

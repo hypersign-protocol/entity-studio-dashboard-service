@@ -31,7 +31,7 @@
         <Info :message="description" />
         
           <div class="form-group" style="display:flex">
-           <h3 v-if="templateList.length > 0" class="mt-4" style="text-align: left;">Schema</h3>
+           <h3 v-if="templateList.length > 0" class="mt-4" style="text-align: left;">Presentation</h3>
             <h3 v-else class="mt-4" style="text-align: left;">Create your first presentation template!</h3>            
             <hf-buttons 
               name="+ Presentation Template"
@@ -153,9 +153,11 @@ import conf from '../config';
 const { hypersignSDK } = conf;
 import QrcodeVue from "qrcode.vue";
 import Info from '@/components/Info.vue'
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/vue-loading.css";
 export default {
   name: "Presentation",
-  components: { QrcodeVue, Info , StudioSideBar, HfButtons},
+  components: { QrcodeVue, Info , StudioSideBar, HfButtons, Loading},
   computed:{
     templateList(){
       return this.$store.state.templateList;

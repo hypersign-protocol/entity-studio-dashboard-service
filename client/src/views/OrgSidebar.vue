@@ -39,16 +39,16 @@
           <input type="text" class="form-control" id="domain" v-model="orgStore.domain" aria-describedby="domainHelp"
             placeholder="Enter your domain name">
         </div>
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label for="logo"><strong>Logo URL:</strong></label>
           <input type="text" class="form-control" id="logo" v-model="orgStore.logo" aria-describedby="logoHelp"
             placeholder="Enter logo URL">
-        </div>
-        <div class="form-group">
+        </div> -->
+        <!-- <div class="form-group">
           <label for="region"><strong>Region:</strong></label>
           <input type="text" class="form-control" id="region" v-model="orgStore.region" aria-describedby="regionHelp"
             placeholder="Select your region">
-        </div>
+        </div> -->
         <!-- <div class="form-group">
                       <label for="region"><strong>Network:</strong></label>
                       <input type="text" class="form-control" id="region" v-model="orgStore.network" aria-describedby="regionHelp" placeholder="Select your region">
@@ -170,8 +170,8 @@ export default {
       orgStore: {
         name: "Hypermine Pvt Ltd",
         domain: "hypermine.in",
-        logo: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%3Fid%3DOIP.5EZ51foyo3QBV2FHnKq1cwHaEc%26pid%3DApi&f=1",
-        region: "US EAST",
+        // logo: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%3Fid%3DOIP.5EZ51foyo3QBV2FHnKq1cwHaEc%26pid%3DApi&f=1",
+        // region: "US EAST",
         network: "Jagrat",
         orgDid: "",
         userDid: "",
@@ -319,8 +319,8 @@ export default {
       this.orgStore = {
         name: "",
         domain: "",
-        logo: "",
-        region: "",
+        // logo: "",
+        // region: "",
         network: "",
         orgDid: "",
         userDid: "",
