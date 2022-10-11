@@ -5,6 +5,7 @@ import creadSchema from '../models/CreadSchema';
 import { WALLET_WEB_HOOK_CREAD } from '../config';
 import { send } from '../services/sse';
 import ApiResponse from '../response/apiResponse';
+import { urlSanitizer } from '../utils/fields';
 
 const setCredentialStatus = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -128,14 +129,17 @@ const sendCredentialDetail = async (req: Request, res: Response, next: NextFunct
 
     const issuedJWTToken = await jwt.sign(data, jwtSecret, { expiresIn: jwtExpiryInMilli });
 
-    const link = `${studioServerBaseUrl}${pathToIssueCred}?token=${issuedJWTToken}`;
+    const link = `${urlSanitizer(studioServerBaseUrl, true)}${pathToIssueCred}?token=${issuedJWTToken}`;
 
     const QRData = JSON.stringify({
       QRType: 'ISSUE_CRED',
       url: link, // This url user will eventually call from the wallet to fetch vc from studio server
     });
 
-    const deeplink = `${studioServerBaseUrl}deeplink.html?deeplink=hypersign:deeplink?url=${QRData}`;
+    const deeplink = `${urlSanitizer(
+      studioServerBaseUrl,
+      true
+    )}deeplink.html?deeplink=hypersign:deeplink?url=${QRData}`;
 
     logger.info('==========CredController ::sendCredentialDetail Ends ================');
     return next(ApiResponse.success({ url: deeplink }));

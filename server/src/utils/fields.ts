@@ -11,3 +11,24 @@ export function isValidURL(str: string): boolean {
   ); // fragment locator
   return !!pattern.test(str) || validURL.isUri(str); //
 }
+
+export function urlSanitizer(url, endsWith) {
+  switch (endsWith) {
+    case true: {
+      if (url.endsWith('/')) {
+        return url;
+      } else {
+        return url + '/';
+      }
+    }
+    case false: {
+      if (url.endsWith('/')) {
+        return url.slice(0, -1);
+      } else {
+        return url;
+      }
+    }
+    default:
+      return url;
+  }
+}
