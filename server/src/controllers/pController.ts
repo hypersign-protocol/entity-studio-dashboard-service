@@ -2,6 +2,7 @@ import PresentationRequestSchema, { IPresentationRequest } from '../models/Prese
 import PresentationTemplateSchema, { IPresentationTemplate } from '../models/presentationTemplateSchema';
 import OrgSchema, { IOrg } from '../models/OrgSchema';
 import { logger, studioServerBaseUrl } from '../config';
+import { urlSanitizer } from '../utils/fields';
 
 import { uuid } from 'uuidv4';
 
@@ -143,7 +144,7 @@ export async function getChallenge(req, res, next) {
       op: 'init',
       data: {
         QRType: 'REQUEST_CRED',
-        serviceEndpoint: `${studioServerBaseUrl}/api/v1/presentation/request/verify/`,
+        serviceEndpoint: `${urlSanitizer(studioServerBaseUrl, false)}/api/v1/presentation/request/verify/`,
         schemaId: schemaId,
         appDid: templateOwnerDid,
         appName: name,
