@@ -39,7 +39,7 @@ export default function app() {
       app.use(express.static('public'));
 
       app.use(express.json());
-      app.use(cors(corsOptionsDelegate));
+      // app.use(cors(corsOptionsDelegate));
       app.use(cookieParser());
       app.use(express.json());
       app.use(express.static('public'));
@@ -47,12 +47,12 @@ export default function app() {
       app.use('/api/app', appRoutes);
       app.use('/api/auth', authRoutes);
       app.use('/api/blog', blogRoutes);
-      app.use('/api/v1/credential', credentialRoutes(hypersign));
-      app.use('/api/v1/schema', schemaRoutes(hypersign));
+      app.use('/api/v1/credential', cors(corsOptionsDelegate), credentialRoutes(hypersign));
+      app.use('/api/v1/schema', cors(corsOptionsDelegate), schemaRoutes(hypersign));
       app.use('/api/v1/presentation', presentationRoute(hypersign));
-      app.use('/api/v1/org', orgRoutes(hypersign));
-      app.use(walletAuthRoutes(hypersign));
-      app.use('/api/v1/user', profileRoute(hypersign));
+      app.use('/api/v1/org', cors(corsOptionsDelegate), orgRoutes(hypersign));
+      app.use(cors(corsOptionsDelegate), walletAuthRoutes(hypersign));
+      app.use('/api/v1/user', cors(corsOptionsDelegate), profileRoute(hypersign));
       app.use(apiResponseHandler);
 
       server.listen(port, () => logger.info(`The server is running on port ${port}`));
