@@ -47,9 +47,9 @@ export default function app() {
       app.use('/api/app', appRoutes);
       app.use('/api/auth', authRoutes);
       app.use('/api/blog', blogRoutes);
+      app.use('/api/v1/presentation', presentationRoute(hypersign));
       app.use('/api/v1/credential', cors(corsOptionsDelegate), credentialRoutes(hypersign));
       app.use('/api/v1/schema', cors(corsOptionsDelegate), schemaRoutes(hypersign));
-      app.use('/api/v1/presentation', presentationRoute(hypersign));
       app.use('/api/v1/org', cors(corsOptionsDelegate), orgRoutes(hypersign));
       app.use(cors(corsOptionsDelegate), walletAuthRoutes(hypersign));
       app.use('/api/v1/user', cors(corsOptionsDelegate), profileRoute(hypersign));
