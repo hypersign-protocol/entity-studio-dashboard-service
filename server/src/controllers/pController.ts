@@ -27,16 +27,19 @@ const verifyPresentation = async (vp, challenge, issuerDid, holderDid, domain) =
       hidWalletInstance.offlineSigner,
       walletOptions.hidNodeRPCUrl,
       walletOptions.hidNodeRestUrl,
-      'devnet'
+      'testnet'
     );
     await hsSdk.init();
-
+    const holderVerificationMethodId = vp.verifiableCredential[0].proof.verificationMethod;
+    const issuerVerificationMethodId = vp.proof.verificationMethod;
     const result = await hsSdk.vp.verifyPresentation({
       signedPresentation: vp,
       challenge,
       domain,
       issuerDid,
       holderDid,
+      holderVerificationMethodId,
+      issuerVerificationMethodId,
     });
     return result;
   } catch (error) {
@@ -94,7 +97,7 @@ export async function verify(req, res, next) {
     presentationTemplate.domain
   );
 
-  const { verified } = result.presentationResult;
+  const { verified } = result;
   if (verified === true) {
     // TODO: 4. send data or create JWT
 
