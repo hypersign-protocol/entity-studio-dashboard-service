@@ -11,40 +11,36 @@ import HypersignSsiSDK from 'hs-ssi-sdk';
 import { walletOptions, mnemonic } from '../config';
 
 const verifyPresentation = async (vp, challenge, issuerDid, holderDid, domain) => {
-  try {
-    logger.info({
-      vp,
-      challenge,
-      issuerDid,
-      holderDid,
-      domain,
-    });
+  logger.info({
+    vp,
+    challenge,
+    issuerDid,
+    holderDid,
+    domain,
+  });
 
-    // TODO: This initialization need to be done one time globally
-    const hidWalletInstance = new HIDWallet(walletOptions);
-    await hidWalletInstance.generateWallet({ mnemonic });
-    const hsSdk = new HypersignSsiSDK(
-      hidWalletInstance.offlineSigner,
-      walletOptions.hidNodeRPCUrl,
-      walletOptions.hidNodeRestUrl,
-      'testnet'
-    );
-    await hsSdk.init();
-    const holderVerificationMethodId = vp.verifiableCredential[0].proof.verificationMethod;
-    const issuerVerificationMethodId = vp.proof.verificationMethod;
-    const result = await hsSdk.vp.verifyPresentation({
-      signedPresentation: vp,
-      challenge,
-      domain,
-      issuerDid,
-      holderDid,
-      holderVerificationMethodId,
-      issuerVerificationMethodId,
-    });
-    return result;
-  } catch (error) {
-    logger.error('', error);
-  }
+  // TODO: This initialization need to be done one time globally
+  const hidWalletInstance = new HIDWallet(walletOptions);
+  await hidWalletInstance.generateWallet({ mnemonic });
+  const hsSdk = new HypersignSsiSDK(
+    hidWalletInstance.offlineSigner,
+    walletOptions.hidNodeRPCUrl,
+    walletOptions.hidNodeRestUrl,
+    'testnet'
+  );
+  await hsSdk.init();
+  const holderVerificationMethodId = vp.verifiableCredential[0].proof.verificationMethod;
+  const issuerVerificationMethodId = vp.proof.verificationMethod;
+  const result = await hsSdk.vp.verifyPresentation({
+    signedPresentation: vp,
+    challenge,
+    domain,
+    issuerDid,
+    holderDid,
+    holderVerificationMethodId,
+    issuerVerificationMethodId,
+  });
+  return result;
 };
 
 function writeServerSendEvent(res, sseId, data) {
@@ -53,61 +49,65 @@ function writeServerSendEvent(res, sseId, data) {
 }
 
 export async function verify(req, res, next) {
-  const { challenge, vp } = req.body;
-  if (!challenge || !vp) {
-    return res.status(400).send({ status: 400, message: null, error: 'challenge and vp must be passed' });
-  }
+  try {
+    const { challenge, vp } = req.body;
+    if (!challenge || !vp) {
+      return res.status(400).send({ status: 400, message: null, error: 'challenge and vp must be passed' });
+    }
 
-  // TODO: 1. fetch challeng record from db, if not throw error
-  const presentationRequest: IPresentationRequest = (await PresentationRequestSchema.findOne({
-    challenge: challenge,
-    status: 0,
-  })) as IPresentationRequest;
-  if (!presentationRequest) {
-    return res
-      .status(401)
-      .send({ status: 401, message: null, error: 'Invalid challenge. Refresh the page and try again.' });
-  }
+    // TODO: 1. fetch challeng record from db, if not throw error
+    const presentationRequest: IPresentationRequest = (await PresentationRequestSchema.findOne({
+      challenge: challenge,
+      status: 0,
+    })) as IPresentationRequest;
+    if (!presentationRequest) {
+      return res
+        .status(401)
+        .send({ status: 401, message: null, error: 'Invalid challenge. Refresh the page and try again.' });
+    }
 
-  const { expiresTime, templateId } = presentationRequest;
-  const presentationTemplate: IPresentationTemplate = (await PresentationTemplateSchema.findOne({
-    _id: templateId,
-  })) as IPresentationTemplate;
-  if (!presentationTemplate) {
-    return res.status(400).send({ status: 400, message: null, error: 'Invalid templateId' });
-  }
+    const { expiresTime, templateId } = presentationRequest;
+    const presentationTemplate: IPresentationTemplate = (await PresentationTemplateSchema.findOne({
+      _id: templateId,
+    })) as IPresentationTemplate;
+    if (!presentationTemplate) {
+      return res.status(400).send({ status: 400, message: null, error: 'Invalid templateId' });
+    }
 
-  // TODO: 2. check the exprity time of the challege , if not throw error
-  const now: number = new Date().getTime();
-  if (now > expiresTime) {
-    return res
-      .status(401)
-      .send({ status: 401, message: null, error: 'The session expired. Refresh the page and try again.' });
-  }
+    // TODO: 2. check the exprity time of the challege , if not throw error
+    const now: number = new Date().getTime();
+    if (now > expiresTime) {
+      return res
+        .status(401)
+        .send({ status: 401, message: null, error: 'The session expired. Refresh the page and try again.' });
+    }
 
-  // TODO: 3. verify the presentation, if not throw error
-  const parsedVP = JSON.parse(vp);
-  const vc = parsedVP.verifiableCredential[0]; // TODO: You should not hard code to fetch just one vc;  you should get holderDid from request body
-  const templateIssuers: Array<string> = presentationTemplate.issuerDid;
-  const result = await verifyPresentation(
-    parsedVP,
-    challenge,
-    templateIssuers[0], //  TODO: Need to fix this hardcoing
-    vc.credentialSubject.id,
-    presentationTemplate.domain
-  );
+    // TODO: 3. verify the presentation, if not throw error
+    const parsedVP = JSON.parse(vp);
+    const vc = parsedVP.verifiableCredential[0]; // TODO: You should not hard code to fetch just one vc;  you should get holderDid from request body
+    const templateIssuers: Array<string> = presentationTemplate.issuerDid;
+    const result = await verifyPresentation(
+      parsedVP,
+      challenge,
+      templateIssuers[0], //  TODO: Need to fix this hardcoing
+      vc.credentialSubject.id,
+      presentationTemplate.domain
+    );
 
-  const { verified } = result;
-  if (verified === true) {
-    // TODO: 4. send data or create JWT
+    const { verified } = result;
+    if (verified === true) {
+      // TODO: 4. send data or create JWT
 
-    // TODO: 5. Update the status to success i.e 1 in background
-    PresentationRequestSchema.findOneAndUpdate({ challenge: challenge }, { status: 1 }).exec();
+      // TODO: 5. Update the status to success i.e 1 in background
+      PresentationRequestSchema.findOneAndUpdate({ challenge: challenge }, { status: 1 }).exec();
 
-    return res.status(200).send({ status: 200, message: 'OK', error: null });
-  } else {
-    // TODO: 4. send data or create JWT
-    return res.status(401).send({ status: 401, message: null, error: 'Unauthorized' });
+      return res.status(200).send({ status: 200, message: 'OK', error: null });
+    } else {
+      // TODO: 4. send data or create JWT
+      return res.status(401).send({ status: 401, message: null, error: 'Unauthorized' });
+    }
+  } catch (e) {
+    res.status(500).json(e);
   }
 }
 
