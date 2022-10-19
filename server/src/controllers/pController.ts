@@ -38,7 +38,7 @@ const verifyPresentation = async (vp, challenge, issuerDid, holderDid, domain, h
     domain,
     issuerDid,
     //holderDid,
-    holderDidDocSigned,
+    holderDidDocSigned: JSON.parse(holderDidDocSigned),
     holderVerificationMethodId,
     issuerVerificationMethodId,
   });
@@ -54,7 +54,12 @@ function writeServerSendEvent(res, sseId, data) {
 export async function verify(req, res, next) {
   try {
     logger.info('pCntrl:: verify() method start....');
-    const { challenge, vp, holderDidDocSigned } = req.body;
+    const { challenge, vp } = req.body;
+    let { holderDidDocSigned } = req.body;
+    const publicKeyMultiBase = JSON.parse(holderDidDocSigned).id.split(':').at(-1);
+    const parsedDidDoc = JSON.parse(holderDidDocSigned);
+    parsedDidDoc.verificationMethod[0].publicKeyMultibase = publicKeyMultiBase;
+    holderDidDocSigned = JSON.stringify(parsedDidDoc);
     if (!challenge || !vp) {
       return res.status(400).send({ status: 400, message: null, error: 'challenge and vp must be passed' });
     }
