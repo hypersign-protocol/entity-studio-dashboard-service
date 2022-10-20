@@ -6,7 +6,7 @@ export function corsOptionsDelegate(req, callback) {
     message = null;
     corsOptions = { origin: true }; // reflect (enable) the requested origin in the CORS response
   } else {
-    message = new Error('This is CORS-enabled for a whitelisted domain.');
+    message = 'This is CORS-enabled for a whitelisted domain.';
     corsOptions = { origin: false }; // disable CORS for this request
   }
   logger.info(req.header('Origin'));
