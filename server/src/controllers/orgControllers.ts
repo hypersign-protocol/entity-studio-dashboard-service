@@ -5,6 +5,7 @@ import { logger, WALLET_WEB_HOOK_ORG_DID, ORG_SERVICE_ENDPOINT_GET_STATUS, sse_c
 import { Interface } from 'readline';
 import { send } from '../services/sse';
 import ApiResonse from '../response/apiResponse';
+import PresentationTemplate from '../models/presentationTemplateSchema';
 
 const CreateOrg = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -140,6 +141,8 @@ const updateOrg = async (req: Request, res: Response, next: NextFunction) => {
       logger.error('orgCtrl:: updateOrg() : Error', e);
       return next(ApiResonse.badRequest(null, 'Invalid orgId'));
     }
+    logger.info('OrgCtrl:: updating domain of presentation template');
+    await PresentationTemplate.updateMany({ orgDid: orgData._id }, { domain: orgData.domain }, { multi: true });
     logger.info('orgCtrl:: updateOrg() method end...');
     return next(ApiResonse.success({ org }));
   } catch (e) {
