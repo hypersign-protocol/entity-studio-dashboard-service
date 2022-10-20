@@ -10,7 +10,8 @@ import HIDWallet from 'hid-hd-wallet';
 import HypersignSsiSDK from 'hs-ssi-sdk';
 import { walletOptions, mnemonic } from '../config';
 
-const verifyPresentation = async (vp, challenge, issuerDid, holderDid, domain) => {
+const verifyPresentation = async (vp, challenge, issuerDid, holderDid, domain, holderDidDocSigned) => {
+  logger.info('pContrl:: verifyPresentation() method starts');
   logger.info({
     vp,
     challenge,
@@ -29,17 +30,19 @@ const verifyPresentation = async (vp, challenge, issuerDid, holderDid, domain) =
     'testnet'
   );
   await hsSdk.init();
-  const holderVerificationMethodId = vp.verifiableCredential[0].proof.verificationMethod;
-  const issuerVerificationMethodId = vp.proof.verificationMethod;
+  const holderVerificationMethodId = vp.proof.verificationMethod;
+  const issuerVerificationMethodId = vp.verifiableCredential[0].proof.verificationMethod;
   const result = await hsSdk.vp.verifyPresentation({
     signedPresentation: vp,
     challenge,
     domain,
     issuerDid,
-    holderDid,
+    //holderDid,
+    holderDidDocSigned: JSON.parse(holderDidDocSigned),
     holderVerificationMethodId,
     issuerVerificationMethodId,
   });
+  logger.debug(`Result of verifyPresentation() is ${result}`);
   return result;
 };
 
@@ -50,7 +53,13 @@ function writeServerSendEvent(res, sseId, data) {
 
 export async function verify(req, res, next) {
   try {
+    logger.info('pCntrl:: verify() method start....');
     const { challenge, vp } = req.body;
+    let { holderDidDocSigned } = req.body;
+    const publicKeyMultiBase = JSON.parse(holderDidDocSigned).id.split(':').at(-1);
+    const parsedDidDoc = JSON.parse(holderDidDocSigned);
+    parsedDidDoc.verificationMethod[0].publicKeyMultibase = publicKeyMultiBase;
+    holderDidDocSigned = JSON.stringify(parsedDidDoc);
     if (!challenge || !vp) {
       return res.status(400).send({ status: 400, message: null, error: 'challenge and vp must be passed' });
     }
@@ -91,19 +100,23 @@ export async function verify(req, res, next) {
       challenge,
       templateIssuers[0], //  TODO: Need to fix this hardcoing
       vc.credentialSubject.id,
-      presentationTemplate.domain
+      presentationTemplate.domain,
+      holderDidDocSigned
     );
 
     const { verified } = result;
+    logger.debug(`Result of credential verification ${result.verified}`);
     if (verified === true) {
       // TODO: 4. send data or create JWT
 
       // TODO: 5. Update the status to success i.e 1 in background
       PresentationRequestSchema.findOneAndUpdate({ challenge: challenge }, { status: 1 }).exec();
+      logger.info('pCntrl:: verify() method ends....');
 
       return res.status(200).send({ status: 200, message: 'OK', error: null });
     } else {
       // TODO: 4. send data or create JWT
+      logger.info('pCntrl:: verify() method ends....');
       return res.status(401).send({ status: 401, message: null, error: 'Unauthorized' });
     }
   } catch (e) {
@@ -113,6 +126,7 @@ export async function verify(req, res, next) {
 
 export async function getChallenge(req, res, next) {
   try {
+    logger.info('PresentationCont:: getChallenge() method starts......');
     const { presentationTemplateId } = req.params;
     if (!presentationTemplateId) {
       return res.status(400).send('presentationTemplateId can not be null or empty');

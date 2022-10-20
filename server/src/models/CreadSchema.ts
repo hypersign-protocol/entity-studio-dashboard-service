@@ -9,6 +9,7 @@ export interface ICreadSchema extends Document {
   vc: JSON;
   vc_id: string;
   orgDid: string;
+  expiryDate: Date;
 }
 
 export const creadSchema = new Schema({
@@ -38,6 +39,10 @@ export const creadSchema = new Schema({
   createdAt: {
     type: Date,
     required: false,
+  },
+  expiryDate: {
+    type: Date,
+    required: true,
   },
 });
 export default mongoose.model<ICreadSchema>('CreadSchema', creadSchema);

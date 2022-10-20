@@ -70,7 +70,7 @@ const presentationTempalateById = async (req: Request, res: Response, next: Next
     //     ]
     //   }
     const id = req.params.id;
-    const allTemplate = await PresentationTemplateSchema.findOne({ templateOwnerDid: data.id, _id: id });
+    const allTemplate = await PresentationTemplateSchema.findOne({ primaryDid: data.id, _id: id });
     res.json(allTemplate);
   } catch (error) {
     res.status(500).json(error);
@@ -83,7 +83,7 @@ const presentationTempalateAll = async (req: Request, res: Response, next: NextF
     const { data } = req.body.hypersign;
     const orgDid = req.params.orgDid;
     const allTemplate: Array<IPresentationTemplate> = await PresentationTemplateSchema.find({
-      templateOwnerDid: data.id,
+      primaryDid: data.id,
       orgDid,
     });
     logger.info('presentationCtrl:: presentationTempalateAll() method ends...');
@@ -110,7 +110,8 @@ const presentationTempalate = async (req: Request, res: Response, next: NextFunc
       reason,
       required,
       callbackUrl,
-      templateOwnerDid: data.id,
+      templateOwnerDid: issuerDid,
+      primaryDid: data.id,
     });
     logger.info('presentationControllers:: presentationTempalate() method ends...');
     return next(ApiResponse.success({ presentationTemplateObj }));

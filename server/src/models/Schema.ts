@@ -6,11 +6,13 @@ export interface ISchema extends Document {
   schemaId: string;
   createdAt: Date;
   status: string;
+  primaryDid: string;
 }
 
 export const SchemaDbSchema = new Schema({
   orgDid: { type: String, reqired: false },
   did: { type: String, required: true },
+  primaryDid: { type: String, required: true },
   transactionHash: {
     type: String,
     required: false,
