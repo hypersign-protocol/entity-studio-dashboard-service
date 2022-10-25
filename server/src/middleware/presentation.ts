@@ -1,6 +1,7 @@
 import { body, param } from 'express-validator';
 import { isValidURL } from '../utils/fields';
-
+import { logger } from '../config';
+import presentationModel, { IPresentationTemplate } from '../models/presentationTemplateSchema';
 export const presentationSchemaBody = [
   body('queryType').trim().exists({ checkFalsy: true }).withMessage('queryType can not be null or empty'),
   body('domain').trim().exists({ checkFalsy: true }).withMessage('domain can not be null or empty'),
@@ -17,3 +18,23 @@ export const presentationSchemaBody = [
 export const presentationSchemaParams = [
   param('orgDid').trim().exists({ checkFalsy: true }).withMessage('orgDid can not be null or empty'),
 ];
+
+export async function verifyOrigin(req, callback) {
+  logger.info('Presentation middleware verifyOrigin() method starts');
+  let corsOptions;
+  let message;
+  const { presentationTemplateId } = req.params;
+  const presentationTemplate: IPresentationTemplate = (await presentationModel.findOne({
+    _id: presentationTemplateId,
+  })) as IPresentationTemplate;
+  const { domain } = presentationTemplate;
+  const parsedBaseUrl = new URL(domain);
+  if (parsedBaseUrl.origin === req.header('Origin')) {
+    message = null;
+    corsOptions = { origin: true };
+  } else {
+    message = 'OriginMismatch';
+    corsOptions = { origin: false };
+  }
+  callback(message, corsOptions);
+}

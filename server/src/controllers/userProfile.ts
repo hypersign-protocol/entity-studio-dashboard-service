@@ -22,7 +22,7 @@ const fetchUserDetail = async (req: Request, res: Response, next: NextFunction) 
       templatesCount = await PresentationModel.countDocuments({ templateOwnerDid: data.id });
     }
     const credentialsCount = await CredentialModel.countDocuments({ issuerDid: data.id });
-    logger.error('profileCtrl:: fetchUserDetail() method ends...');
+    logger.info('profileCtrl:: fetchUserDetail() method ends...');
     return next(ApiResponse.success({ orgsCount, schemasCount, templatesCount, credentialsCount }));
   } catch (e) {
     logger.error('profileCtrl:: fetchUserDetail(): Error', e);
