@@ -12,7 +12,7 @@ import cors from 'cors';
 
 export const presentationRoute = (hypersign) => {
   const router = Router();
-
+  router.post('/request/verify', verify);
   router.post(
     '/template',
     hypersign.authorize.bind(hypersign),
@@ -34,7 +34,6 @@ export const presentationRoute = (hypersign) => {
 export const presentationRequestRoute = () => {
   const router = Router();
   router.get('/:presentationTemplateId', cors(verifyOrigin), getChallenge);
-  router.post('/verify', verify);
 
   return router;
 };
