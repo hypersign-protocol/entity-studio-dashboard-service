@@ -12,7 +12,7 @@ import { credentialRoutes } from './routes/verifiableCredentials';
 import db from './dbConn';
 import http from 'http';
 import { schemaRoutes } from './routes/schemaRoutes';
-import { presentationRoute } from './routes/presentationRoutes';
+import { presentationRoute, presentationRequestRoute } from './routes/presentationRoutes';
 import apiResponseHandler from './response/apiResponseHandler';
 import { profileRoute } from './routes/userProfile';
 import { corsOptionsDelegate } from './utils/https';
@@ -47,6 +47,7 @@ export default function app() {
       app.use('/api/app', appRoutes);
       app.use('/api/auth', authRoutes);
       app.use('/api/blog', blogRoutes);
+      app.use('/api/v1/presentation/request', presentationRequestRoute());
       app.use('/api/v1/presentation', cors(corsOptionsDelegate), presentationRoute(hypersign));
       app.use('/api/v1/credential', cors(corsOptionsDelegate), credentialRoutes(hypersign));
       app.use('/api/v1/schema', cors(corsOptionsDelegate), schemaRoutes(hypersign));
