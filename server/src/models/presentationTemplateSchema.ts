@@ -10,6 +10,7 @@ export interface IPresentationTemplate extends Document {
   required: boolean;
   callbackUrl: string;
   templateOwnerDid: string;
+  primaryDid: string;
 }
 
 export const PresentationTemplateSchema = new Schema({
@@ -23,6 +24,7 @@ export const PresentationTemplateSchema = new Schema({
   reason: { type: String, required: true },
   required: { type: Boolean, required: false },
   callbackUrl: { type: String, required: true },
+  primaryDid: { type: String, required: true },
 });
 
 export default mongoose.model<IPresentationTemplate>('PresentationTemplateSchema', PresentationTemplateSchema);

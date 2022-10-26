@@ -82,9 +82,16 @@
     <div class="row">
       <div class="col-md-12" style="text-align: left">
         <Info :message="description" />
-          <div class="form-group" style="text-align: right">
-            <button @click="openSlider()" class="btn btn-primary">+ Schema</button>
-          </div>
+          <div class="form-group" style="display:flex">
+           <h3 v-if="schemaList.length > 0" class="mt-4" style="text-align: left;">Schema</h3>
+            <h3 v-else class="mt-4" style="text-align: left;">Create your first schema!</h3>      
+            <hf-buttons 
+              name="+ Schema"
+              style="text-align: right;"
+              class="btn btn-primary ml-auto mt-4"
+              @executeAction="openSlider()"
+            ></hf-buttons>
+          </div> 
           <StudioSideBar title="Create Schema">
               <div class="container">
                 <div class="form-group">
@@ -133,8 +140,12 @@
                       </div>
                     </div>
                     <div class="form-group row">
-                      <div class="col-sm-10">
-                        <a class="btn btn-primary" style="color:white; " v-on:click="addBlankAttrBox()">Add +</a>
+                      <div class="col-sm-10">                        
+                        <hf-buttons 
+                          name="Add +"        
+                          class="btn btn-primary"
+                          @executeAction="addBlankAttrBox()"
+                        ></hf-buttons>
                       </div>
                     </div>
                   </b-collapse>
@@ -145,8 +156,12 @@
                 </div>
                 <div class="form-group row">
                   <div class="col-md-12">
-                    <hr/>
-                    <button class="btn btn-outline-primary btn-sm" @click="createSchema()">Create</button>
+                    <hr/>                    
+                    <hf-buttons 
+                      name="Create"        
+                      class="btn btn-primary"
+                      @executeAction="createSchema()"
+                    ></hf-buttons>
                   </div>
                 </div>
               </div>
@@ -199,9 +214,6 @@
         <button class="btn btn-outline-warning btn-sm"  @click="fetchSchemasNext()"  > Next </button> -->
       </div>
     </div>
-    <div class="form-group" v-else>
-      <h2>Create your first schema!</h2>
-    </div>
   </div>
 </template>
 
@@ -213,10 +225,10 @@ import UtilsMixin from '../mixins/utils';
 import Loading from "vue-loading-overlay";
 import config from "../config";
 import StudioSideBar from "../components/element/StudioSideBar.vue";
-
+import HfButtons from "../components/element/HfButtons.vue"
 export default {
   name: "IssueCredential",
-  components: { QrcodeVue, Info, Loading, StudioSideBar },
+  components: { QrcodeVue, Info, Loading, StudioSideBar, HfButtons },
   computed: {
     schemaList() {
       return this.$store.state.schemaList;
@@ -264,6 +276,7 @@ export default {
   created() {
     const usrStr = localStorage.getItem("user");
     this.user = JSON.parse(usrStr);
+    this.$store.commit('updateSideNavStatus',true)
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -272,12 +285,20 @@ export default {
   },
   methods: {
     openSlider() {
+      this.clearAll();
       this.$root.$emit("bv::toggle::collapse", "sidebar-right");
     },
     gotosubpage: (id) => {
       this.$router.push(`${id}`);
     },
+    clearAll(){
+      this.attributeName = ''
+      this.attributeTypes = ''
+      this.attributeFormat = ''
+      this.attributeRequired = false
+      this.attributes = []
 
+    },
     addBlankAttrBox() {
       console.log(this.attributeName, this.attributeTypes);
       if (this.attributeName !== "" && this.attributeTypes !== "") {
@@ -288,7 +309,6 @@ export default {
           isRequired: this.attributeRequired
 
         }
-        console.log(obj);
         this.attributes.push(obj)
         this.attributeName = "";
         this.attributeTypes = "";
@@ -359,19 +379,19 @@ export default {
         })
           .then((res) => res.json())
           .then((j) => {
-            const { QR_DATA } = j
-            if (j.status === 200) {
+            const { QR_DATA } = j.data
+            if (j.message === 'success') {
               this.notifySuccess("Schema creation initiated. Please approve the transaction from your wallet");
               // TODO: Why this is hardcoded?
-              this.credentialName = 'Schema';
+              // this.credentialName = 'Schema';
 
               // Store the information in store.
-              this.$store.dispatch('insertAschema', j.schema);
+              this.$store.dispatch('insertAschema', j.data.schema);
 
               // Open the wallet for trasanctional approval.
               const URL = `${this.$config.webWalletAddress}/deeplink?url=${JSON.stringify(QR_DATA)}`
               this.openWallet(URL)
-              this.ssePopulateSchema(j.schema._id, this.$store)
+              this.ssePopulateSchema(j.data.schema._id, this.$store)
               this.openSlider();
             } else {
               throw new Error(`${j.error}`);

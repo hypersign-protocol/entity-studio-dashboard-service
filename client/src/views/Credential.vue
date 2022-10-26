@@ -12,6 +12,14 @@
 .card {
   border-radius: 10px;
 }
+.goschema{
+  color: #339af0;
+}
+.goschema:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 </style>
 <template>
   <div class="home">
@@ -20,24 +28,33 @@
     <div class="row">
       <div class="col-md-12" style="text-align: left">
         <Info :message="description" />
-        <div class="form-group" style="text-align: right">
-            <button @click="openSlider()" class="btn btn-primary">+ Credential</button>
-          </div>          
+          <div class="form-group" style="display:flex">
+           <h3 v-if="vcList.length > 0" class="mt-4" style="text-align: left;">Credentials</h3>
+            <h3 v-else class="mt-4" style="text-align: left;">Issue your first credential!</h3>
+            <hf-buttons 
+              name="+ Credential"
+              style="text-align: right;"
+              class="btn btn-primary ml-auto mt-4"
+              @executeAction="openSlider()"
+            ></hf-buttons>
+          </div>    
             <StudioSideBar title="Issue Credential">
               <div class="container">
                 <div class="form-group row">
                   <div class="col-md-12">
                     <form style="max-height:300px; overflow:auto; padding: 5px">
                     <div class="form-group">
+                      <label for="fordid"><strong>Subject Did</strong></label>
                       <input type="text" class="form-control" placeholder="Issued To (did:hs:...)"
                         v-model="holderDid" />
                     </div>
                     <div class="form-group">
+                      <label for="forselectschema"><strong>Select Schemmma</strong></label>
                       <b-form-select v-model="selected" :options="selectOptions"
                         @change="OnSchemaSelectDropDownChange($event)" size="md" class="mt-3">
                       </b-form-select>
-
                     </div>
+                    <span class="goschema" v-if="selectOptions.length === 1" @click="goToSchema()">Create Schema</span>              
                     <div class="form-group" v-for="attr in issueCredAttributes" :key="attr.name">
                       <label for="schDescription"><strong>{{ attr.name }}</strong></label>
                       <input type="text" class="form-control" id="schemaName" v-model="attr.value" aria-describedby="schemaNameHelp" placeholder="Enter attribute value">
@@ -47,8 +64,13 @@
                 </div>
                 <div class="form-group row">
                   <div class="col-md-12">
-                    <hr />
-                    <button class="btn btn-outline-primary btn-sm" @click="issueCredential()">Issue</button>
+                    <hr />    
+                    <hf-buttons 
+                      name="Issue"
+                      style="text-align: right;"
+                      class="btn btn-primary ml-auto mt-4"
+                      @executeAction="issueCredential()"
+                    ></hf-buttons>
                   </div>
                 </div>
               </div>
@@ -87,8 +109,14 @@
               <!-- <td>{{ row.credStatus ?  row.credStatus.credentialHash : "-"}}</td>  -->
               <td> {{ row.credStatus ? row.credStatus.claim.currentStatus : row.status}}</td>
               <td>{{ row.credStatus ? row.credStatus.claim.statusReason  : "-"}}</td>
-              <td> 
-                <button type="button" class="btn btn-primary" @click="generateCred(`${row._id}`)" v-if="row.credStatus">Send</button>
+              <td>               
+                <hf-buttons
+                  v-if="row.credStatus"
+                  name="Send"
+                  style="text-align: right;"
+                  class="btn btn-primary"
+                  @executeAction="generateCred(`${row._id}`)"
+                ></hf-buttons>
                 <span v-else>-</span>
               </td>
             </tr>
@@ -100,9 +128,6 @@
         </hf-pop-up>
       </div>
     </div>
-    <div class="form-group" v-else>
-      <h2>Issue your first credential!</h2>
-    </div>
   </div>
 </template>
 
@@ -113,9 +138,10 @@ import UtilsMixin from '../mixins/utils';
 import HfPopUp from "../components/element/hfPopup.vue";
 import Loading from "vue-loading-overlay";
 import StudioSideBar from "../components/element/StudioSideBar.vue";
+import HfButtons from "../components/element/HfButtons.vue"
 export default {
   name: "IssueCredential",
-  components: { Info, HfPopUp, Loading, StudioSideBar },
+  components: { Info, HfPopUp, Loading, StudioSideBar, HfButtons },
   computed: {
     vcList(){
       return this.$store.state.vcList;
@@ -173,6 +199,7 @@ export default {
   created() {
     const usrStr = localStorage.getItem("user");
     this.user = JSON.parse(usrStr);
+    this.$store.commit('updateSideNavStatus',true)
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -180,7 +207,11 @@ export default {
     });
   },
   methods: {
+    goToSchema() {
+      this.$router.push('schema')
+    },
     openSlider() {
+      this.clearAll();
       this.$root.$emit("bv::toggle::collapse", "sidebar-right");
     },
     ssePopulateCredStatus(id,store){
@@ -225,7 +256,7 @@ export default {
       const URL = this.$config.studioServer.BASE_URL + this.$config.studioServer.ACCPCT_CRED_EP
       const res = await fetch(URL, options)
       const resp =await res.json()
-      this.credUrl = resp.url;
+      this.credUrl = resp.data.url;
       this.$root.$emit('modal-show')
       this.notifySuccess("Cred Url Generated Successfully")
     },
@@ -315,7 +346,7 @@ export default {
           body: JSON.stringify({ QR_DATA: this.QrData }),
         }).then((res) => res.json())
           .then(json => {
-            const { QR_DATA,creadRecord } = json
+            const { QR_DATA,creadRecord } = json.data
             
 
             this.$store.dispatch("insertAcredential", creadRecord)
@@ -334,6 +365,11 @@ export default {
         this.isLoading = false;
       }
     },
+    clearAll() {
+      this.holderDid = "";
+      this.selected = null;
+      this.issueCredAttributes = []
+    }
   },
   mixins: [UtilsMixin],
 

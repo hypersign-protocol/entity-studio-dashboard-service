@@ -10,10 +10,32 @@ export default new Vuex.Store({
         templateList: [],
         orgList: [
         ],
-        selectedOrgDid: ""
-
+        selectedOrgDid: "",
+        showSideNavbar:false,
+        userProfile:{
+            details:{
+              name: '',
+              email: '',
+              did: '',
+            },
+            count: {
+                credentialsCount:0,
+                orgsCount:0,
+                schemasCount:0,
+                templatesCount:0,
+            }
+        }
     },
     getters: {
+        userDetails(state) {
+            return state.userProfile.details
+        },
+        allMetricsData(state) {
+            return state.userProfile.count
+        },
+        sideNavStatus(state) {
+            return state.showSideNavbar
+        },
         isAnyOrgSelected(state) {
             return state.selectedOrgDid != "" ? true : false
         },
@@ -22,6 +44,12 @@ export default new Vuex.Store({
         },
         totalCredentials(state) {
             return state.vcList.length;
+        },
+        totalTemplateCount(state) {
+            return state.templateList.length;
+        },
+        totalOrgList(state) {
+            return state.orgList.length;
         },
         findSchemaBySchemaID: (state) => (schemaId) => {
             return state.schemaList.find(x => x.schemaId === schemaId);
@@ -51,16 +79,42 @@ export default new Vuex.Store({
     },
     mutations: {
         resetStore(state){
-            console.log('resetting store');
             state.orgList=[]
             state.schemaList=[]
             state.vcList=[]
             state.templateList=[]
             state.selectedOrgDid=""
+            state.showSideNavbar=false
+            state.userProfile = {
+                details:{
+                  name: '',
+                  email: '',
+                  did: '',
+                },
+                count: {
+                    credentialsCount:0,
+                    orgsCount:0,
+                    schemasCount:0,
+                    templatesCount:0,
+                }
+            }
+        },
+        increaseOrgCount(state) {
+            state.userProfile.count.orgsCount +=1;
+        },
+        addUserDetailsToProfile(state,payload) {
+            state.userProfile.details.name = payload.name;
+            state.userProfile.details.email = payload.email;
+            state.userProfile.details.did = payload.id
+        },
+        addCountDataToProfile(state,payload) {
+            state.userProfile.count = { ...payload }
         },
         selectAnOrg(state, orgDid) {
             state.selectedOrgDid = orgDid;
-
+        },
+        updateSideNavStatus(state,payload) {
+            state.showSideNavbar = payload
         },
         insertAschema(state, payload) {
             if (!state.schemaList.find(x => x._id === payload._id)) {
@@ -82,7 +136,6 @@ export default new Vuex.Store({
             }
         },
         updateAschema(state, payload) {
-            console.log('updating schema');
             let index = state.schemaList.findIndex(x => x._id === payload._id);
            Object.assign(state.schemaList[index], {...payload});
            // state.schemaList[index] = payload;
@@ -105,11 +158,13 @@ export default new Vuex.Store({
             }
         },
         updateAcredential(state, payload) {
-            console.log("updating a credential" ,payload);
             let index = state.vcList.findIndex(x => x._id === payload._id);
             Object.assign(state.vcList[index], {...payload});
+        },
+        updateSidebarStatus(state,payload) {
+            state.showSideNavbar = payload
         }
-        
+
         //     fetchAllOrgDataOnOrgSelect(state, payload) {
         //         console.log(state , payload);
         // }
@@ -160,9 +215,9 @@ export default new Vuex.Store({
                     headers
                 }).then(response => response.json()).then(json => {
                     
-                    if (json.length!==0) {
+                    if (json.data.length!==0) {
                         this.state.templateList=[]
-                        json.forEach(template => {
+                        json.data.forEach(template => {
                             this.commit('insertApresentationTemplate', template)
                         })
                     }else{
@@ -185,11 +240,11 @@ export default new Vuex.Store({
 
                 fetch(url, {
                     headers: options.headers
-                }).then(response => response.json()).then(json => {
-                   
-                    if (json && json.schemaList.length!==0) {
+                }).then(response => response.json()).then(json => {       
+
+                    if (json && json.data.schemaList.length!==0) {
                         this.state.schemaList = []
-                        json.schemaList.forEach(schema => {
+                        json.data.schemaList.forEach(schema => {
 
                             this.dispatch('insertAschema', schema)
                         })
@@ -216,9 +271,9 @@ export default new Vuex.Store({
                 fetch(url, {
                     headers: options.headers
                 }).then(response => response.json()).then(json => {
-                    if (json && json.credList.length!==0) {
+                    if (json && json.data.credList.length!==0) {
                         this.state.vcList = []
-                        json.credList.forEach(credential => {
+                        json.data.credList.forEach(credential => {
                             this.dispatch('insertAcredential', credential)
                         })
                     }else{

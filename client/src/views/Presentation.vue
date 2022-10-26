@@ -14,6 +14,13 @@
   background: aliceblue;
   padding: 0px;
 }
+.goschema{
+  color: #339af0;
+}
+.goschema:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
 </style>
 <template>
   <div class="home">
@@ -23,58 +30,76 @@
       <div class="col-md-12" style="text-align: left">
         <Info :message="description" />
         
-          <div class="form-group" style="text-align: right">
-            <button @click="openSlider()" class="btn btn-primary">+ Presentation Template</button>
-          </div>  
+          <div class="form-group" style="display:flex">
+           <h3 v-if="templateList.length > 0" class="mt-4" style="text-align: left;">Presentation</h3>
+            <h3 v-else class="mt-4" style="text-align: left;">Create your first presentation template!</h3>            
+            <hf-buttons 
+              name="+ Presentation Template"
+              style="text-align: right;"
+              class="btn btn-primary ml-auto mt-4"
+              @executeAction="openSlider()"
+            ></hf-buttons>
+          </div>
           <StudioSideBar title="Create Presentation Template">
 
               <div class="form-group row container">
                 <div class="col-md-12">
                   <form>
                     <div class="form-group">
-                      <label class="floatLeft">Domain :</label>
+                      <label class="floatLeft"><strong> Domain :</strong></label>
                       <input class="form-control" type="url" v-model="presentationTemplate.domain" />
 
 
                     </div>
                     <div class="form-group">
-                      <label class="floatLeft">Name (optional):</label>
+                      <label class="floatLeft"><strong>Name (optional) :</strong></label>
                       <input class="form-control" type="text" v-model="presentationTemplate.name" />
 
 
                     </div>
                     <div class="form-group">
-                      <label class="floatLeft">IssuerDid</label>
+                      <label class="floatLeft"><strong> IssuerDid :</strong></label>
                       <input class="form-control" type="text" v-model="presentationTemplate.issuerDid" />
 
 
                     </div>
-                    <div class="form-group">
-                      <label class="floatLeft">Schema Id :</label>
+                    <!-- <div class="form-group">
+                      <label class="floatLeft"><strong>Schema Id :<strong></label>
                       <input class="form-control" type="text" v-model="presentationTemplate.schemaId" />
 
 
-                    </div>
+                    </div> -->
                     <div class="form-group">
-                      <label class="floatLeft">Reason :</label>
+                      <label for="forselectschema"><strong>Select Schema</strong></label>
+                      <b-form-select v-model="selected" :options="selectOptions"
+                        @change="OnSchemaSelectDropDownChange($event)" size="md" class="mt-3">
+                      </b-form-select>
+                      <span class="goschema" v-if="selectOptions.length === 1" @click="goToSchema()">Create Schema</span>              
+                    </div>              
+                    <div class="form-group">
+                      <label class="floatLeft"><strong>Reason :</strong></label>
                       <input class="form-control" type="text" v-model="presentationTemplate.reason" />
 
 
                     </div>
                     <div class="form-group">
-                      <label class="floatLeft">Callback URI</label>
+                      <label class="floatLeft"><strong>Callback URI</strong></label>
                       <input class="form-control" type="url" v-model="presentationTemplate.callbackUrl" />
 
 
                     </div>
                     <div class="form-group">
-                      <label class="floatLeft ">Required :</label>
+                      <label class="floatLeft "><strong>Required :</strong></label>
                       <input type="checkbox" v-model="presentationTemplate.required" />
                     </div>
 
                   </form>
                   <hr />
-                  <button class="btn btn-outline-primary btn-sm" @click="generatePresentation()">Generate</button>
+                  <hf-buttons 
+                    name="Generate"            
+                    class="btn btn-primary"
+                    @executeAction="generatePresentation()"
+                  ></hf-buttons>
                 </div>
               </div>
             </StudioSideBar>
@@ -115,9 +140,6 @@
       </div>
       <!-- </div> -->
     </div>
-    <div class="form-group" v-else>
-      <h2>Create your first presentation template!</h2>
-    </div>
 
   </div>
 </template>
@@ -126,21 +148,26 @@
 import fetch from "node-fetch";
 import UtilsMixin from '../mixins/utils';
 import StudioSideBar from "../components/element/StudioSideBar.vue";
-
+import HfButtons from "../components/element/HfButtons.vue"
 import conf from '../config';
 const { hypersignSDK } = conf;
 import QrcodeVue from "qrcode.vue";
 import Info from '@/components/Info.vue'
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/vue-loading.css";
 export default {
   name: "Presentation",
-  components: { QrcodeVue, Info , StudioSideBar},
+  components: { QrcodeVue, Info , StudioSideBar, HfButtons, Loading},
   computed:{
     templateList(){
       return this.$store.state.templateList;
     },
     selectedOrg(){
       return this.$store.getters.getSelectedOrg;
-    }
+    },
+    selectOptions(){
+      return this.$store.getters.listOfAllSchemaOptions;
+    },
   },
   data() {
     return {
@@ -157,14 +184,15 @@ export default {
       show at the security check.",
       presentationTemplate: {
         queryType: 'QueryByExample',
-        domain: '',
+        domain: "",
         name: '',
-        issuerDid: '',
+        issuerDid:'',
         schemaId: '',
         reason: '',
         required: true,
         callbackUrl: '',
       },
+      selected:null,
       active: 0,
       host: location.hostname,
       user: {},
@@ -185,7 +213,7 @@ export default {
       selected: null,
       attributeValues: {},
       authToken: localStorage.getItem("authToken"),
-      selectOptions: [{ value: null, text: "Please select a schema" }],
+   
       schemaMap: {},
       vcList: [],
       schemaList: [],
@@ -202,7 +230,8 @@ export default {
   created() {
     const usrStr = localStorage.getItem("user");
     this.user = JSON.parse(usrStr);
-    this.fetchTemplates()
+    this.$store.commit('updateSideNavStatus',true)
+    // this.fetchTemplates()
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -210,7 +239,29 @@ export default {
     });
   },
   methods: {
+    goToSchema() {
+      this.$router.push('schema')
+    },
+    OnSchemaSelectDropDownChange(event) {
+      if (event) {     
+        this.presentationTemplate.schemaId=this.selected
+      } else {
+        this.schemaId = '';
+      }
+    },
+    clearAll() {
+      this.presentationTemplate.issuerDid = ''
+      this.presentationTemplate.domain = ''
+      this.presentationTemplate.name = ''
+      this.presentationTemplate.required = true
+      this.presentationTemplate.callbackUrl = ''
+      this.presentationTemplate.reason = ''
+      this.selected = null
+    },
     openSlider() {
+      this.clearAll()
+      this.presentationTemplate.issuerDid = JSON.parse(localStorage.getItem("user")).id
+      this.presentationTemplate.domain = this.selectedOrg.domain;
       this.$root.$emit("bv::toggle::collapse", "sidebar-right");
     },
     showClaims() {
@@ -287,6 +338,7 @@ export default {
     async generatePresentation() {
       this.isLoading = true
       try {
+        
         const issuerDid = this.presentationTemplate.issuerDid.split(',')
         const headers = {
           "Content-Type": "application/json",
@@ -309,7 +361,7 @@ export default {
           method: "POST",
           headers: headers,
         }).then((res) => res.json()).then(json => {
-          this.$store.commit('insertApresentationTemplate', json)
+          this.$store.commit('insertApresentationTemplate', json.data.presentationTemplateObj)
           this.notifySuccess('Template Successfully created')
           this.openSlider();
         })

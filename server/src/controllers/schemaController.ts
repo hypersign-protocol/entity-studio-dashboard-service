@@ -12,6 +12,7 @@ const saveSchema = async (req: Request, res: Response, next: NextFunction) => {
     const SchemaObj = await Schema.create({
       did: hypersign.data.id,
       createdAt: new Date(),
+      primaryDid: hypersign.data.id,
       orgDid: QR_DATA.data.orgDid,
       status: 'Initiated',
     });
@@ -68,10 +69,7 @@ const getSchema = async (req: Request, res: Response, next: NextFunction) => {
     }
     const pageInt = page ? parseInt(page.toString()) : 1;
     const skip = (pageInt - 1) * limitInt;
-    const schemaList = await Schema.find({ did: hypersign.data.id, orgDid })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limitInt);
+    const schemaList = await Schema.find({ orgDid }).sort({ createdAt: -1 }).skip(skip).limit(limitInt);
     logger.info('==========SchemaController ::getSchema Ends================');
     return next(ApiResonse.success({ schemaList }));
   } catch (error) {

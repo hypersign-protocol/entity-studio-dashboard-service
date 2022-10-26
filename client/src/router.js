@@ -9,7 +9,7 @@ import Dashboard from './views/Dashboard.vue'
 import fetch from 'node-fetch'
 import Schema from './views/Schema.vue'
 import Org from './views/Org.vue'
-
+import store from './store/store'
 Vue.use(Router)
 
 const router =  new Router({
@@ -110,8 +110,7 @@ router.beforeEach((to, from, next) => {
   if(to.matched.some(record => record.meta.requiresAuth)){
     const authToken = localStorage.getItem('authToken')
     if(authToken){
-      const url = `${config.studioServer.BASE_URL}protected`
-      console.log(url)
+      const url = `${config.studioServer.BASE_URL}api/v2/protected`
       fetch(url,{
         headers: {
           Authorization: `Bearer ${authToken}`,
@@ -126,7 +125,7 @@ router.beforeEach((to, from, next) => {
           })  
         }else{
           localStorage.setItem("user", JSON.stringify(json.message));
-          console.log(json);
+          store.commit('addUserDetailsToProfile',json.message)
           next()
         }
       })
