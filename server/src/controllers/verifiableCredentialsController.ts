@@ -222,12 +222,13 @@ const updateCredentials = async (req: Request, res: Response, next: NextFunction
         status,
         vcId,
         credentialStatusUrl,
+        _id: credData._id,
       },
     };
     QR_DATA.serviceEndpoint = `${WALLET_WEB_HOOK_CREAD}/${credData._id}`;
 
     logger.info('CredController :: updateCredential() method end...');
-    return next(ApiResponse.success(QR_DATA));
+    return next(ApiResponse.success({ QR_DATA }));
   } catch (e) {
     logger.error('CredController :: updateCredential() method: Error ' + e);
     return next(ApiResponse.internal(null, e));
