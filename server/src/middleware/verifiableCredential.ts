@@ -1,5 +1,5 @@
 import { body, param, query } from 'express-validator';
-import { logger, rpcEndPoint } from '../config';
+import { logger, schemaResolver } from '../config';
 import ApiResponse from '../response/apiResponse';
 import fetch from 'node-fetch';
 let schemaId;
@@ -36,7 +36,7 @@ export async function isValidField(req, res, next) {
   try {
     logger.info('isValidField');
     const { fields } = req.body.QR_DATA.data;
-    const schemaRpc = rpcEndPoint + schemaId + ':';
+    const schemaRpc = schemaResolver + schemaId + ':';
     const schemaDetail = await fetch(schemaRpc);
     const resp = await schemaDetail.json();
     const configuredSchemaProperties = JSON.parse(resp.schema[0].schema.properties);
