@@ -66,20 +66,9 @@ export async function isValidField(req, res, next) {
               break;
             }
             case 'boolean': {
-              // if (
-              //   !(
-              //     (typeof element.value === 'string' &&
-              //       (element.value.toLowerCase() === 'true' || element.value.toLowerCase() === 'yes')) ||
-              //     element.value.toLowerCase() === 'false' ||
-              //     element.value.toLowerCase() === 'no' ||
-              //     parseInt(element.value) === 1 ||
-              //     parseInt(element.value) === 0
-              //   )
-              // ) {
-              // if(!typeof(element.value)== 'boolean')
-              //   return next(ApiResponse.badRequest(null, `Invalid type for field ${element.name}`));
-              // }
-              console.log('boolean');
+              if (!(element.value === (true || 1) || element.value === (false || 0))) {
+                return next(ApiResponse.badRequest(null, `Invalid type for field ${element.name}`));
+              }
               break;
             }
             case 'date': {
