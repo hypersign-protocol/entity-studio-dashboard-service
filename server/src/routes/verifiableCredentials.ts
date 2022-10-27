@@ -30,5 +30,6 @@ export const credentialRoutes = (hypersign) => {
   );
   router.post('/send', checkIfIdExists, validateRequestSchema, appCtrl.sendCredentialDetail);
   router.get('/walletAccepct', checkIfQueryExists, validateRequestSchema, appCtrl.acceptCredentials);
+  router.put('/', hypersign.authorize.bind(hypersign), appCtrl.updateCredentials);
   return router;
 };
