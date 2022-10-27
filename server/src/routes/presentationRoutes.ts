@@ -4,6 +4,7 @@ import {
   verifyPresentation,
   presentationTempalateAll,
   presentationTempalateById,
+  deletePresentationTemplate,
 } from '../controllers/presentationController';
 import { getChallenge, verify } from '../controllers/pController';
 import { presentationSchemaBody, presentationSchemaParams, verifyOrigin } from '../middleware/presentation';
@@ -28,6 +29,9 @@ export const presentationRoute = (hypersign) => {
     validateRequestSchema,
     presentationTempalateAll
   );
+
+  router.delete('/template/:id', hypersign.authorize.bind(hypersign), deletePresentationTemplate);
+
   return router;
 };
 

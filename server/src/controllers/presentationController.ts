@@ -120,5 +120,22 @@ const presentationTempalate = async (req: Request, res: Response, next: NextFunc
     return next(ApiResponse.internal(null, error));
   }
 };
+const deletePresentationTemplate = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    logger.info('presentationControllers:: deletePresentationTemplate() method start ....');
+    const id = req.params.id;
+    const templateDetail = await PresentationTemplateSchema.findOneAndDelete({ _id: id });
+    return next(ApiResponse.success(templateDetail));
+  } catch (e) {
+    logger.error('presentationControllers:: deletePresentationTemplate() method Error: ' + e);
+    return next(ApiResponse.internal(null, e));
+  }
+};
 
-export { verifyPresentation, presentationTempalate, presentationTempalateAll, presentationTempalateById };
+export {
+  verifyPresentation,
+  presentationTempalate,
+  presentationTempalateAll,
+  presentationTempalateById,
+  deletePresentationTemplate,
+};
