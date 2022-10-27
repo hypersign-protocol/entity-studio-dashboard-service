@@ -195,7 +195,7 @@ const acceptCredentials = async (req: Request, res: Response, next: NextFunction
 const updateCredentials = async (req: Request, res: Response, next: NextFunction) => {
   try {
     logger.info('credController :: updateCredential() method start...');
-    const { vcId, credentialStatusUrl, status } = req.body.QR_DATA.data;
+    const { vcId, status } = req.body.QR_DATA.data;
     console.log(vcId);
     let credData: any = await creadSchema.findOne({ 'vc.id': vcId });
     if (!credData) {
@@ -221,7 +221,7 @@ const updateCredentials = async (req: Request, res: Response, next: NextFunction
         expirationDate: credData.expiryDate,
         status,
         vcId,
-        credentialStatusUrl,
+        credentialStatusUrl: credData.vc_id,
         _id: credData._id,
       },
     };
