@@ -5,6 +5,7 @@ import {
   credentialSchemaBody,
   checkIfIdExists,
   checkIfQueryExists,
+  isValidField,
 } from '../middleware/verifiableCredential';
 import { validateRequestSchema } from '../middleware/validateRequestSchema';
 
@@ -14,6 +15,7 @@ export const credentialRoutes = (hypersign) => {
     '/',
     hypersign.authorize.bind(hypersign),
     credentialSchemaBody,
+    isValidField,
     validateRequestSchema,
     appCtrl.issueCredential
   );
