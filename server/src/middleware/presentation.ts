@@ -19,7 +19,10 @@ export const presentationSchemaBody = [
 export const presentationSchemaParams = [
   param('orgDid').trim().exists({ checkFalsy: true }).withMessage('orgDid can not be null or empty'),
 ];
-
+export const isIdExists = [param('id').trim().exists({ checkFalsy: true }).withMessage('Id cannot be null or empty')];
+export const isIdExistsInBody = [
+  body('_id').trim().exists({ checkFalsy: true }).withMessage('id can not be null or empty'),
+];
 export async function verifyOrigin(req, callback) {
   logger.info('Presentation middleware verifyOrigin() method starts');
   let corsOptions;

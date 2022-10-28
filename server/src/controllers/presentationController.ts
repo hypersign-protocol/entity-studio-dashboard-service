@@ -120,5 +120,60 @@ const presentationTempalate = async (req: Request, res: Response, next: NextFunc
     return next(ApiResponse.internal(null, error));
   }
 };
+const updatePresentation = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    logger.info('presentationControllers:: updatePresentation() method start ...');
+    const { _id, issuerDid, name, schemaId, reason, required, callbackUrl, hypersign, orgDid } = req.body;
+    const filter = { issuerDid, name, schemaId, reason, required, callbackUrl };
+    let templateData;
+    try {
+      templateData = await PresentationTemplateSchema.where({ _id, orgDid }).findOne();
+    } catch (e) {
+      return next(ApiResponse.badRequest(null, `${_id} is a invalid templateId`));
+    }
+    if (!templateData) {
+      return next(ApiResponse.badRequest(null, `No template exists with Id ${_id}`));
+    }
+    if (templateData.primaryDid !== hypersign.data.id) {
+      return next(ApiResponse.badRequest(null, 'You can not edit this template'));
+    }
+    templateData = await PresentationTemplateSchema.findByIdAndUpdate({ _id }, filter, { returnDocument: 'after' });
+    return next(ApiResponse.success(templateData));
+  } catch (e) {
+    logger.error('presentationControllers:: updatePresentation() method Error: ' + e);
+    return next(ApiResponse.internal(null, e));
+  }
+};
+const deletePresentationTemplate = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    logger.info('presentationControllers:: deletePresentationTemplate() method start ....');
+    const id = req.params.id;
+    const { hypersign } = req.body;
+    let templateDetail;
+    try {
+      templateDetail = await PresentationTemplateSchema.findById({ _id: id });
+    } catch (e) {
+      return next(ApiResponse.badRequest(null, `${id} is a invalid templateId`));
+    }
+    if (!templateDetail) {
+      return next(ApiResponse.badRequest(null, `No template exists with ${id}. `));
+    }
+    if (templateDetail.primaryDid !== hypersign.data.id) {
+      return next(ApiResponse.badRequest(null, `You can not delete this template`));
+    }
+    templateDetail = await PresentationTemplateSchema.findOneAndDelete({ _id: id });
+    return next(ApiResponse.success(templateDetail));
+  } catch (e) {
+    logger.error('presentationControllers:: deletePresentationTemplate() method Error: ' + e);
+    return next(ApiResponse.internal(null, e));
+  }
+};
 
-export { verifyPresentation, presentationTempalate, presentationTempalateAll, presentationTempalateById };
+export {
+  verifyPresentation,
+  presentationTempalate,
+  presentationTempalateAll,
+  presentationTempalateById,
+  deletePresentationTemplate,
+  updatePresentation,
+};
