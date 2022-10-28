@@ -6,6 +6,7 @@ import {
   checkIfIdExists,
   checkIfQueryExists,
   isValidField,
+  checkIfStatusExists,
 } from '../middleware/verifiableCredential';
 import { validateRequestSchema } from '../middleware/validateRequestSchema';
 
@@ -30,5 +31,12 @@ export const credentialRoutes = (hypersign) => {
   );
   router.post('/send', checkIfIdExists, validateRequestSchema, appCtrl.sendCredentialDetail);
   router.get('/walletAccepct', checkIfQueryExists, validateRequestSchema, appCtrl.acceptCredentials);
+  router.put(
+    '/',
+    hypersign.authorize.bind(hypersign),
+    checkIfStatusExists,
+    validateRequestSchema,
+    appCtrl.updateCredentials
+  );
   return router;
 };

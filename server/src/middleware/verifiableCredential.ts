@@ -32,6 +32,10 @@ export const checkIfQueryExists = [
   query('token').trim().exists({ checkFalsy: true }).withMessage('token should not be null or empty'),
 ];
 
+export const checkIfStatusExists = [
+  body('QR_DATA.status').trim().exists({ checkFalsy: true }).withMessage('status can not be null or empty'),
+];
+
 export async function isValidField(req, res, next) {
   try {
     logger.info('isValidField');
@@ -66,16 +70,7 @@ export async function isValidField(req, res, next) {
               break;
             }
             case 'boolean': {
-              if (
-                !(
-                  (typeof element.value === 'string' &&
-                    (element.value.toLowerCase() === 'true' || element.value.toLowerCase() === 'yes')) ||
-                  element.value.toLowerCase() === 'false' ||
-                  element.value.toLowerCase() === 'no' ||
-                  parseInt(element.value) === 1 ||
-                  parseInt(element.value) === 0
-                )
-              ) {
+              if (!(element.value === true || element.value === false)) {
                 return next(ApiResponse.badRequest(null, `Invalid type for field ${element.name}`));
               }
               break;
@@ -86,12 +81,16 @@ export async function isValidField(req, res, next) {
               }
               break;
             }
+            default: {
+              return next(ApiResponse.badRequest(null, `Invalid type for field ${element.name}`));
+            }
           }
-        } else {
-          logger.info('valid schema field');
-        }
+        } // else {
+        //   logger.info('valid schema field');
+        // }
       } catch (e) {
-        return next(ApiResponse.badRequest(null, 'Invalid schema field'));
+        console.log(e);
+        return next(ApiResponse.badRequest(null, e));
       }
     });
     req.body.QR_DATA.data.fields = tempFields;
