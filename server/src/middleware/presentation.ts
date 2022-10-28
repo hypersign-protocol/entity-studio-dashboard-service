@@ -2,6 +2,7 @@ import { body, param } from 'express-validator';
 import { isValidURL } from '../utils/fields';
 import { logger } from '../config';
 import presentationModel, { IPresentationTemplate } from '../models/presentationTemplateSchema';
+import { URL } from 'url';
 export const presentationSchemaBody = [
   body('queryType').trim().exists({ checkFalsy: true }).withMessage('queryType can not be null or empty'),
   body('domain').trim().exists({ checkFalsy: true }).withMessage('domain can not be null or empty'),

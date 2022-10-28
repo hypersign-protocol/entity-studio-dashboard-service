@@ -10,6 +10,7 @@ import { urlSanitizer } from '../utils/fields';
 const setCredentialStatus = async (req: Request, res: Response, next: NextFunction) => {
   try {
     logger.info('==========CredController ::setCredentialStatus Starts ================');
+    
     const id = req.params.id;
     if (!req.body.credStatus) {
       const { issuerDid, subjectDid, schemaId } = req.body.vc;
@@ -25,11 +26,12 @@ const setCredentialStatus = async (req: Request, res: Response, next: NextFuncti
         }
       );
     } else {
+      
       const { transactionHash, credStatus } = req.body;
       await creadSchema.findOneAndUpdate(
         { _id: id },
         {
-          status: credStatus,
+          status: credStatus.claim.currentStatus,
           transactionHash,
         }
       );
