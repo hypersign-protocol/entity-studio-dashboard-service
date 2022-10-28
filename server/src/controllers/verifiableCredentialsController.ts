@@ -220,7 +220,7 @@ const updateCredentials = async (req: Request, res: Response, next: NextFunction
         subjectDid: credData.subjectDid,
         orgDid: credData.orgDid,
         expirationDate: credData.expiryDate,
-        status,
+        status: 'Pending',
         vcId,
         credentialStatusUrl: credData.vc_id,
         _id: credData._id,
