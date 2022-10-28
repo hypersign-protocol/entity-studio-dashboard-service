@@ -70,7 +70,7 @@ export async function isValidField(req, res, next) {
               break;
             }
             case 'boolean': {
-              if (!(element.value === (true || 1) || element.value === (false || 0))) {
+              if (!(element.value === true || element.value === false)) {
                 return next(ApiResponse.badRequest(null, `Invalid type for field ${element.name}`));
               }
               break;
