@@ -195,13 +195,12 @@ const acceptCredentials = async (req: Request, res: Response, next: NextFunction
 const updateCredentials = async (req: Request, res: Response, next: NextFunction) => {
   try {
     logger.info('credController :: updateCredential() method start...');
-    const { vcId, status } = req.body.QR_DATA.data;
-    console.log(vcId);
+    const { vcId, status } = req.body.QR_DATA;
     let credData: any = await creadSchema.findOne({ 'vc.id': vcId });
     if (!credData) {
       return next(ApiResponse.badRequest(null, 'Invalid credential detail'));
     } else if (credData.status === 'Revoked') {
-      return next(ApiResponse.badRequest(null, 'You can not edit crededntial if it revoked'));
+      return next(ApiResponse.badRequest(null, 'You can not edit credential if it is revoked'));
     } else {
       credData = await creadSchema.findOneAndUpdate({ 'vc.id': vcId }, { status }, { returnDocument: 'after' });
     }

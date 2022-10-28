@@ -32,6 +32,10 @@ export const checkIfQueryExists = [
   query('token').trim().exists({ checkFalsy: true }).withMessage('token should not be null or empty'),
 ];
 
+export const checkIfStatusExists = [
+  body('QR_DATA.status').trim().exists({ checkFalsy: true }).withMessage('status can not be null or empty'),
+];
+
 export async function isValidField(req, res, next) {
   try {
     logger.info('isValidField');
