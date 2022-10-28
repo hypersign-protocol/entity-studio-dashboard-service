@@ -10,7 +10,7 @@ import { urlSanitizer } from '../utils/fields';
 const setCredentialStatus = async (req: Request, res: Response, next: NextFunction) => {
   try {
     logger.info('==========CredController ::setCredentialStatus Starts ================');
-    
+
     const id = req.params.id;
     if (!req.body.credStatus) {
       const { issuerDid, subjectDid, schemaId } = req.body.vc;
@@ -26,7 +26,6 @@ const setCredentialStatus = async (req: Request, res: Response, next: NextFuncti
         }
       );
     } else {
-      
       const { transactionHash, credStatus } = req.body;
       await creadSchema.findOneAndUpdate(
         { _id: id },
@@ -204,7 +203,11 @@ const updateCredentials = async (req: Request, res: Response, next: NextFunction
     } else if (credData.status === 'Revoked') {
       return next(ApiResponse.badRequest(null, 'You can not edit credential if it is revoked'));
     } else {
-      credData = await creadSchema.findOneAndUpdate({ 'vc.id': vcId }, { status }, { returnDocument: 'after' });
+      credData = await creadSchema.findOneAndUpdate(
+        { 'vc.id': vcId },
+        { status: 'Pending' },
+        { returnDocument: 'after' }
+      );
     }
     const QR_DATA = {
       QRType: 'ISSUE_CREDENTIAL',
@@ -220,7 +223,7 @@ const updateCredentials = async (req: Request, res: Response, next: NextFunction
         subjectDid: credData.subjectDid,
         orgDid: credData.orgDid,
         expirationDate: credData.expiryDate,
-        status: 'Pending',
+        status,
         vcId,
         credentialStatusUrl: credData.vc_id,
         _id: credData._id,
