@@ -3,6 +3,7 @@ import PresentationTemplateSchema, { IPresentationTemplate } from '../models/pre
 import OrgSchema, { IOrg } from '../models/OrgSchema';
 import { logger, studioServerBaseUrl } from '../config';
 import { urlSanitizer } from '../utils/fields';
+import userCredInfoModel, { IUserPresentation } from '../models/userCredentialInfo';
 
 import { uuid } from 'uuidv4';
 
@@ -56,6 +57,12 @@ export async function verify(req, res, next) {
     logger.info('pCntrl:: verify() method start....');
     const { challenge, vp } = req.body;
     let { holderDidDocSigned } = req.body;
+    const presentationInfo = JSON.parse(vp);
+    await userCredInfoModel.create({
+      holderDid: presentationInfo.holder,
+      credentialId: presentationInfo.verifiableCredential[0].id,
+      credentialDetail: presentationInfo.verifiableCredential[0].credentialSubject,
+    });
     const publicKeyMultiBase = JSON.parse(holderDidDocSigned).id.split(':').at(-1);
     const parsedDidDoc = JSON.parse(holderDidDocSigned);
     parsedDidDoc.verificationMethod[0].publicKeyMultibase = publicKeyMultiBase;
