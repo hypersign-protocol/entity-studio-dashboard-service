@@ -78,7 +78,6 @@ const getCread = async (id) => {
 const issueCredential = async (req: Request, res: Response, next: NextFunction) => {
   try {
     logger.info('==========CredController ::issueCredential Starts ================');
-
     const { QR_DATA, hypersign } = req.body;
     const { issuerDid, subjectDid, schemaId, orgDid, expirationDate } = QR_DATA.data;
     QR_DATA.data.issuerDid = hypersign.data.id;
@@ -90,9 +89,9 @@ const issueCredential = async (req: Request, res: Response, next: NextFunction) 
       status: 'Initiated',
       createdAt: new Date(),
       orgDid,
-      expirationDate: new Date(expirationDate),
+      expiryDate: new Date(expirationDate),
     });
-
+    QR_DATA.expirationDate = new Date(expirationDate);
     QR_DATA.serviceEndpoint = `${WALLET_WEB_HOOK_CREAD}/${creadObj._id}`;
 
     logger.info('==========CredController ::issueCredential Ends ================');
