@@ -1,11 +1,14 @@
 var QRCode = require('qrcode');
 //import axios, * as others from 'axios';
 const axios = require('axios').default;
-
+console.log(axios)
+const { resolve } = require('path');
+const { rejects } = require('assert');
 const HS_EVENTS_ENUM = {
   ERROR: 'studio-error',
   SUCCESS: 'studio-success',
-  WAITING: 'studio-wait', 
+  WAITING: 'studio-wait',
+  
 };
 
 /**
@@ -28,7 +31,7 @@ function dispatchEvent(eventType, message) {
   );
 }
 
-function initiateEventSource({ hsWalletBaseURL, eventSourceURL, hsLoginBtnDOM, hsLoginQRDOM, hsloginBtnText }) {
+async function initiateEventSource({ hsWalletBaseURL, eventSourceURL, hsLoginBtnDOM, hsLoginQRDOM, hsloginBtnText }) {
   const source = new EventSource(eventSourceURL);
   source.onopen = () => {
     console.log('Connections to the server established');
@@ -49,15 +52,15 @@ function initiateEventSource({ hsWalletBaseURL, eventSourceURL, hsLoginBtnDOM, h
             });
           } else if (dataParsed.op === 'end') {
             console.log(dataParsed)
-            if (dataParsed.accessToken) {
+          //  if (dataParsed.accessToken) {
                const accessToken = dataParsed.accessToken
-            fetchData(accessToken)
+             fetchData(accessToken)
             .then(res => {
              console.log(res)
             }).catch(error => {
             dispatchEvent(HS_EVENTS_ENUM.ERROR, error.message);        
            })
-            }
+          //  }
            
            // console.log(JSON.stringify(data))
             dispatchEvent(HS_EVENTS_ENUM.SUCCESS, dataParsed.message);
@@ -122,11 +125,11 @@ async function fetchData(accessToken) {
    })
      data .then((res) => {
        console.log(res)
-      // resolve(res)
+       resolve(res)
       })
       .catch((error) => {
       console.log(error)
-     // rejects(error)
+      rejects(error)
     })
  //  const datatest = await data.json()
     //console.log()
