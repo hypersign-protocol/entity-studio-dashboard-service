@@ -128,7 +128,7 @@ const getCredentialList = async (req: Request, res: Response, next: NextFunction
 
     const { hypersign } = req.body;
     const orgDid = req.params.orgDid;
-    const credList = await creadSchema.find({ issuerDid: hypersign.data.id, orgDid }).sort({ createdAt: -1 });
+    const credList = await creadSchema.find({ orgDid }).sort({ createdAt: -1 });
     logger.info('==========CredController ::getCredentialList Ends ================');
     return next(ApiResponse.success({ credList }));
   } catch (error) {

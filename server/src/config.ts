@@ -52,7 +52,10 @@ const did = {
   method: process.env.DID_METHOD_NAME || 'hypersign',
 };
 const studioServerBaseUrl = process.env.STUDIO_SERVER_BASE_URL;
-const jwtSecret = process.env.JWT_SECRET || 'secretKey';
+//Secrets
+const rawData = fs.readFileSync('hypersign.json');
+const hypersignjsondata = JSON.parse(rawData.toString());
+const jwtSecret = process.env.JWT_SECRET || hypersignjsondata.jwt.secret || 'secretKey';
 const jwtExpiryInMilli = 240000;
 
 const nodeServer = {

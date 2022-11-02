@@ -7,13 +7,14 @@ import {
   deletePresentationTemplate,
   updatePresentation,
 } from '../controllers/presentationController';
-import { getChallenge, verify } from '../controllers/pController';
+import { getChallenge, verify, getUserCredDetail } from '../controllers/pController';
 import {
   presentationSchemaBody,
   presentationSchemaParams,
   verifyOrigin,
   isIdExists,
   isIdExistsInBody,
+  isAccessTokenExists,
 } from '../middleware/presentation';
 import { validateRequestSchema } from '../middleware/validateRequestSchema';
 import cors from 'cors';
@@ -56,6 +57,7 @@ export const presentationRoute = (hypersign) => {
 
 export const presentationRequestRoute = () => {
   const router = Router();
+  router.get('/info', isAccessTokenExists, getUserCredDetail);
   router.get('/:presentationTemplateId', cors(verifyOrigin), getChallenge);
 
   return router;

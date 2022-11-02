@@ -1,9 +1,11 @@
 var QRCode = require('qrcode');
+//import axios, * as others from 'axios';
+const axios = require('axios').default;
 
 const HS_EVENTS_ENUM = {
   ERROR: 'studio-error',
   SUCCESS: 'studio-success',
-  WAITING: 'studio-wait',
+  WAITING: 'studio-wait', 
 };
 
 /**
@@ -37,7 +39,6 @@ function initiateEventSource({ hsWalletBaseURL, eventSourceURL, hsLoginBtnDOM, h
       try {
         const dataParsed = JSON.parse(e.data);
         if (dataParsed) {
-          // console.log(dataParsed.op)
           if (dataParsed.op === 'init') {
             formQRAndButtonHTML({
               hsWalletBaseURL,
@@ -47,7 +48,20 @@ function initiateEventSource({ hsWalletBaseURL, eventSourceURL, hsLoginBtnDOM, h
               hsloginBtnText,
             });
           } else if (dataParsed.op === 'end') {
+            console.log(dataParsed)
+            if (dataParsed.accessToken) {
+               const accessToken = dataParsed.accessToken
+            fetchData(accessToken)
+            .then(res => {
+             console.log(res)
+            }).catch(error => {
+            dispatchEvent(HS_EVENTS_ENUM.ERROR, error.message);        
+           })
+            }
+           
+           // console.log(JSON.stringify(data))
             dispatchEvent(HS_EVENTS_ENUM.SUCCESS, dataParsed.message);
+            //dispatchEvent(HS_EVENTS_ENUM.SUCCESS, data)
             source.close();
           } else if (dataParsed.op === 'processing') {
             dispatchEvent(HS_EVENTS_ENUM.WAITING, dataParsed.message);
@@ -96,6 +110,30 @@ function sanitizeURL(url) {
   }
 }
 
+async function fetchData(accessToken) {
+  let data;
+  if (accessToken) {
+    console.log(accessToken)
+    const url = "http://localhost:9000/api/v1/presentation/request/info"
+    data= axios.get(url, {
+      headers: {
+        accessToken
+      }
+   })
+     data .then((res) => {
+       console.log(res)
+      // resolve(res)
+      })
+      .catch((error) => {
+      console.log(error)
+     // rejects(error)
+    })
+ //  const datatest = await data.json()
+    //console.log()
+  } 
+    return data
+
+}
 /**
  * Starts the program
  * @returns void
@@ -103,6 +141,7 @@ function sanitizeURL(url) {
 function start() {
   try {
     if (!checkForEventSourceSupport()) {
+      console.log('========')
       throw new Error(
         'Your browser does not support EventSource (https://developer.mozilla.org/en-US/docs/Web/API/EventSource). Try different browser'
       );

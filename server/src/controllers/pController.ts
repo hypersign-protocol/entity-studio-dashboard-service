@@ -1,11 +1,12 @@
 import PresentationRequestSchema, { IPresentationRequest } from '../models/PresentationRequest';
 import PresentationTemplateSchema, { IPresentationTemplate } from '../models/presentationTemplateSchema';
 import OrgSchema, { IOrg } from '../models/OrgSchema';
-import { logger, studioServerBaseUrl } from '../config';
+import { logger, studioServerBaseUrl, jwtSecret } from '../config';
 import { urlSanitizer } from '../utils/fields';
 import userCredInfoModel, { IUserPresentation } from '../models/userCredentialInfo';
-
+import JWT from 'jsonwebtoken';
 import { uuid } from 'uuidv4';
+import ApiResponse from '../response/apiResponse';
 
 import HIDWallet from 'hid-hd-wallet';
 import HypersignSsiSDK from 'hs-ssi-sdk';
@@ -48,6 +49,7 @@ const verifyPresentation = async (vp, challenge, issuerDid, holderDid, domain, h
 };
 
 function writeServerSendEvent(res, sseId, data) {
+  console.log(data);
   res.write('id: ' + sseId + '\n');
   res.write('data: ' + data + '\n\n');
 }
@@ -57,13 +59,8 @@ export async function verify(req, res, next) {
     logger.info('pCntrl:: verify() method start....');
     const { challenge, vp } = req.body;
     let { holderDidDocSigned } = req.body;
-    const presentationInfo = JSON.parse(vp);
-    await userCredInfoModel.create({
-      holderDid: presentationInfo.holder,
-      credentialId: presentationInfo.verifiableCredential[0].id,
-      credentialDetail: presentationInfo.verifiableCredential[0].credentialSubject,
-    });
-    const publicKeyMultiBase = JSON.parse(holderDidDocSigned).id.split(':').at(-1);
+    const publicKeyMultiBaseTemp = JSON.parse(holderDidDocSigned).id.split(':'); //[-1];
+    const publicKeyMultiBase = publicKeyMultiBaseTemp[publicKeyMultiBaseTemp.length - 1];
     const parsedDidDoc = JSON.parse(holderDidDocSigned);
     parsedDidDoc.verificationMethod[0].publicKeyMultibase = publicKeyMultiBase;
     holderDidDocSigned = JSON.stringify(parsedDidDoc);
@@ -117,7 +114,15 @@ export async function verify(req, res, next) {
       // TODO: 4. send data or create JWT
 
       // TODO: 5. Update the status to success i.e 1 in background
-      PresentationRequestSchema.findOneAndUpdate({ challenge: challenge }, { status: 1 }).exec();
+      const presentationInfo = JSON.parse(vp);
+      logger.info('pCntrl:: verify() method storing cred data to db');
+      const userCredInfo = await userCredInfoModel.create({
+        holderDid: presentationInfo.holder,
+        credentialId: presentationInfo.verifiableCredential[0].id,
+        credentialDetail: presentationInfo.verifiableCredential[0].credentialSubject,
+      });
+      const accessToken = JWT.sign({ id: userCredInfo._id }, jwtSecret, { expiresIn: '5m' });
+      PresentationRequestSchema.findOneAndUpdate({ challenge: challenge }, { status: 1, accessToken }).exec();
       logger.info('pCntrl:: verify() method ends....');
 
       return res.status(200).send({ status: 200, message: 'OK', error: null });
@@ -197,6 +202,7 @@ export async function getChallenge(req, res, next) {
             if (result.status === 1) {
               QR_DATA.op = 'end';
               QR_DATA['message'] = 'Verified';
+              QR_DATA['accessToken'] = result.accessToken;
               // TODO: 4. end the interval and end the response
               writeServerSendEvent(res, sseId, JSON.stringify(QR_DATA));
 
@@ -204,6 +210,7 @@ export async function getChallenge(req, res, next) {
               clearInterval(setinterval);
               return res.end();
             } else {
+              console.log('============-------------8888888888');
               QR_DATA.op = 'processing';
               QR_DATA['message'] = 'Waiting for verificaiton...';
               // TODO: 4.  wait till the challege is verified
@@ -218,13 +225,14 @@ export async function getChallenge(req, res, next) {
 
     // The interval should also close once the challenge is expired
     setTimeout(() => {
+      console.log('setTimeOut');
       const QR_DATA = {
         op: '',
         message: '',
       };
       QR_DATA.op = 'end';
       QR_DATA['message'] = 'Challenge expired';
-
+      console.log(res, sseId, JSON.stringify(QR_DATA));
       writeServerSendEvent(res, sseId, JSON.stringify(QR_DATA));
       clearInterval(setinterval);
       return res.end();
@@ -235,5 +243,22 @@ export async function getChallenge(req, res, next) {
     logger.error('==========SchemaController ::getSchemaById Ends================');
     logger.error('SchemaController ::getSchemaById : Error', error);
     res.status(500).json(error);
+  }
+}
+
+export async function getUserCredDetail(req, res, next) {
+  try {
+    logger.info('pCtrl:: getUserCredDetail() method starts....');
+    const { accessToken } = req.headers;
+    const decode = await JWT.decode(accessToken);
+    const userDetail = await userCredInfoModel.findOne({ _id: decode.id });
+    if (!userDetail) {
+      return next(ApiResponse.badRequest(null, `User detail for ${decode.id} does not exists`));
+    }
+    console.log(userDetail);
+    return next(ApiResponse.success({ userDetail }));
+  } catch (e) {
+    logger.info('pCtrl:: getUserCredDetail() method Error: ' + e);
+    return next(ApiResponse.internal(null, e));
   }
 }
