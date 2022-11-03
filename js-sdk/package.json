@@ -3,7 +3,7 @@
   "version": "1.0.2",
   "description": "",
   "scripts": {
-    "dev": "parcel index.html",
+    "dev": "parcel index.html ",
     "build": "npm run pretty && npm run lint && parcel build index.js --public-url '.'",
     "lint": "eslint index.js",
     "pretty": "prettier --config .prettierrc.json --write index.js index.html",
@@ -13,12 +13,16 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "buffer": "^6.0.3",
     "eslint": "^8.3.0",
     "parcel": "^2.0.1",
     "prettier": "^2.5.0"
   },
   "dependencies": {
     "axios": "^1.1.3",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "node-fetch": "^3.2.10",
     "path": "^0.12.7",
     "qrcode": "^1.5.0"
   }
