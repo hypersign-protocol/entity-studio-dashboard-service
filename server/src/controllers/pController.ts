@@ -49,7 +49,6 @@ const verifyPresentation = async (vp, challenge, issuerDid, holderDid, domain, h
 };
 
 function writeServerSendEvent(res, sseId, data) {
-  console.log(data);
   res.write('id: ' + sseId + '\n');
   res.write('data: ' + data + '\n\n');
 }
@@ -190,7 +189,6 @@ export async function getChallenge(req, res, next) {
     res.setHeader('X-Accel-Buffering', 'no');
 
     const sseId = challenge;
-
     const setinterval = setInterval(function () {
       PresentationRequestSchema.findOne({ challenge: challenge })
         .then((result) => {
@@ -204,17 +202,16 @@ export async function getChallenge(req, res, next) {
               QR_DATA['message'] = 'Verified';
               QR_DATA['accessToken'] = result.accessToken;
               // TODO: 4. end the interval and end the response
-              writeServerSendEvent(res, sseId, JSON.stringify(QR_DATA));
+              clearInterval(setinterval);
+
+              return writeServerSendEvent(res, sseId, JSON.stringify(QR_DATA));
 
               // The interval will be closed one its verified
-              clearInterval(setinterval);
-              return res.end();
             } else {
-              console.log('============-------------8888888888');
               QR_DATA.op = 'processing';
               QR_DATA['message'] = 'Waiting for verificaiton...';
               // TODO: 4.  wait till the challege is verified
-              writeServerSendEvent(res, sseId, JSON.stringify(QR_DATA));
+              return writeServerSendEvent(res, sseId, JSON.stringify(QR_DATA));
             }
           }
         })
@@ -225,14 +222,12 @@ export async function getChallenge(req, res, next) {
 
     // The interval should also close once the challenge is expired
     setTimeout(() => {
-      console.log('setTimeOut');
       const QR_DATA = {
         op: '',
         message: '',
       };
       QR_DATA.op = 'end';
       QR_DATA['message'] = 'Challenge expired';
-      console.log(res, sseId, JSON.stringify(QR_DATA));
       writeServerSendEvent(res, sseId, JSON.stringify(QR_DATA));
       clearInterval(setinterval);
       return res.end();
@@ -249,16 +244,33 @@ export async function getChallenge(req, res, next) {
 export async function getUserCredDetail(req, res, next) {
   try {
     logger.info('pCtrl:: getUserCredDetail() method starts....');
-    const { accessToken } = req.headers;
-    const decode = await JWT.decode(accessToken);
-    const userDetail = await userCredInfoModel.findOne({ _id: decode.id });
-    if (!userDetail) {
-      return next(ApiResponse.badRequest(null, `User detail for ${decode.id} does not exists`));
+    const { accesstoken } = req.headers;
+    let id;
+
+    if (!accesstoken) {
+      return next(ApiResponse.badRequest(null, 'Please send accessToken in header'));
     }
-    console.log(userDetail);
+    await JWT.verify(accesstoken, jwtSecret, async (err, decode) => {
+      if (err) {
+        if (err.name === 'JsonWebTokenError') {
+          return next(ApiResponse.badRequest(null, 'Token is invalid'));
+        } else {
+          if (err.name === 'TokenExpiredError') {
+            return next(ApiResponse.badRequest(null, 'Token has expired'));
+          }
+        }
+      }
+      id = decode.id;
+    });
+    const userDetail = await userCredInfoModel.findOne({ _id: id });
+    if (!userDetail) {
+      return next(ApiResponse.badRequest(null, `User detail for ${id} does not exists`));
+    }
+
+    await userCredInfoModel.findByIdAndDelete({ _id: id });
     return next(ApiResponse.success({ userDetail }));
   } catch (e) {
-    logger.info('pCtrl:: getUserCredDetail() method Error: ' + e);
+    logger.error('pCtrl:: getUserCredDetail() method Error: ' + e);
     return next(ApiResponse.internal(null, e));
   }
 }

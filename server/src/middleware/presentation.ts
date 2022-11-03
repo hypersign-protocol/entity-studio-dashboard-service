@@ -24,7 +24,13 @@ export const isIdExistsInBody = [
   body('_id').trim().exists({ checkFalsy: true }).withMessage('id can not be null or empty'),
 ];
 export const isAccessTokenExists = [
-  header('accessToken').trim().exists({ checkFalsy: true }).withMessage('Please send accessToken'),
+  header('accesstoken')
+    .trim()
+    .exists({ checkFalsy: true })
+    .custom((value) => {
+      return true;
+    })
+    .withMessage('Please send accessToken'),
 ];
 export async function verifyOrigin(req, callback) {
   logger.info('Presentation middleware verifyOrigin() method starts');
