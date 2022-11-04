@@ -7,9 +7,9 @@ export interface IOrg extends Document {
   domain: string;
   logo: string;
   status: string;
-  schemaCount: string;
-  credentialCount: string;
-  templateCount: string;
+  schemasCount: string;
+  credentialsCount: string;
+  templatesCount: string;
 }
 export const OrgDbSchema = new Schema({
   status: {
@@ -40,17 +40,17 @@ export const OrgDbSchema = new Schema({
     type: String,
     required: false,
   },
-  schemaCount: {
+  schemasCount: {
     type: Number,
     required: false,
     default: 0,
   },
-  credCount: {
+  credentialsCount: {
     type: Number,
     required: false,
     default: 0,
   },
-  templateCount: {
+  templatesCount: {
     type: Number,
     required: false,
     default: 0,

@@ -93,13 +93,13 @@ const issueCredential = async (req: Request, res: Response, next: NextFunction) 
       expiryDate: new Date(expirationDate),
     });
     const orgDetail: any = await orgModel.findById({ _id: creadObj.orgDid });
-    let credentialCount;
-    if (!orgDetail.credentialCount) {
-      credentialCount = await creadSchema.countDocuments({ orgDid: creadObj.orgDid });
+    let credentialsCount;
+    if (!orgDetail.credentialsCount) {
+      credentialsCount = await creadSchema.countDocuments({ orgDid: creadObj.orgDid });
     } else {
-      credentialCount = orgDetail.credentialCount + 1;
+      credentialsCount = orgDetail.credentialsCount + 1;
     }
-    await orgModel.findByIdAndUpdate({ _id: creadObj.orgDid }, { credentialCount });
+    await orgModel.findByIdAndUpdate({ _id: creadObj.orgDid }, { credentialsCount });
 
     QR_DATA.expirationDate = new Date(expirationDate);
     QR_DATA.serviceEndpoint = `${WALLET_WEB_HOOK_CREAD}/${creadObj._id}`;

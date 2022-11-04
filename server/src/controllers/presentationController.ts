@@ -115,13 +115,13 @@ const presentationTempalate = async (req: Request, res: Response, next: NextFunc
       primaryDid: data.id,
     });
     const orgDetail: any = await OrgModel.findById({ _id: presentationTemplateObj.orgDid });
-    let templateCount;
-    if (!orgDetail.templateCount) {
-      templateCount = await PresentationTemplateSchema.countDocuments({ orgdid: presentationTemplateObj.orgDid });
+    let templatesCount;
+    if (!orgDetail.templatesCount) {
+      templatesCount = await PresentationTemplateSchema.countDocuments({ orgDid: presentationTemplateObj.orgDid });
     } else {
-      templateCount = orgDetail.templateCount + 1;
+      templatesCount = orgDetail.templatesCount + 1;
     }
-    await OrgModel.findByIdAndUpdate({ _id: presentationTemplateObj.orgDid }, { templateCount });
+    await OrgModel.findByIdAndUpdate({ _id: presentationTemplateObj.orgDid }, { templatesCount });
 
     logger.info('presentationControllers:: presentationTempalate() method ends...');
     return next(ApiResponse.success({ presentationTemplateObj }));
@@ -172,6 +172,8 @@ const deletePresentationTemplate = async (req: Request, res: Response, next: Nex
       return next(ApiResponse.badRequest(null, `You can not delete this template`));
     }
     templateDetail = await PresentationTemplateSchema.findOneAndDelete({ _id: id });
+    await OrgModel.findByIdAndUpdate({ _id: templateDetail.orgDid }, { $inc: { templatesCount: -1 } });
+
     return next(ApiResponse.success(templateDetail));
   } catch (e) {
     logger.error('presentationControllers:: deletePresentationTemplate() method Error: ' + e);

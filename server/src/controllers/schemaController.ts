@@ -18,14 +18,14 @@ const saveSchema = async (req: Request, res: Response, next: NextFunction) => {
       status: 'Initiated',
     });
     const orgDetail: any = await orgModel.findById({ _id: SchemaObj.orgDid });
-    let schemaCount;
-    if (!orgDetail.schemaCount) {
-      schemaCount = await Schema.countDocuments({ orgDid: SchemaObj.orgDid });
+    let schemasCount;
+    if (!orgDetail.schemasCount) {
+      schemasCount = await Schema.countDocuments({ orgDid: SchemaObj.orgDid });
     } else {
-      schemaCount = orgDetail['schemaCount'] + 1;
+      schemasCount = orgDetail['schemasCount'] + 1;
     }
 
-    await orgModel.findByIdAndUpdate({ _id: SchemaObj.orgDid }, { schemaCount });
+    await orgModel.findByIdAndUpdate({ _id: SchemaObj.orgDid }, { schemasCount });
     QR_DATA.serviceEndpoint = `${WALLET_WEBHOOK}/${SchemaObj._id}`;
     logger.info('==========SchemaController ::saveSchema Ends ================');
     return next(ApiResonse.success({ QR_DATA, schema: SchemaObj }));
