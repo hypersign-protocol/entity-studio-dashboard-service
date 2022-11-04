@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { jwtExpiryInMilli, jwtSecret, pathToIssueCred, studioServerBaseUrl, logger, sse_client } from '../config';
 import jwt from 'jsonwebtoken';
-import creadSchema from '../models/CreadSchema';
+import creadSchema, { ICreadSchema } from '../models/CreadSchema';
 import { WALLET_WEB_HOOK_CREAD } from '../config';
 import { send } from '../services/sse';
 import ApiResponse from '../response/apiResponse';
@@ -10,13 +10,32 @@ import { urlSanitizer } from '../utils/fields';
 const setCredentialStatus = async (req: Request, res: Response, next: NextFunction) => {
   try {
     logger.info('==========CredController ::setCredentialStatus Starts ================');
-    const id = req.params.id;
-    const { issuerDid, subjectDid, schemaId } = req.body.vc;
 
-    const credObj = await creadSchema.findOneAndUpdate(
-      { _id: id },
-      { vc: req.body.vc, vc_id: req.body.vc.credentialStatus.id, issuerDid, subjectDid, schemaId, status: 'Registered' }
-    );
+    const id = req.params.id;
+    if (!req.body.credStatus) {
+      const { issuerDid, subjectDid, schemaId } = req.body.vc;
+      const credObj = await creadSchema.findOneAndUpdate(
+        { _id: id },
+        {
+          vc: req.body.vc,
+          vc_id: req.body.vc.credentialStatus.id,
+          issuerDid,
+          subjectDid,
+          schemaId,
+          status: 'Registered',
+        }
+      );
+    } else {
+      const { transactionHash, credStatus } = req.body;
+      await creadSchema.findOneAndUpdate(
+        { _id: id },
+        {
+          status: credStatus.claim.currentStatus,
+          transactionHash,
+        }
+      );
+    }
+
     logger.info('==========CredController ::setCredentialStatus Ends ================');
 
     res.json({ msg: 'success' });
@@ -59,9 +78,8 @@ const getCread = async (id) => {
 const issueCredential = async (req: Request, res: Response, next: NextFunction) => {
   try {
     logger.info('==========CredController ::issueCredential Starts ================');
-
     const { QR_DATA, hypersign } = req.body;
-    const { issuerDid, subjectDid, schemaId, orgDid, expiryDate } = QR_DATA.data;
+    const { issuerDid, subjectDid, schemaId, orgDid, expirationDate } = QR_DATA.data;
     QR_DATA.data.issuerDid = hypersign.data.id;
 
     const creadObj = await creadSchema.create({
@@ -71,10 +89,9 @@ const issueCredential = async (req: Request, res: Response, next: NextFunction) 
       status: 'Initiated',
       createdAt: new Date(),
       orgDid,
-      expiryDate,
+      expiryDate: new Date(expirationDate),
     });
-
-    QR_DATA.data.expirationDate = new Date(expiryDate);
+    QR_DATA.expirationDate = new Date(expirationDate);
     QR_DATA.serviceEndpoint = `${WALLET_WEB_HOOK_CREAD}/${creadObj._id}`;
 
     logger.info('==========CredController ::issueCredential Ends ================');
@@ -174,6 +191,52 @@ const acceptCredentials = async (req: Request, res: Response, next: NextFunction
     res.status(500).json(error);
   }
 };
+const updateCredentials = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    logger.info('credController :: updateCredential() method start...');
+    const { vcId, status, statusReason } = req.body.QR_DATA;
+    let credData: any = await creadSchema.findOne({ 'vc.id': vcId });
+    if (!credData) {
+      return next(ApiResponse.badRequest(null, 'Invalid credential detail'));
+    } else if (credData.status === 'Revoked') {
+      return next(ApiResponse.badRequest(null, 'You can not edit credential if it is revoked'));
+    } else {
+      credData = await creadSchema.findOneAndUpdate(
+        { 'vc.id': vcId },
+        { status: 'Pending' },
+        { returnDocument: 'after' }
+      );
+    }
+    const QR_DATA = {
+      QRType: 'ISSUE_CREDENTIAL',
+      serviceEndpoint: '',
+      schemaId: '',
+      appDid: '',
+      appName: 'Hypersign Studio',
+      challenge: '',
+      provider: '',
+      data: {
+        schemaId: credData.schemaId,
+        issuerDid: credData.issuerDid,
+        subjectDid: credData.subjectDid,
+        orgDid: credData.orgDid,
+        expirationDate: credData.expiryDate,
+        status,
+        statusReason,
+        vcId,
+        credentialStatusUrl: credData.vc_id,
+        _id: credData._id,
+      },
+    };
+    QR_DATA.serviceEndpoint = `${WALLET_WEB_HOOK_CREAD}/${credData._id}`;
+
+    logger.info('CredController :: updateCredential() method end...');
+    return next(ApiResponse.success({ QR_DATA }));
+  } catch (e) {
+    logger.error('CredController :: updateCredential() method: Error ' + e);
+    return next(ApiResponse.internal(null, e));
+  }
+};
 export {
   issueCredential,
   getCredentialList,
@@ -181,4 +244,5 @@ export {
   sendCredentialDetail,
   acceptCredentials,
   getCredentialById,
+  updateCredentials,
 };

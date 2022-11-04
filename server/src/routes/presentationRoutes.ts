@@ -4,9 +4,17 @@ import {
   verifyPresentation,
   presentationTempalateAll,
   presentationTempalateById,
+  deletePresentationTemplate,
+  updatePresentation,
 } from '../controllers/presentationController';
 import { getChallenge, verify } from '../controllers/pController';
-import { presentationSchemaBody, presentationSchemaParams, verifyOrigin } from '../middleware/presentation';
+import {
+  presentationSchemaBody,
+  presentationSchemaParams,
+  verifyOrigin,
+  isIdExists,
+  isIdExistsInBody,
+} from '../middleware/presentation';
 import { validateRequestSchema } from '../middleware/validateRequestSchema';
 import cors from 'cors';
 
@@ -28,6 +36,21 @@ export const presentationRoute = (hypersign) => {
     validateRequestSchema,
     presentationTempalateAll
   );
+  router.put(
+    '/template',
+    hypersign.authorize.bind(hypersign),
+    presentationSchemaBody,
+    isIdExistsInBody,
+    updatePresentation
+  );
+  router.delete(
+    '/template/:id',
+    hypersign.authorize.bind(hypersign),
+    isIdExists,
+    validateRequestSchema,
+    deletePresentationTemplate
+  );
+
   return router;
 };
 

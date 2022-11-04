@@ -88,7 +88,7 @@ const walletOptions = {
 };
 const pathToIssueCred = process.env.PATH_TO_ISSUE_CRED;
 const whitelistedCors = process.env.WHITELISTED_CORS || ['*'];
-const rpcEndPoint =
+const schemaResolver =
   process.env.RPC_ENDPOINT || 'https://jagrat.hypersign.id/rest/hypersign-protocol/hidnode/ssi/schema/';
 
 export {
@@ -114,5 +114,5 @@ export {
   walletOptions,
   sse_client,
   whitelistedCors,
-  rpcEndPoint,
+  schemaResolver,
 };
