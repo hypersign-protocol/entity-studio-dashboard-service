@@ -1,12 +1,13 @@
 <html>
   <head>
     <title>Hypersign Js Frontend SDK</title>
-    <link href="style.css" rel="stylesheet" />
+    <link href="./style.css" rel="stylesheet" />
   </head>
   <body>
     <div class="box">
       <h2>Login</h2>
-      <p>
+      <p id="display-data" style="display: none; "></p>
+      <p id="qr-and-qr-text">
         <canvas id="studio-qr"></canvas>
         <span>Scan the QR code </span>
       </p>
@@ -14,12 +15,12 @@
       <div id="studio-btn"></div>
 
       <script
-        type="module"
-        src="index.js"
+      type="text/javascript"
+        src="./index.js"
         data-button-text="Present Presentation"
         data-hs-wallet-base-url="https://wallet-stage.hypersign.id"
-        data-presentation-request-endpoint="https://stage.hypermine.in/studioserver/api/v1/presentation/request/"
-        data-presentation-template-id="631ad7e31a837bfc1cba2338"
+        data-presentation-request-endpoint="http://localhost:9000/api/v1/presentation/request/"
+        data-presentation-template-id="63651460a798e8841ccf03a3"
       ></script>
     </div>
   </body>
@@ -27,7 +28,10 @@
 
 <script>
   document.addEventListener('studio-success', function (e) {
-    alert(e.detail);
+    alert('Success');
+    document.getElementById('qr-and-qr-text').style.display = 'none';
+    document.getElementById('display-data').style.display = 'block';
+    document.getElementById('display-data').innerHTML=JSON.stringify(e.detail,null,2);
   });
 
   document.addEventListener('studio-wait', function (e) {

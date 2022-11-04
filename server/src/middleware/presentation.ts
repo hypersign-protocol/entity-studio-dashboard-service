@@ -1,4 +1,4 @@
-import { body, param } from 'express-validator';
+import { body, param, header } from 'express-validator';
 import { isValidURL } from '../utils/fields';
 import { logger } from '../config';
 import presentationModel, { IPresentationTemplate } from '../models/presentationTemplateSchema';
@@ -23,11 +23,21 @@ export const isIdExists = [param('id').trim().exists({ checkFalsy: true }).withM
 export const isIdExistsInBody = [
   body('_id').trim().exists({ checkFalsy: true }).withMessage('id can not be null or empty'),
 ];
+export const isAccessTokenExists = [
+  header('accesstoken')
+    .trim()
+    .exists({ checkFalsy: true })
+    .custom((value) => {
+      return true;
+    })
+    .withMessage('Please send accessToken'),
+];
 export async function verifyOrigin(req, callback) {
   logger.info('Presentation middleware verifyOrigin() method starts');
   let corsOptions;
   let message;
   const { presentationTemplateId } = req.params;
+  console.log(presentationTemplateId);
   const presentationTemplate: IPresentationTemplate = (await presentationModel.findOne({
     _id: presentationTemplateId,
   })) as IPresentationTemplate;

@@ -13,7 +13,10 @@ const setCredentialStatus = async (req: Request, res: Response, next: NextFuncti
 
     const id = req.params.id;
     if (!req.body.credStatus) {
-      const { issuerDid, subjectDid, schemaId } = req.body.vc;
+      const vc = req.body.vc;
+      const issuerDid = vc.issuer;
+      const subjectDid = vc.credentialSubject.id;
+      const schemaId = vc.credentialSchema.id;
       const credObj = await creadSchema.findOneAndUpdate(
         { _id: id },
         {
@@ -80,7 +83,7 @@ const issueCredential = async (req: Request, res: Response, next: NextFunction) 
     logger.info('==========CredController ::issueCredential Starts ================');
     const { QR_DATA, hypersign } = req.body;
     const { issuerDid, subjectDid, schemaId, orgDid, expirationDate } = QR_DATA.data;
-    QR_DATA.data.issuerDid = hypersign.data.id;
+    // QR_DATA.data.issuerDid = hypersign.data.id;
 
     const creadObj = await creadSchema.create({
       issuerDid,
@@ -90,6 +93,7 @@ const issueCredential = async (req: Request, res: Response, next: NextFunction) 
       createdAt: new Date(),
       orgDid,
       expiryDate: new Date(expirationDate),
+      primaryDid: hypersign.data.id,
     });
     QR_DATA.expirationDate = new Date(expirationDate);
     QR_DATA.serviceEndpoint = `${WALLET_WEB_HOOK_CREAD}/${creadObj._id}`;
@@ -126,7 +130,7 @@ const getCredentialList = async (req: Request, res: Response, next: NextFunction
 
     const { hypersign } = req.body;
     const orgDid = req.params.orgDid;
-    const credList = await creadSchema.find({ issuerDid: hypersign.data.id, orgDid }).sort({ createdAt: -1 });
+    const credList = await creadSchema.find({ orgDid }).sort({ createdAt: -1 });
     logger.info('==========CredController ::getCredentialList Ends ================');
     return next(ApiResponse.success({ credList }));
   } catch (error) {

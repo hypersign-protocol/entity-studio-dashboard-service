@@ -1,7 +1,7 @@
 import PresentationRequestSchema, { IPresentationRequest } from '../models/PresentationRequest';
 import PresentationTemplateSchema, { IPresentationTemplate } from '../models/presentationTemplateSchema';
 import OrgSchema, { IOrg } from '../models/OrgSchema';
-import { studioServerBaseUrl } from '../config';
+import { logger, studioServerBaseUrl } from '../config';
 
 import { uuid } from 'uuidv4';
 
@@ -151,7 +151,7 @@ export async function getChallenge(req, res, next) {
       },
     };
 
-    console.log('==========SchemaController ::getSchemaById Ends================');
+    logger.info('==========SchemaController ::getSchemaById Ends================');
     res.setHeader('Access-Control-Allow-Origin', domain);
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -207,7 +207,7 @@ export async function getChallenge(req, res, next) {
 
     writeServerSendEvent(res, sseId, JSON.stringify(QR_DATA));
   } catch (error) {
-    console.error('==========SchemaController ::getSchemaById Ends================');
+    logger.error('==========SchemaController ::getSchemaById Ends================');
     res.status(500).json(error);
   }
 }

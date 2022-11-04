@@ -10,6 +10,7 @@ export interface ICreadSchema extends Document {
   vc_id: string;
   orgDid: string;
   expiryDate: Date;
+  primaryDid: string;
 }
 
 export const creadSchema = new Schema({
@@ -42,6 +43,10 @@ export const creadSchema = new Schema({
   },
   expiryDate: {
     type: Date,
+    required: true,
+  },
+  primaryDid: {
+    type: String,
     required: true,
   },
 });
