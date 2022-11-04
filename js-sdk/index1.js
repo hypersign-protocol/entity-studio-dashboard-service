@@ -1,5 +1,5 @@
 var QRCode = require('qrcode');
-//const axios = require('axios').default;
+const axios = require('axios').default;
 const HS_EVENTS_ENUM = {
   ERROR: 'studio-error',
   SUCCESS: 'studio-success',
@@ -28,7 +28,7 @@ function dispatchEvent(eventType, message) {
 }
 
  function initiateEventSource({ hsWalletBaseURL, eventSourceURL, hsLoginBtnDOM, hsLoginQRDOM, hsloginBtnText }) {
-  const source = new EventSource(eventSourceURL);
+  const source =  new EventSource(eventSourceURL);
   source.onopen = () => {
     console.log('Connections to the server established');
   };
@@ -47,7 +47,14 @@ function dispatchEvent(eventType, message) {
               hsloginBtnText,
             });
           } else if (dataParsed.op === 'end') {
-            dispatchEvent(HS_EVENTS_ENUM.SUCCESS, dataParsed.message);        
+            dispatchEvent(HS_EVENTS_ENUM.SUCCESS, dataParsed.message);
+            // if (dataParsed.accessToken) {           
+            //    const accessToken = dataParsed.accessToken
+            //  const result = await fetchData(accessToken)
+            //  if (result.status == 200) {
+            // dispatchEvent(HS_EVENTS_ENUM.SUCCESS, JSON.stringify(result.data.data.userDetail.credentialDetail, null, 2))
+            //      }        
+            // }         
             source.close();
           } else if (dataParsed.op === 'processing') {
             dispatchEvent(HS_EVENTS_ENUM.WAITING, dataParsed.message);
@@ -96,8 +103,19 @@ function sanitizeURL(url) {
   }
 }
 
+ async function fetchData(accessToken) {
+  let data;
+  if (accessToken) {
+    const url = "http://localhost:9000/api/v1/presentation/request/info"
+    data= await axios.get(url, {
+      headers: {
+        accessToken
+      }
+    })
+  } 
+    return data
 
-// }
+}
 /**
  * Starts the program
  * @returns void

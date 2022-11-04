@@ -5,6 +5,7 @@ export interface IPresentationRequest extends Document {
   templateId: string;
   expiresTime: number;
   status: number;
+  accessToken: string;
 }
 
 export const PresentationRequestSchema = new Schema({
@@ -13,6 +14,7 @@ export const PresentationRequestSchema = new Schema({
   templateId: { type: String, required: true },
   expiresTime: { type: Number, required: true },
   status: { type: Number, required: true },
+  accessToken: { type: String, required: false },
 });
 
 export default mongoose.model<IPresentationRequest>('PresentationRequestSchema', PresentationRequestSchema);
