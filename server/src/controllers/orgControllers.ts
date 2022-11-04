@@ -1,11 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import Team from '../models/TeamSchema';
 import Org, { IOrg } from '../models/OrgSchema';
+import SchemaModel from '../models/Schema';
+import presentationModel from '../models/presentationTemplateSchema';
+import credentialModel from '../models/CreadSchema';
 import { logger, WALLET_WEB_HOOK_ORG_DID, ORG_SERVICE_ENDPOINT_GET_STATUS, sse_client } from '../config';
-import { Interface } from 'readline';
 import { send } from '../services/sse';
 import ApiResonse from '../response/apiResponse';
 import PresentationTemplate from '../models/presentationTemplateSchema';
+import Schema from '../models/Schema';
 
 const CreateOrg = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -79,8 +82,19 @@ const GetOrgsByUserDid = async (req: Request, res: Response, next: NextFunction)
     logger.info('OrgCtrl:: GetOrgsByUserDid() method start...');
     const { hypersign } = req.body;
     const org: Array<IOrg> = await Org.find({ userDid: hypersign.data.id }).exec();
+    const tempOrgList: Array<IOrg> = [];
+    for (let i = 0; i < org.length; i++) {
+      const tempOrg: IOrg = org[i];
+      const schemasCount = await SchemaModel.countDocuments({ orgDid: tempOrg._id });
+      const templatesCount = await presentationModel.countDocuments({ orgDid: tempOrg._id });
+      const credentialsCount = await credentialModel.countDocuments({ orgDid: tempOrg._id });
+      tempOrg.schemasCount = schemasCount;
+      tempOrg.templatesCount = templatesCount;
+      tempOrg.credentialsCount = credentialsCount;
+      tempOrgList.push({ ...tempOrg['_doc'] });
+    }
     logger.info('OrgCtrl:: GetOrgsByUserDid() method ends...');
-    return next(ApiResonse.success({ org }));
+    return next(ApiResonse.success({ org: tempOrgList }));
   } catch (e) {
     logger.error('OrgCtrl:: GetOrgsByUserDid(): Error ' + e);
     return next(ApiResonse.internal(null, e));
