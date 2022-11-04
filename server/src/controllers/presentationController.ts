@@ -172,8 +172,10 @@ const deletePresentationTemplate = async (req: Request, res: Response, next: Nex
       return next(ApiResponse.badRequest(null, `You can not delete this template`));
     }
     templateDetail = await PresentationTemplateSchema.findOneAndDelete({ _id: id });
-    await OrgModel.findByIdAndUpdate({ _id: templateDetail.orgDid }, { $inc: { templatesCount: -1 } });
-
+    const orgDetail: any = await OrgModel.findById({ _id: templateDetail.orgDid });
+    if (orgDetail.templatesCount) {
+      await OrgModel.findByIdAndUpdate({ _id: templateDetail.orgDid }, { $inc: { templatesCount: -1 } });
+    }
     return next(ApiResponse.success(templateDetail));
   } catch (e) {
     logger.error('presentationControllers:: deletePresentationTemplate() method Error: ' + e);
