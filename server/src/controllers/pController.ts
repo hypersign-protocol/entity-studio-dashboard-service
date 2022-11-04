@@ -195,11 +195,14 @@ export async function getChallenge(req, res, next) {
           if (result) {
             const QR_DATA = {
               op: '',
-              message: '',
+              message: {},
             };
             if (result.status === 1) {
               QR_DATA.op = 'end';
-              QR_DATA['message'] = 'Verified';
+              QR_DATA['message'] = {
+                status: 'Verified',
+                accessToken: result.accessToken,
+              };
               QR_DATA['accessToken'] = result.accessToken;
               // TODO: 4. end the interval and end the response
               clearInterval(setinterval);
