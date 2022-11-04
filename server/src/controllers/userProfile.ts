@@ -11,17 +11,9 @@ const fetchUserDetail = async (req: Request, res: Response, next: NextFunction) 
     logger.info('profileCtrl:: fetchUserDetail() method start..');
     const { data } = req.body.hypersign;
     const orgsCount = await OrgModel.countDocuments({ userDid: data.id });
-    let schemasCount = await SchemaModel.countDocuments({ primaryDid: data.id });
-    // for backward compatibility
-    if (schemasCount === 0) {
-      schemasCount = await SchemaModel.countDocuments({ did: data.id });
-    }
-    let templatesCount = await PresentationModel.countDocuments({ primaryDid: data.id });
-    // for backward compatibility
-    if (templatesCount === 0) {
-      templatesCount = await PresentationModel.countDocuments({ templateOwnerDid: data.id });
-    }
-    const credentialsCount = await CredentialModel.countDocuments({ issuerDid: data.id });
+    const schemasCount = await SchemaModel.countDocuments({ primaryDid: data.id });
+    const templatesCount = await PresentationModel.countDocuments({ primaryDid: data.id });
+    const credentialsCount = await CredentialModel.countDocuments({ primaryDid: data.id });
     logger.info('profileCtrl:: fetchUserDetail() method ends...');
     return next(ApiResponse.success({ orgsCount, schemasCount, templatesCount, credentialsCount }));
   } catch (e) {
