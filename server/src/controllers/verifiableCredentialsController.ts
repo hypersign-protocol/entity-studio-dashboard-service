@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { jwtExpiryInMilli, jwtSecret, pathToIssueCred, studioServerBaseUrl, logger, sse_client } from '../config';
 import jwt from 'jsonwebtoken';
-import creadSchema, { ICreadSchema } from '../models/CreadSchema';
+import creadSchema from '../models/CreadSchema';
+import orgModel from '../models/OrgSchema';
 import { WALLET_WEB_HOOK_CREAD } from '../config';
 import { send } from '../services/sse';
 import ApiResponse from '../response/apiResponse';
@@ -91,6 +92,15 @@ const issueCredential = async (req: Request, res: Response, next: NextFunction) 
       orgDid,
       expiryDate: new Date(expirationDate),
     });
+    const orgDetail: any = await orgModel.findById({ _id: creadObj.orgDid });
+    let credentialCount;
+    if (!orgDetail.credentialCount) {
+      credentialCount = await creadSchema.countDocuments({ orgDid: creadObj.orgDid });
+    } else {
+      credentialCount = orgDetail.credentialCount + 1;
+    }
+    await orgModel.findByIdAndUpdate({ _id: creadObj.orgDid }, { credentialCount });
+
     QR_DATA.expirationDate = new Date(expirationDate);
     QR_DATA.serviceEndpoint = `${WALLET_WEB_HOOK_CREAD}/${creadObj._id}`;
 

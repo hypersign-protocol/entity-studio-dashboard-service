@@ -4,6 +4,7 @@ import PresentationTemplateSchema, { IPresentationTemplate } from '../models/pre
 import HIDWallet from 'hid-hd-wallet';
 import HypersignSsiSDK from 'hs-ssi-sdk';
 import { walletOptions, mnemonic, logger } from '../config';
+import OrgModel from '../models/OrgSchema';
 import ApiResponse from '../response/apiResponse';
 
 const verifyPresentation = async (req: Request, res: Response, next: NextFunction) => {
@@ -113,6 +114,15 @@ const presentationTempalate = async (req: Request, res: Response, next: NextFunc
       templateOwnerDid: issuerDid,
       primaryDid: data.id,
     });
+    const orgDetail: any = await OrgModel.findById({ _id: presentationTemplateObj.orgDid });
+    let templateCount;
+    if (!orgDetail.templateCount) {
+      templateCount = await PresentationTemplateSchema.countDocuments({ orgdid: presentationTemplateObj.orgDid });
+    } else {
+      templateCount = orgDetail.templateCount + 1;
+    }
+    await OrgModel.findByIdAndUpdate({ _id: presentationTemplateObj.orgDid }, { templateCount });
+
     logger.info('presentationControllers:: presentationTempalate() method ends...');
     return next(ApiResponse.success({ presentationTemplateObj }));
   } catch (error) {
