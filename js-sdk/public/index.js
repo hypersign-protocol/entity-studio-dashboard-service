@@ -1,5 +1,4 @@
 var QRCode = require('qrcode');
-//import axios, * as others from 'axios';
 //const axios = require('axios').default;
 const HS_EVENTS_ENUM = {
   ERROR: 'studio-error',
@@ -48,22 +47,7 @@ function dispatchEvent(eventType, message) {
               hsloginBtnText,
             });
           } else if (dataParsed.op === 'end') {
-            dispatchEvent(HS_EVENTS_ENUM.SUCCESS, dataParsed.message);
-            // if (dataParsed.accessToken) {  
-            //   const accessToken = dataParsed.accessToken
-            //    const result = await fetchData(accessToken)
-            //   if (result.data.message == 'success') {
-            //     localStorage.setItem('data', JSON.stringify(result.data.data.userDetail, null, 2))
-            //     const urlPrams= JSON.stringify(result.data.data.userDetail)
-            //     window.open(`http://localhost:3000/cred?data=${urlPrams}`)
-                
-            //   } else {
-            //      const data = 'Some Error has occured while fetching data'
-            //     localStorage.setItem('data', data)
-            //      const urlPrams= JSON.stringify(result.data)
-            //     window.open(`http://localhost:3000/cred?data=${urlPrams}`)                
-            //   }     
-            // }         
+            dispatchEvent(HS_EVENTS_ENUM.SUCCESS, dataParsed.message);        
             source.close();
           } else if (dataParsed.op === 'processing') {
             dispatchEvent(HS_EVENTS_ENUM.WAITING, dataParsed.message);
@@ -112,17 +96,6 @@ function sanitizeURL(url) {
   }
 }
 
-// async function fetchData(accesstoken) {
-//     let data;
-//   if (accesstoken) {
-//       const url = "http://localhost:3000/data"
-//       data = await axios.get(url, {
-//         headers: {
-//           accesstoken
-//         }
-//       })
-//     }
-//     return data
 
 // }
 /**
