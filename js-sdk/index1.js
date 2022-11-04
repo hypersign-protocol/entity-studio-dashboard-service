@@ -48,13 +48,13 @@ function dispatchEvent(eventType, message) {
             });
           } else if (dataParsed.op === 'end') {
             dispatchEvent(HS_EVENTS_ENUM.SUCCESS, dataParsed.message);
-            if (dataParsed.accessToken) {           
-               const accessToken = dataParsed.accessToken
-             const result = await fetchData(accessToken)
-             if (result.status == 200) {
-            dispatchEvent(HS_EVENTS_ENUM.SUCCESS, JSON.stringify(result.data.data.userDetail.credentialDetail, null, 2))
-                 }        
-            }         
+            // if (dataParsed.accessToken) {           
+            //    const accessToken = dataParsed.accessToken
+            //  const result = await fetchData(accessToken)
+            //  if (result.status == 200) {
+            // dispatchEvent(HS_EVENTS_ENUM.SUCCESS, JSON.stringify(result.data.data.userDetail.credentialDetail, null, 2))
+            //      }        
+            // }         
             source.close();
           } else if (dataParsed.op === 'processing') {
             dispatchEvent(HS_EVENTS_ENUM.WAITING, dataParsed.message);
