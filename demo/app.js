@@ -5,39 +5,35 @@ const port = 1234;
 const app = express();
 const server = http.createServer(app);
 const cors = require('cors');
-app.use(cors())
-app.use(express.static('public'));
+app.use(express.static('../js-sdk/public'));
 app.use(express.json());
-
+app.use(cors())
 app.get('/', (req, res) => {
     try {
-        res.sendFile('./public/index.html', { root: __dirname });   
+        res.sendFile('../js-sdk/public/index.html', { root: __dirname });   
     } catch (e) {
         res.send(e)
     }
 })
-app.get('/cred', async (req, res) => {
-    try {
-        res.sendFile('./public/cred.html', { root: __dirname });  
-    } catch (e) {
-        res.send(`Error: ${e}`);
-    }
-})
 app.get('/auth', async (req, res) => {
     try {
+        console.log('auth')
         const { accesstoken } = req.headers
+        console.log(accesstoken)
+
         if (accesstoken == '' || accesstoken == null || accesstoken== undefined) {
             return res.send ('Please send accesstoken')
         }
         const url = "http://localhost:9000/api/v1/presentation/request/info";
-        await axios.get(url, {
+        const response=  await axios(url, {
             headers: {
                 accesstoken
             },
         })
-        res.sendFile('./public/cred.html', { root: __dirname });  
+        const data = response.data.data.userDetail     
+        res.send(data)
+       // res.sendFile(`../js-sdk/public/home.html?data=${data}`, { root: __dirname });  
 
-       // return res.send(data.data)          
     } catch (e) {
        return  res.send(`Error: ${e.response.data}`)
     }
