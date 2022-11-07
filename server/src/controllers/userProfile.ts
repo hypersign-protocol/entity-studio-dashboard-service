@@ -13,11 +13,11 @@ const fetchUserDetail = async (req: Request, res: Response, next: NextFunction) 
     const orgsCount = await OrgModel.countDocuments({ userDid: data.id });
     const schemasCount = await SchemaModel.countDocuments({ primaryDid: data.id });
     const templatesCount = await PresentationModel.countDocuments({ primaryDid: data.id });
-    let credentialsCount = await CredentialModel.countDocuments({ primaryDid: data.id });
+    const credentialsCount = await CredentialModel.countDocuments({ primaryDid: data.id });
     // for backward compatibility
-    if (credentialsCount === 0) {
-      credentialsCount = await CredentialModel.countDocuments({ issuerDid: data.id });
-    }
+    // if (credentialsCount === 0) {
+    //   credentialsCount = await CredentialModel.countDocuments({ issuerDid: data.id });
+    // }
     logger.info('profileCtrl:: fetchUserDetail() method ends...');
     return next(ApiResponse.success({ orgsCount, schemasCount, templatesCount, credentialsCount }));
   } catch (e) {
