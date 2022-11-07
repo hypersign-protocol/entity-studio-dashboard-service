@@ -72,6 +72,6 @@ npm i
 npm run build
 ```
 
+
 Add build file in your public folder as done [here](../js-sdk/demo/public)
 
-Note: Make sure you have used `http://localhost:1234` in domain name while creating organisation.
