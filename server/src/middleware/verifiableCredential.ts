@@ -89,7 +89,7 @@ export async function isValidField(req, res, next) {
         //   logger.info('valid schema field');
         // }
       } catch (e) {
-        console.log(e);
+        logger.error(e);
         return next(ApiResponse.badRequest(null, e));
       }
     });

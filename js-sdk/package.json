@@ -3,10 +3,10 @@
   "version": "1.0.2",
   "description": "",
   "scripts": {
-    "dev": "parcel build index.js --dist-dir public  --no-source-maps && node app.js",
-    "build": "npm run pretty && npm run lint && parcel build index.js --public-url '.'",
+    "dev": "parcel build index.js --dist-dir build  --no-source-maps && node app.js",
+    "build": "npm run pretty && npm run lint && parcel build index.js --dist-dir build",
     "lint": "eslint index.js",
-    "pretty": "prettier --config .prettierrc.json --write index.js index.html",
+    "pretty": "prettier --config .prettierrc.json --write index.js ",
     "test": "echo \"Error: no test specified\" && exit 1",
     "publish": "npm run build && cp dist/index.js build"
   },
