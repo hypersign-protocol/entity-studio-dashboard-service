@@ -18,11 +18,10 @@ app.get('/', (req, res) => {
 app.get('/auth', async (req, res) => {
     try {
         const { accesstoken } = req.headers
-
         if (accesstoken == '' || accesstoken == null || accesstoken== undefined) {
             return res.send ('Please send accesstoken')
         }
-        const url = "http://localhost:9000/api/v1/presentation/request/info";
+        const url = "https://stage.hypermine.in/studioserver/api/v1/presentation/request/info";
         const response=  await axios(url, {
             headers: {
                 accesstoken
