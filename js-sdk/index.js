@@ -1,9 +1,9 @@
 var QRCode = require('qrcode');
-
 const HS_EVENTS_ENUM = {
   ERROR: 'studio-error',
   SUCCESS: 'studio-success',
   WAITING: 'studio-wait',
+  
 };
 
 /**
@@ -26,18 +26,17 @@ function dispatchEvent(eventType, message) {
   );
 }
 
-function initiateEventSource({ hsWalletBaseURL, eventSourceURL, hsLoginBtnDOM, hsLoginQRDOM, hsloginBtnText }) {
+ function initiateEventSource({ hsWalletBaseURL, eventSourceURL, hsLoginBtnDOM, hsLoginQRDOM, hsloginBtnText }) {
   const source = new EventSource(eventSourceURL);
   source.onopen = () => {
     console.log('Connections to the server established');
   };
 
-  source.onmessage = (e) => {
+  source.onmessage = async (e) => {
     if (e.data) {
       try {
         const dataParsed = JSON.parse(e.data);
         if (dataParsed) {
-          // console.log(dataParsed.op)
           if (dataParsed.op === 'init') {
             formQRAndButtonHTML({
               hsWalletBaseURL,
@@ -47,7 +46,7 @@ function initiateEventSource({ hsWalletBaseURL, eventSourceURL, hsLoginBtnDOM, h
               hsloginBtnText,
             });
           } else if (dataParsed.op === 'end') {
-            dispatchEvent(HS_EVENTS_ENUM.SUCCESS, dataParsed.message);
+            dispatchEvent(HS_EVENTS_ENUM.SUCCESS, dataParsed.message);        
             source.close();
           } else if (dataParsed.op === 'processing') {
             dispatchEvent(HS_EVENTS_ENUM.WAITING, dataParsed.message);
@@ -96,6 +95,8 @@ function sanitizeURL(url) {
   }
 }
 
+
+// }
 /**
  * Starts the program
  * @returns void

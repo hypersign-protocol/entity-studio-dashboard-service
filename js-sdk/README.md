@@ -29,24 +29,36 @@ You can eiter render a button or QR code or both.
 
 We expose three events for clients to listen; `studio-success`, `studio-wait`, `studio-error`
 
+### Step3.1: studio-success
+
 ```js
 // Once the user present his credential and the credential is verified at the studio server.
 document.addEventListener('studio-success', function (e) {
-  alert(e.detail);
+  const { status, accessToken }= e.detail
 });
+//Here you have got status and accessToken. You can use this accessToken to call our api to get the data.
+```
+see the API Documentation [here](https://github.com/hypersign-protocol/studio/issues/135)
 
+### Step3.2: studio-wait
+
+```js
 // Meanwhile waiting for user to present his credential
 document.addEventListener('studio-wait', function (e) {
   console.log(e.detail);
 });
+```
 
+### Step3.3: studio-error
+
+```js
 // Incase of any error
 document.addEventListener('studio-error', function (e) {
   console.error(e.detail);
 });
 ```
 
-See the [demo](./index.html) implmentation for more details.
+See the [demo](../js-sdk/demo/public/index.html) implmentation for more details.
 
 ## Installation
 
@@ -54,10 +66,12 @@ See the [demo](./index.html) implmentation for more details.
 npm i
 ```
 
-## Run the project
+## Build the project
 
 ```sh
-npm run dev
+npm run build
 ```
 
+
+Add build file in your public folder as done [here](../js-sdk/demo/public)
 
