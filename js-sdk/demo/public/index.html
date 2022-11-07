@@ -6,7 +6,7 @@
   <body>
     <div class="box">
       <h2>Login</h2>
-      <p id="display-data" style="display: none; "></p>
+      <p id="display-data" style="display: none"></p>
       <p id="qr-and-qr-text">
         <canvas id="studio-qr"></canvas>
         <span>Scan the QR code </span>
@@ -15,12 +15,12 @@
       <div id="studio-btn"></div>
 
       <script
-      type="text/javascript"
+        type="text/javascript"
         src="./index.js"
         data-button-text="Present Presentation"
         data-hs-wallet-base-url="https://wallet-stage.hypersign.id"
-        data-presentation-request-endpoint="http://localhost:9000/api/v1/presentation/request/"
-        data-presentation-template-id="63651460a798e8841ccf03a3"
+        data-presentation-request-endpoint="https://stage.hypermine.in/studioserver/api/v1/presentation/request/"
+        data-presentation-template-id="6368e44c098b6444a7aa706a"
       ></script>
     </div>
   </body>
@@ -28,10 +28,20 @@
 
 <script>
   document.addEventListener('studio-success', function (e) {
-    alert('Success');
-    document.getElementById('qr-and-qr-text').style.display = 'none';
-    document.getElementById('display-data').style.display = 'block';
-    document.getElementById('display-data').innerHTML=JSON.stringify(e.detail,null,2);
+    alert(JSON.stringify(e.detail, null, 2));
+    const url = 'http://localhost:1234/auth';
+    if (e.detail.accessToken) {
+      const accessToken = e.detail.accessToken;
+      fetch(url, {
+        headers: {
+          accessToken,
+        },
+      })
+        .then((resp) => resp.json())
+        .then((data) => {
+          window.open(`./home.html?data=${JSON.stringify(data)}`);
+        });
+    }
   });
 
   document.addEventListener('studio-wait', function (e) {

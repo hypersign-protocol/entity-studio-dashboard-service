@@ -1,5 +1,4 @@
 var QRCode = require('qrcode');
-//const axios = require('axios').default;
 const HS_EVENTS_ENUM = {
   ERROR: 'studio-error',
   SUCCESS: 'studio-success',

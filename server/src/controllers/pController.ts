@@ -269,9 +269,9 @@ export async function getUserCredDetail(req, res, next) {
     if (!userDetail) {
       return next(ApiResponse.badRequest(null, `User detail for ${id} does not exists`));
     }
-
+    const userInfo = userDetail.credentialDetail;
     await userCredInfoModel.findByIdAndDelete({ _id: id });
-    return next(ApiResponse.success({ userDetail }));
+    return next(ApiResponse.success(userInfo));
   } catch (e) {
     logger.error('pCtrl:: getUserCredDetail() method Error: ' + e);
     return next(ApiResponse.internal(null, e));
