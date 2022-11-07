@@ -60,6 +60,4 @@ npm i
 npm run dev
 ```
 
-Browse the login page [http://localhost:1234](http://localhost:1234)
 
-Note: Make sure you have used `http://localhost:1234` in domain name while creating presentation template.
