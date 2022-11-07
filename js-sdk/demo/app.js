@@ -5,21 +5,19 @@ const port = 1234;
 const app = express();
 const server = http.createServer(app);
 const cors = require('cors');
-app.use(express.static('../js-sdk/public'));
+app.use(express.static('public'));
 app.use(express.json());
 app.use(cors())
 app.get('/', (req, res) => {
     try {
-        res.sendFile('../js-sdk/public/index.html', { root: __dirname });   
+        res.sendFile('index.html', { root: __dirname });   
     } catch (e) {
         res.send(e)
     }
 })
 app.get('/auth', async (req, res) => {
     try {
-        console.log('auth')
         const { accesstoken } = req.headers
-        console.log(accesstoken)
 
         if (accesstoken == '' || accesstoken == null || accesstoken== undefined) {
             return res.send ('Please send accesstoken')
@@ -32,7 +30,7 @@ app.get('/auth', async (req, res) => {
         })
         const data = response.data.data.userDetail     
         res.send(data)
-       // res.sendFile(`../js-sdk/public/home.html?data=${data}`, { root: __dirname });  
+       // res.redirect(`home.html?data=${JSON.stringify(data)}`);  
 
     } catch (e) {
        return  res.send(`Error: ${e.response.data}`)

@@ -21,39 +21,35 @@
         data-hs-wallet-base-url="https://wallet-stage.hypersign.id"
         data-presentation-request-endpoint="http://localhost:9000/api/v1/presentation/request/"
         data-presentation-template-id="636857f72acbfa4ce3b629ff"
-      >
-        import axios from 'axios'
-      </script>
+      ></script>
     </div>
   </body>
 </html>
 
 <script>
-  document.addEventListener('studio-success', function (e) {
+  document.addEventListener("studio-success", function (e) {
     alert(JSON.stringify(e.detail, null, 2));
-    const url = 'http://localhost:1234/auth';
+    const url = "http://localhost:1234/auth";
     if (e.detail.accessToken) {
       const accessToken = e.detail.accessToken;
-      const x = fetch(url, {
+      fetch(url, {
         headers: {
           accessToken,
         },
       })
         .then((resp) => resp.json())
         .then((data) => {
+          console.log("=============");
           window.open(`./home.html?data=${JSON.stringify(data)}`);
         });
     }
-    // document.getElementById('qr-and-qr-text').style.display = 'none';
-    // document.getElementById('display-data').style.display = 'block';
-    // document.getElementById('display-data').innerHTML = JSON.stringify(e.detail, null, 2);
   });
 
-  document.addEventListener('studio-wait', function (e) {
+  document.addEventListener("studio-wait", function (e) {
     console.log(e.detail);
   });
 
-  document.addEventListener('studio-error', function (e) {
+  document.addEventListener("studio-error", function (e) {
     console.error(e.detail);
   });
 </script>
