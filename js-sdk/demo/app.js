@@ -27,7 +27,7 @@ app.get('/auth', async (req, res) => {
                 accesstoken
             },
         })
-        const data = response.data.data.userDetail     
+        const data = response.data.data 
         res.send(data)
        // res.redirect(`home.html?data=${JSON.stringify(data)}`);  
 
