@@ -37,8 +37,8 @@ document.addEventListener('studio-success', function (e) {
   const { status, accessToken }= e.detail
 });
 //Here you have got status and accessToken. You can use this accessToken to call our api to get the data.
-see the API Documentation [here]('https://github.com/hypersign-protocol/studio/issues/135')
 ```
+see the API Documentation [here](https://github.com/hypersign-protocol/studio/issues/135)
 
 ### Step3.2: studio-wait
 
