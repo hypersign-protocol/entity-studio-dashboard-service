@@ -10,8 +10,8 @@
         try {
           let params = new URLSearchParams(window.location.search);
           const data = JSON.parse(params.get('data'));
-          if (data.credentialDetail) {
-            window.document.getElementById('mydiv').innerText = JSON.stringify(data.credentialDetail, null, 2);
+          if (data) {
+            window.document.getElementById('mydiv').innerText = JSON.stringify(data, null, 2);
           } else {
             if (data.include('Error')) {
               data = JSON.stringify(data);
