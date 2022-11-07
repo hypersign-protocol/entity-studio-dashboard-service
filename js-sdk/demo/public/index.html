@@ -19,17 +19,17 @@
         src="./index.js"
         data-button-text="Present Presentation"
         data-hs-wallet-base-url="https://wallet-stage.hypersign.id"
-        data-presentation-request-endpoint="http://localhost:9000/api/v1/presentation/request/"
-        data-presentation-template-id="636857f72acbfa4ce3b629ff"
+        data-presentation-request-endpoint="https://stage.hypermine.in/studioserver/api/v1/presentation/request/"
+        data-presentation-template-id="6368e44c098b6444a7aa706a"
       ></script>
     </div>
   </body>
 </html>
 
 <script>
-  document.addEventListener("studio-success", function (e) {
+  document.addEventListener('studio-success', function (e) {
     alert(JSON.stringify(e.detail, null, 2));
-    const url = "http://localhost:1234/auth";
+    const url = 'http://localhost:1234/auth';
     if (e.detail.accessToken) {
       const accessToken = e.detail.accessToken;
       fetch(url, {
@@ -39,17 +39,16 @@
       })
         .then((resp) => resp.json())
         .then((data) => {
-          console.log("=============");
           window.open(`./home.html?data=${JSON.stringify(data)}`);
         });
     }
   });
 
-  document.addEventListener("studio-wait", function (e) {
+  document.addEventListener('studio-wait', function (e) {
     console.log(e.detail);
   });
 
-  document.addEventListener("studio-error", function (e) {
+  document.addEventListener('studio-error', function (e) {
     console.error(e.detail);
   });
 </script>
