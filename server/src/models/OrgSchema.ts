@@ -4,6 +4,7 @@ export interface IOrg extends Document {
   orgDid: string;
   region: string;
   name: string;
+  controller: Array<string>;
   domain: string;
   logo: string;
   status: string;
@@ -14,6 +15,10 @@ export interface IOrg extends Document {
 export const OrgDbSchema = new Schema({
   status: {
     type: String,
+    required: false,
+  },
+  controller: {
+    type: Array,
     required: false,
   },
   userDid: {
