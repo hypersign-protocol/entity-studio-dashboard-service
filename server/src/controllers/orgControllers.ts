@@ -82,7 +82,7 @@ const GetOrgsByUserDid = async (req: Request, res: Response, next: NextFunction)
   try {
     logger.info('OrgCtrl:: GetOrgsByUserDid() method start...');
     const { hypersign } = req.body;
-    const org: Array<IOrg> = await Org.find({ controller: { $all:[hypersign.data.id]}}).exec();
+    const org: Array<IOrg> = await Org.find({ controller: { $all: [hypersign.data.id] } }).exec();
     const tempOrgList: Array<IOrg> = [];
     for (let i = 0; i < org.length; i++) {
       const tempOrg: IOrg = org[i];
@@ -165,7 +165,6 @@ const updateOrg = async (req: Request, res: Response, next: NextFunction) => {
           domain: orgData.domain,
           logo: orgData.logo,
           controller: orgData.controller,
-          
         },
         { returnDocument: 'after' }
       ).exec();
@@ -178,7 +177,6 @@ const updateOrg = async (req: Request, res: Response, next: NextFunction) => {
     await PresentationTemplate.updateMany({ orgDid: orgData._id }, { domain: orgData.domain }, { multi: true });
     logger.info('orgCtrl:: updateOrg() method end...');
 
-    
     QrData.serviceEndpoint = `${WALLET_WEB_HOOK_ORG_DID}/${orgData._id}`;
     QrData.data.controllers = org.controller;
 
@@ -189,7 +187,7 @@ const updateOrg = async (req: Request, res: Response, next: NextFunction) => {
     // QrData.data.logo = org.logo
     // QrData.data.status = org.status
     QrData.data.serviceEndpoint = `${ORG_SERVICE_ENDPOINT_GET_STATUS}`;
-    return next(ApiResonse.success({ org , QrData}));
+    return next(ApiResonse.success({ org, QrData }));
   } catch (e) {
     logger.error('orgCtrl:: updateOrg() : Error', e);
 
