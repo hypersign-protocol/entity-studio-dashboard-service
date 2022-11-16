@@ -33,6 +33,7 @@ const CreateOrg = async (req: Request, res: Response, next: NextFunction) => {
     const org: IOrg = await new Org({
       userDid: hypersign.data.id,
       orgDid: orgData.orgDid,
+      controller: orgData.controller,
       region: orgData.region,
       name: orgData.name,
       domain: orgData.domain,
@@ -43,7 +44,7 @@ const CreateOrg = async (req: Request, res: Response, next: NextFunction) => {
     const team = await new Team({ orgDid: org._id, userDid: hypersign.data.id }).save();
 
     QrData.serviceEndpoint = `${WALLET_WEB_HOOK_ORG_DID}/${org._id}`;
-    QrData.data.controllers = [org.userDid];
+    QrData.data.controllers = org.controller;
 
     // QrData.data.region = org.region
     // QrData.data.name = org.name
@@ -81,7 +82,7 @@ const GetOrgsByUserDid = async (req: Request, res: Response, next: NextFunction)
   try {
     logger.info('OrgCtrl:: GetOrgsByUserDid() method start...');
     const { hypersign } = req.body;
-    const org: Array<IOrg> = await Org.find({ userDid: hypersign.data.id }).exec();
+    const org: Array<IOrg> = await Org.find({ controller: { $all: [hypersign.data.id] } }).exec();
     const tempOrgList: Array<IOrg> = [];
     for (let i = 0; i < org.length; i++) {
       const tempOrg: IOrg = org[i];
@@ -135,6 +136,22 @@ const orgStatusByid = async (id) => {
 };
 const updateOrg = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const QrData = {
+      QRType: 'UPDATE_DID',
+      serviceEndpoint: '',
+      schemaId: '',
+      appDid: '',
+      appName: 'Hypersign Studio',
+      challenge: '',
+      provider: '',
+      data: {
+        controllers: [''],
+        orgDid: '',
+        alsoKnownAs: '',
+
+        serviceEndpoint: '',
+      },
+    };
     logger.info('orgCtrl:: updateOrg() method start...');
     const { orgData } = req.body;
     let org;
@@ -147,6 +164,7 @@ const updateOrg = async (req: Request, res: Response, next: NextFunction) => {
           name: orgData.name,
           domain: orgData.domain,
           logo: orgData.logo,
+          controller: orgData.controller,
         },
         { returnDocument: 'after' }
       ).exec();
@@ -158,7 +176,18 @@ const updateOrg = async (req: Request, res: Response, next: NextFunction) => {
     logger.info('OrgCtrl:: updating domain of presentation template');
     await PresentationTemplate.updateMany({ orgDid: orgData._id }, { domain: orgData.domain }, { multi: true });
     logger.info('orgCtrl:: updateOrg() method end...');
-    return next(ApiResonse.success({ org }));
+
+    QrData.serviceEndpoint = `${WALLET_WEB_HOOK_ORG_DID}/${orgData._id}`;
+    QrData.data.controllers = org.controller;
+
+    // QrData.data.region = org.region
+    // QrData.data.name = org.name
+    QrData.data.alsoKnownAs = org.domain;
+    QrData.data.orgDid = org.orgDid;
+    // QrData.data.logo = org.logo
+    // QrData.data.status = org.status
+    QrData.data.serviceEndpoint = `${ORG_SERVICE_ENDPOINT_GET_STATUS}`;
+    return next(ApiResonse.success({ org, QrData }));
   } catch (e) {
     logger.error('orgCtrl:: updateOrg() : Error', e);
 
