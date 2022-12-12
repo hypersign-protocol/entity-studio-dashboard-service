@@ -17,6 +17,8 @@ import apiResponseHandler from './response/apiResponseHandler';
 import { profileRoute } from './routes/userProfile';
 import { corsOptionsDelegate } from './utils/https';
 import { orgRoutes } from './routes/orgRoutes';
+import { AppRoutes, AppAuthRoutes } from './api/v1/App/routes';
+import appApiResponseHandler from './api/v1/App/response/appApiResponseHandler';
 const HypersignAuth = require('hypersign-auth-node-sdk');
 export default function app() {
   db.openConnection()
@@ -55,7 +57,9 @@ export default function app() {
       app.use(walletAuthRoutes(hypersign));
       app.use('/api/v1/user', profileRoute(hypersign));
       app.use(apiResponseHandler);
-
+      app.use('/api/v1/app', AppRoutes(hypersign));
+      app.use('/api/v1/app/auth', cors(), AppAuthRoutes());
+      app.use(appApiResponseHandler);
       server.listen(port, () => logger.info(`The server is running on port ${port}`));
       process.on('SIGINT', function () {
         db.closeConnection().then(() => {
