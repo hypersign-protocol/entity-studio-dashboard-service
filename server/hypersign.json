@@ -9,8 +9,8 @@
         "privateKeyBase58": "zrv3aFJvb6YKMXE24VjoZBr9viRhpGW9BmCW8VJrZs1VWqVu9jMFU2Qd2Mx3EPrEnCzNvaqz8xUpjQPcTJ5k3mgh5AW"
     },
     "schemaId": "sch:hid:testnet:z6snnZ5zgTxtuLZ2iQ7qCGvY1NCTRJBNhV7QCpU1Vajv3:1.0",
-    "networkUrl": "https://jagrat.hypersign.id/rpc",
-    "networkRestUrl": "https://jagrat.hypersign.id/rest",
+    "networkUrl": "https://rpc.jagrat.hypersign.id/",
+    "networkRestUrl": "https://api.jagrat.hypersign.id/",
     "mail": {
         "host": "hypermine.in",
         "port": 465,
@@ -47,7 +47,7 @@
             "did": "did:hid:testnet:z8uyZoEA2JTCMWfadrSPaqyWmwzwc3qAwAM4snVrfLKue",
             "owner": "did:hid:testnet:z8uyZoEA2JTCMWfadrSPaqyWmwzwc3qAwAM4snVrfLKue",
             "schemaId": "sch:hid:testnet:z12GNMh8pWFnY4wN1evLaQ52gwD8Be4VKstKSriVEnpe8:1.0",
-            "serviceEp": "https://stage.hypermine.in/studioserver",
+            "serviceEp": "http://localhost:9000",
             "subscriptionId": "dummy_id",
             "planId": "dummy_id",
             "planName": "dummy_id",
