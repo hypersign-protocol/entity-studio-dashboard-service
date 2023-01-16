@@ -119,7 +119,7 @@ export async function verify(req, res, next) {
         holderDid: presentationInfo.holder,
         credentialId: presentationInfo.verifiableCredential[0].id,
         credentialDetail: presentationInfo.verifiableCredential[0].credentialSubject,
-        presentationDump: vp
+        presentationDump: presentationInfo
       });
       const accessToken = JWT.sign({ id: userCredInfo._id }, jwtSecret, { expiresIn: '5m' });
       PresentationRequestSchema.findOneAndUpdate({ challenge: challenge }, { status: 1, accessToken }).exec();
@@ -270,9 +270,9 @@ export async function getUserCredDetail(req, res, next) {
     if (!userDetail) {
       return next(ApiResponse.badRequest(null, `User detail for ${id} does not exists`));
     }
-    const userInfo = userDetail.credentialDetail;
+    // const userInfo = userDetail.credentialDetail;
     await userCredInfoModel.findByIdAndDelete({ _id: id });
-    return next(ApiResponse.success(userInfo));
+    return next(ApiResponse.success(userDetail));
   } catch (e) {
     logger.error('pCtrl:: getUserCredDetail() method Error: ' + e);
     return next(ApiResponse.internal(null, e));
