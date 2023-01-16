@@ -3,6 +3,7 @@ export interface IUserPresentation extends Document {
   holderDid: string;
   credentialId: string;
   credentialDetail: object;
+  presentationDump: object;
 }
 
 export const UserCredential = new Schema({
