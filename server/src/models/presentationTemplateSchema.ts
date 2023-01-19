@@ -5,7 +5,7 @@ export interface IPresentationTemplate extends Document {
   domain: string;
   name: string;
   issuerDid: [];
-  schemaId: string;
+  schemaId: [];
   reason: string;
   required: boolean;
   callbackUrl: string;
@@ -19,8 +19,8 @@ export const PresentationTemplateSchema = new Schema({
   queryType: { type: String, required: true },
   domain: { type: String, required: true },
   name: { type: String, required: false },
-  issuerDid: { type: Array<string>, required: true },
-  schemaId: { type: String, required: true },
+  issuerDid: { type: Array<String>, required: true },
+  schemaId: { type: Array<String>, required: true },
   reason: { type: String, required: true },
   required: { type: Boolean, required: false },
   callbackUrl: { type: String, required: true },
