@@ -178,7 +178,8 @@ export async function getChallenge(req, res, next) {
         appDid: templateOwnerDid,
         appName: name,
         challenge,
-        reason
+        reason,
+        domain
       },
     };
 
