@@ -152,7 +152,7 @@ export async function getChallenge(req, res, next) {
       return res.status(400).send('invalid presentationTemplateId = ' + presentationTemplateId);
     }
 
-    const { schemaId, templateOwnerDid, orgDid, domain } = presentationTemplate;
+    const { schemaId, templateOwnerDid, orgDid, domain, reason } = presentationTemplate;
 
     const org: IOrg = (await OrgSchema.findOne({ _id: orgDid })) as IOrg;
 
@@ -178,6 +178,7 @@ export async function getChallenge(req, res, next) {
         appDid: templateOwnerDid,
         appName: name,
         challenge,
+        reason
       },
     };
 
