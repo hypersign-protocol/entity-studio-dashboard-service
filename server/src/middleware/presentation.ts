@@ -6,7 +6,7 @@ import { URL } from 'url';
 export const presentationSchemaBody = [
   body('queryType').trim().exists({ checkFalsy: true }).withMessage('queryType can not be null or empty'),
   body('domain').trim().exists({ checkFalsy: true }).withMessage('domain can not be null or empty'),
-  body('schemaId').trim().exists({ checkFalsy: true }).withMessage('schemaId cannot be null or empty'),
+  body('schemaId').isArray().withMessage('issuerDid must be an array'),
   body('issuerDid').isArray().withMessage('issuerDid must be an array'),
   body('issuerDid').trim().exists({ checkFalsy: true }).withMessage(' issuerDid can not be null or empty'),
   body('callbackUrl')
