@@ -1,8 +1,11 @@
+'use strict';
 var QRCode = require('qrcode');
+
 const HS_EVENTS_ENUM = {
   ERROR: 'studio-error',
   SUCCESS: 'studio-success',
   WAITING: 'studio-wait',
+  INIT: 'studio-init',
 };
 
 /**
@@ -16,7 +19,7 @@ function checkForEventSourceSupport() {
   return true;
 }
 
-function dispatchEvent(eventType, message) {
+function dispatchEvent(eventType, message = '') {
   document.dispatchEvent(
     new CustomEvent(eventType, {
       detail: message,
@@ -33,43 +36,56 @@ function initiateEventSource({
   hsloginBtnText,
   hsButtonStyle,
 }) {
-  const source = new EventSource(eventSourceURL);
-  source.onopen = () => {
-    console.log('Connections to the server established');
-  };
+  try {
+    const hypersignEventSource = new EventSource(eventSourceURL);
 
-  source.onmessage = async (e) => {
-    if (e.data) {
-      try {
-        const dataParsed = JSON.parse(e.data);
-        if (dataParsed) {
-          if (dataParsed.op === 'init') {
-            formQRAndButtonHTML({
-              hsWalletBaseURL,
-              hsLoginBtnDOM,
-              hsLoginQRDOM,
-              qrDataStr: JSON.stringify(dataParsed.data),
-              hsloginBtnText,
-              hsButtonStyle,
-            });
-          } else if (dataParsed.op === 'end') {
-            dispatchEvent(HS_EVENTS_ENUM.SUCCESS, dataParsed.message);
-            source.close();
-          } else if (dataParsed.op === 'processing') {
-            dispatchEvent(HS_EVENTS_ENUM.WAITING, dataParsed.message);
-          } else {
-            dispatchEvent(HS_EVENTS_ENUM.ERROR, 'Invalid operation from studio server');
+    hypersignEventSource.onopen = () => {
+      console.log('Connections to the server established');
+    };
+
+    hypersignEventSource.onmessage = async (e) => {
+      const sseID = e.lastEventId;
+      if (e.data) {
+        try {
+          const dataParsed = JSON.parse(e.data);
+          if (dataParsed) {
+            if (dataParsed.op === 'init') {
+              formQRAndButtonHTML({
+                hsWalletBaseURL,
+                hsLoginBtnDOM,
+                hsLoginQRDOM,
+                qrDataStr: JSON.stringify(dataParsed.data),
+                hsloginBtnText,
+                hsButtonStyle,
+              });
+              dispatchEvent(HS_EVENTS_ENUM.INIT, { id: sseID });
+            } else if (dataParsed.op === 'end') {
+              dispatchEvent(HS_EVENTS_ENUM.SUCCESS, { id: sseID, message: dataParsed.message });
+              hypersignEventSource.close();
+            } else if (dataParsed.op === 'processing') {
+              dispatchEvent(HS_EVENTS_ENUM.WAITING, { id: sseID, message: dataParsed.message });
+            } else {
+              dispatchEvent(HS_EVENTS_ENUM.ERROR, { id: sseID, message: 'Invalid operation from studio server' });
+              hypersignEventSource.close();
+            }
           }
+        } catch (e) {
+          dispatchEvent(HS_EVENTS_ENUM.ERROR, { id: sseID, message: e.message });
+          hypersignEventSource.close();
         }
-      } catch (e) {
-        dispatchEvent(HS_EVENTS_ENUM.ERROR, e.message);
       }
-    }
-  };
+    };
 
-  source.onerror = (e) => {
-    dispatchEvent(HS_EVENTS_ENUM.ERROR, e.message);
-  };
+    hypersignEventSource.onerror = (e) => {
+      console.log('Inside onerror');
+      console.error(e);
+      dispatchEvent(HS_EVENTS_ENUM.ERROR, e);
+      hypersignEventSource.close();
+    };
+  } catch (e) {
+    console.log('.....inside cach');
+    console.error(e);
+  }
 }
 
 /**
