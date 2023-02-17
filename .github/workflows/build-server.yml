@@ -1,0 +1,23 @@
+name: Studio Server Build Workflow
+
+on:
+  pull_request:
+
+jobs:
+  build-studio-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout into repo
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+
+      - name: Build Studio Server
+        run: cd server
+        run: npm i
+        run: npm run build
