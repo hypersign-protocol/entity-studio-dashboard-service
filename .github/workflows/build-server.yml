@@ -16,6 +16,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 14
+      
+      - name: Install Packages
+        run: npm i
+        working-directory: server
 
-      - name: Build Studio Server
-        run: cd server && npm i && npm run build
+      - name: Build Server
+        run: npm run build
+        working-directory: server
