@@ -119,6 +119,7 @@ export async function verify(req, res, next) {
         holderDid: presentationInfo.holder,
         credentialId: presentationInfo.verifiableCredential[0].id,
         credentialDetail: presentationInfo.verifiableCredential[0].credentialSubject,
+        presentation: presentationInfo
       });
       const accessToken = JWT.sign({ id: userCredInfo._id }, jwtSecret, { expiresIn: '5m' });
       PresentationRequestSchema.findOneAndUpdate({ challenge: challenge }, { status: 1, accessToken }).exec();
@@ -151,7 +152,7 @@ export async function getChallenge(req, res, next) {
       return res.status(400).send('invalid presentationTemplateId = ' + presentationTemplateId);
     }
 
-    const { schemaId, templateOwnerDid, orgDid, domain } = presentationTemplate;
+    const { schemaId, templateOwnerDid, orgDid, domain, reason } = presentationTemplate;
 
     const org: IOrg = (await OrgSchema.findOne({ _id: orgDid })) as IOrg;
 
@@ -177,6 +178,8 @@ export async function getChallenge(req, res, next) {
         appDid: templateOwnerDid,
         appName: name,
         challenge,
+        reason,
+        domain
       },
     };
 
@@ -269,7 +272,7 @@ export async function getUserCredDetail(req, res, next) {
     if (!userDetail) {
       return next(ApiResponse.badRequest(null, `User detail for ${id} does not exists`));
     }
-    const userInfo = userDetail.credentialDetail;
+    const userInfo = userDetail.presentation;
     await userCredInfoModel.findByIdAndDelete({ _id: id });
     return next(ApiResponse.success(userInfo));
   } catch (e) {

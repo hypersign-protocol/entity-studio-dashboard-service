@@ -39,7 +39,7 @@
       })
         .then((resp) => resp.json())
         .then((data) => {
-          window.open(`./home.html?data=${JSON.stringify(data)}`);
+          window.location=`./home.html?data=${JSON.stringify(data)}`
         });
     }
   });

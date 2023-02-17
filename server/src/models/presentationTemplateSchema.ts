@@ -5,22 +5,23 @@ export interface IPresentationTemplate extends Document {
   domain: string;
   name: string;
   issuerDid: [];
-  schemaId: string;
+  schemaId: [];
   reason: string;
   required: boolean;
   callbackUrl: string;
   templateOwnerDid: string;
   primaryDid: string;
 }
-
 export const PresentationTemplateSchema = new Schema({
   orgDid: { type: String, required: false },
   templateOwnerDid: { type: String, required: true },
   queryType: { type: String, required: true },
   domain: { type: String, required: true },
   name: { type: String, required: false },
-  issuerDid: { type: Array<string>, required: true },
-  schemaId: { type: String, required: true },
+  // eslint-disable-next-line
+  issuerDid: { type: Array<String>, required: true },
+  // eslint-disable-next-line
+  schemaId: { type: Array<String>, required: true },
   reason: { type: String, required: true },
   required: { type: Boolean, required: false },
   callbackUrl: { type: String, required: true },

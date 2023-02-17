@@ -1,9 +1,11 @@
+'use strict';
 var QRCode = require('qrcode');
+
 const HS_EVENTS_ENUM = {
   ERROR: 'studio-error',
   SUCCESS: 'studio-success',
   WAITING: 'studio-wait',
-  
+  INIT: 'studio-init',
 };
 
 /**
@@ -17,7 +19,7 @@ function checkForEventSourceSupport() {
   return true;
 }
 
-function dispatchEvent(eventType, message) {
+function dispatchEvent(eventType, message = '') {
   document.dispatchEvent(
     new CustomEvent(eventType, {
       detail: message,
@@ -26,54 +28,82 @@ function dispatchEvent(eventType, message) {
   );
 }
 
- function initiateEventSource({ hsWalletBaseURL, eventSourceURL, hsLoginBtnDOM, hsLoginQRDOM, hsloginBtnText }) {
-  const source = new EventSource(eventSourceURL);
-  source.onopen = () => {
-    console.log('Connections to the server established');
-  };
+function initiateEventSource({
+  hsWalletBaseURL,
+  eventSourceURL,
+  hsLoginBtnDOM,
+  hsLoginQRDOM,
+  hsloginBtnText,
+  hsButtonStyle,
+}) {
+  try {
+    const hypersignEventSource = new EventSource(eventSourceURL);
 
-  source.onmessage = async (e) => {
-    if (e.data) {
-      try {
-        const dataParsed = JSON.parse(e.data);
-        if (dataParsed) {
-          if (dataParsed.op === 'init') {
-            formQRAndButtonHTML({
-              hsWalletBaseURL,
-              hsLoginBtnDOM,
-              hsLoginQRDOM,
-              qrDataStr: JSON.stringify(dataParsed.data),
-              hsloginBtnText,
-            });
-          } else if (dataParsed.op === 'end') {
-            dispatchEvent(HS_EVENTS_ENUM.SUCCESS, dataParsed.message);        
-            source.close();
-          } else if (dataParsed.op === 'processing') {
-            dispatchEvent(HS_EVENTS_ENUM.WAITING, dataParsed.message);
-          } else {
-            dispatchEvent(HS_EVENTS_ENUM.ERROR, 'Invalid operation from studio server');
+    hypersignEventSource.onopen = () => {
+      console.log('Connections to the server established');
+    };
+
+    hypersignEventSource.onmessage = async (e) => {
+      const sseID = e.lastEventId;
+      if (e.data) {
+        try {
+          const dataParsed = JSON.parse(e.data);
+          if (dataParsed) {
+            if (dataParsed.op === 'init') {
+              formQRAndButtonHTML({
+                hsWalletBaseURL,
+                hsLoginBtnDOM,
+                hsLoginQRDOM,
+                qrDataStr: JSON.stringify(dataParsed.data),
+                hsloginBtnText,
+                hsButtonStyle,
+              });
+              dispatchEvent(HS_EVENTS_ENUM.INIT, { id: sseID });
+            } else if (dataParsed.op === 'end') {
+              dispatchEvent(HS_EVENTS_ENUM.SUCCESS, { id: sseID, message: dataParsed.message });
+              hypersignEventSource.close();
+            } else if (dataParsed.op === 'processing') {
+              dispatchEvent(HS_EVENTS_ENUM.WAITING, { id: sseID, message: dataParsed.message });
+            } else {
+              dispatchEvent(HS_EVENTS_ENUM.ERROR, { id: sseID, message: 'Invalid operation from studio server' });
+              hypersignEventSource.close();
+            }
           }
+        } catch (e) {
+          dispatchEvent(HS_EVENTS_ENUM.ERROR, { id: sseID, message: e.message });
+          hypersignEventSource.close();
         }
-      } catch (e) {
-        dispatchEvent(HS_EVENTS_ENUM.ERROR, e.message);
       }
-    }
-  };
+    };
 
-  source.onerror = (e) => {
-    dispatchEvent(HS_EVENTS_ENUM.ERROR, e.message);
-  };
+    hypersignEventSource.onerror = (e) => {
+      console.log('Inside onerror');
+      console.error(e);
+      dispatchEvent(HS_EVENTS_ENUM.ERROR, e);
+      hypersignEventSource.close();
+    };
+  } catch (e) {
+    console.log('.....inside cach');
+    console.error(e);
+  }
 }
 
 /**
  * Displays QRCode and Login Button
  * @param {*} param0
  */
-function formQRAndButtonHTML({ hsWalletBaseURL, hsLoginBtnDOM, hsLoginQRDOM, qrDataStr, hsloginBtnText }) {
+function formQRAndButtonHTML({
+  hsWalletBaseURL,
+  hsLoginBtnDOM,
+  hsLoginQRDOM,
+  qrDataStr,
+  hsloginBtnText,
+  hsButtonStyle,
+}) {
   // Display the Login Button
   if (hsLoginBtnDOM) {
     const weblink = encodeURI(hsWalletBaseURL + 'deeplink?url=' + qrDataStr);
-    hsLoginBtnDOM.innerHTML = `<button onclick="window.open('${weblink}', 'popUpWindow','height=800,width=400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');">${hsloginBtnText}</button>`;
+    hsLoginBtnDOM.innerHTML = `<button class='${hsButtonStyle}' onclick="window.open('${weblink}', 'popUpWindow','height=800,width=400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');">${hsloginBtnText}</button>`;
   }
 
   // TODO: Display the QR code to use with mobile app
@@ -95,7 +125,6 @@ function sanitizeURL(url) {
   }
 }
 
-
 // }
 /**
  * Starts the program
@@ -113,6 +142,7 @@ function start() {
       LOGIN_BUTTON_TEXT: document.currentScript.getAttribute('data-button-text')
         ? document.currentScript.getAttribute('data-button-text')
         : 'Credential',
+      LOGIN_BUTTON_STYLE: document.currentScript.getAttribute('data-button-css-class'),
       HS_WALLET_BASEURL: document.currentScript.getAttribute('data-hs-wallet-base-url'),
       PRESENTATION_REQUEST_EP: document.currentScript.getAttribute('data-presentation-request-endpoint'),
       PRESENTATION_TEMPLATE_ID: document.currentScript.getAttribute('data-presentation-template-id'),
@@ -142,6 +172,7 @@ function start() {
       hsLoginBtnDOM,
       hsLoginQRDOM,
       hsloginBtnText: options.LOGIN_BUTTON_TEXT,
+      hsButtonStyle: options.LOGIN_BUTTON_STYLE,
     });
   } catch (e) {
     console.error(e.message);
