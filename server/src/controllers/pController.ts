@@ -119,7 +119,7 @@ export async function verify(req, res, next) {
         holderDid: presentationInfo.holder,
         credentialId: presentationInfo.verifiableCredential[0].id,
         credentialDetail: presentationInfo.verifiableCredential[0].credentialSubject,
-        presentation: presentationInfo
+        presentation: presentationInfo,
       });
       const accessToken = JWT.sign({ id: userCredInfo._id }, jwtSecret, { expiresIn: '5m' });
       PresentationRequestSchema.findOneAndUpdate({ challenge: challenge }, { status: 1, accessToken }).exec();
@@ -179,7 +179,7 @@ export async function getChallenge(req, res, next) {
         appName: name,
         challenge,
         reason,
-        domain
+        domain,
       },
     };
 
