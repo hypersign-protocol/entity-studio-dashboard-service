@@ -183,7 +183,7 @@ export class DBService {
       logger.debug(`Values = `, values);
       db.all(query, values, (err, rows) => {
         if (err) return reject(err);
-        return resolve(rows);
+        return resolve(rows as object[]);
       });
     });
   }

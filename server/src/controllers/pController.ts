@@ -9,7 +9,7 @@ import { uuid } from 'uuidv4';
 import ApiResponse from '../response/apiResponse';
 
 import HIDWallet from 'hid-hd-wallet';
-import HypersignSsiSDK from 'hs-ssi-sdk';
+import { HypersignSSISdk } from 'hs-ssi-sdk';
 import { walletOptions, mnemonic } from '../config';
 
 const verifyPresentation = async (vp, challenge, issuerDid, holderDid, domain, holderDidDocSigned) => {
@@ -25,16 +25,16 @@ const verifyPresentation = async (vp, challenge, issuerDid, holderDid, domain, h
   // TODO: This initialization need to be done one time globally
   const hidWalletInstance = new HIDWallet(walletOptions);
   await hidWalletInstance.generateWallet({ mnemonic });
-  const hsSdk = new HypersignSsiSDK(
-    hidWalletInstance.offlineSigner,
-    walletOptions.hidNodeRPCUrl,
-    walletOptions.hidNodeRestUrl,
-    'testnet'
-  );
+  const hsSdk = new HypersignSSISdk({
+    offlineSigner: hidWalletInstance.offlineSigner,
+    nodeRpcEndpoint: walletOptions.hidNodeRPCUrl,
+    nodeRestEndpoint: walletOptions.hidNodeRestUrl,
+    namespace: 'testnet',
+  });
   await hsSdk.init();
   const holderVerificationMethodId = vp.proof.verificationMethod;
   const issuerVerificationMethodId = vp.verifiableCredential[0].proof.verificationMethod;
-  const result = await hsSdk.vp.verifyPresentation({
+  const result = await hsSdk.vp.verify({
     signedPresentation: vp,
     challenge,
     domain,
@@ -107,8 +107,8 @@ export async function verify(req, res, next) {
       holderDidDocSigned
     );
 
-    const { verified } = result;
-    logger.debug(`Result of credential verification ${result.verified}`);
+    const verified = result['verified'];
+    logger.debug(`Result of credential verification ${result['verified']}`);
     if (verified === true) {
       // TODO: 4. send data or create JWT
 
@@ -119,7 +119,7 @@ export async function verify(req, res, next) {
         holderDid: presentationInfo.holder,
         credentialId: presentationInfo.verifiableCredential[0].id,
         credentialDetail: presentationInfo.verifiableCredential[0].credentialSubject,
-        presentation: presentationInfo
+        presentation: presentationInfo,
       });
       const accessToken = JWT.sign({ id: userCredInfo._id }, jwtSecret, { expiresIn: '5m' });
       PresentationRequestSchema.findOneAndUpdate({ challenge: challenge }, { status: 1, accessToken }).exec();
@@ -179,7 +179,7 @@ export async function getChallenge(req, res, next) {
         appName: name,
         challenge,
         reason,
-        domain
+        domain,
       },
     };
 
