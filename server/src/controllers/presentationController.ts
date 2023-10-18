@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import PresentationTemplateSchema, { IPresentationTemplate } from '../models/presentationTemplateSchema';
 
 import HIDWallet from 'hid-hd-wallet';
-import HypersignSsiSDK from 'hs-ssi-sdk';
+import { HypersignSSISdk } from 'hs-ssi-sdk';
 import { walletOptions, mnemonic, logger } from '../config';
 import ApiResponse from '../response/apiResponse';
 
@@ -15,12 +15,12 @@ const verifyPresentation = async (req: Request, res: Response, next: NextFunctio
     hidWalletInstance
       .generateWallet({ mnemonic })
       .then(async () => {
-        hsSdk = new HypersignSsiSDK(
-          hidWalletInstance.offlineSigner,
-          walletOptions.hidNodeRPCUrl,
-          walletOptions.hidNodeRestUrl,
-          'devnet'
-        );
+        hsSdk = new HypersignSSISdk({
+          offlineSigner: hidWalletInstance.offlineSigner,
+          nodeRpcEndpoint: walletOptions.hidNodeRPCUrl,
+          nodeRestEndpoint: walletOptions.hidNodeRestUrl,
+          namespace: 'testnet',
+        });
         return hsSdk.init();
       })
       .then(async () => {
