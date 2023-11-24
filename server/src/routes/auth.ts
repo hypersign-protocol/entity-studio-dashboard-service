@@ -7,7 +7,6 @@ import { retrive } from '../utils/file';
 const filePath = path.join(__dirname + '/../' + 'keys.json');
 const router = Router();
 router.get('/', authCtrl.check);
-router.post('/register', authCtrl.register);
 router.post('/login', authCtrl.login);
 router.post('/login_pki', verifyAuth, authCtrl.login);
 router.post('/recover', authCtrl.recover);
