@@ -1,22 +1,12 @@
-FROM node:12.6.0-buster
-
-# setting up the working dir
+FROM node:16
 WORKDIR /usr/src/app
-
-# setting up env var from .env file
-# COPY .env .
-# RUN /bin/bash -c "source /usr/src/app/.env"
-
-# pushing the code inside
-COPY package*.json ./
+COPY ./package.json .
+COPY ./tsconfig.json .
+COPY . .
+RUN npm cache clean --force
 RUN npm install
-ADD . /usr/src/app
-RUN rm -f .env*
+CMD ["npm","run", "start:dev"]
 
-# setting up the project
-RUN npm run build
-RUN npm run newdb
 
-EXPOSE $PORT
 
-CMD npm run bootstrap && npm run start
+
