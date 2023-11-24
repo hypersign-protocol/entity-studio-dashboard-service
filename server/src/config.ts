@@ -24,10 +24,10 @@ logger.setLevel(process.env.LOG_LEVEL || 'info');
 
 const port = process.env.PORT || 5000;
 const host = process.env.HOST || 'localhost';
-const WALLET_WEBHOOK = process.env.WALLET_WEB_HOOK;
-const WALLET_WEB_HOOK_ORG_DID = process.env.WALLET_WEB_HOOK_ORG_DID;
-const WALLET_WEB_HOOK_CREAD = process.env.WALLET_WEB_HOOK_CREAD;
-const ORG_SERVICE_ENDPOINT_GET_STATUS = process.env.ORG_SERVICE_END_POINT;
+const WALLET_WEBHOOK = `${process.env.STUDIO_SERVER_BASE_URL}api/v1/schema/status`;
+const WALLET_WEB_HOOK_ORG_DID = `${process.env.STUDIO_SERVER_BASE_URL}api/v1/org/status`;
+const WALLET_WEB_HOOK_CREAD = `${process.env.STUDIO_SERVER_BASE_URL}api/v1/credential/status`;
+const ORG_SERVICE_ENDPOINT_GET_STATUS = `${process.env.STUDIO_SERVER_BASE_URL}api/v1/org`;
 const bootstrapConfig = {
   keysfilePath: path.join(__dirname + '/keys.json'),
   schemafilePath: path.join(__dirname + '/schema.json'),
@@ -67,14 +67,6 @@ const dbConnUrl =
     ? process.env.DB_URL
     : 'mongodb://admin:admin@cluster0-shard-00-00.jg0ef.mongodb.net:27017,cluster0-shard-00-01.jg0ef.mongodb.net:27017,cluster0-shard-00-02.jg0ef.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-n72avn-shard-0&authSource=admin&retryWrites=true&w=majority';
 // DID Related:
-const mail = {
-  host: process.env.MAIL_HOST || 'smtp.gmail.com',
-  port: process.env.MAIL_PORT || 465,
-  user: process.env.MAIL_USERNAME || 'example@gmail.com',
-  pass: process.env.MAIL_PASSWORD || 'ExamplePassword1@',
-  name: process.env.MAIL_NAME || 'Hypermine Admin',
-};
-
 const options = { nodeUrl: `${nodeServer.baseURl}`, didScheme: 'did:hs' };
 const hypersignSDK = {
   did: hsdk.did(options),
@@ -91,7 +83,6 @@ const pathToIssueCred = process.env.PATH_TO_ISSUE_CRED;
 const whitelistedCors = process.env.WHITELISTED_CORS || ['*'];
 const schemaResolver =
   process.env.RPC_ENDPOINT || 'https://api.jagrat.hypersign.id/hypersign-protocol/hidnode/ssi/schema/';
-const studioDashboardServiceEp = process.env.STUDIO_DASHBOARD_SERVICE_PUBLIC_EP || `http://localhost:${process.env.PORT}`
 const schemaId = process.env.EMAIL_CREDENTITAL_SCHEMA_ID || "sch:hid:testnet:zufjU7LuQuJNFiUpuhCwYkTrakUu1VmtxE9SPi5TwfUB:1.0"
 export {
   port,
@@ -102,7 +93,6 @@ export {
   jwtSecret,
   jwtExpiryInMilli,
   nodeServer,
-  mail,
   bootstrapConfig,
   hypersignSDK,
   dbConnUrl,
@@ -117,6 +107,5 @@ export {
   sse_client,
   whitelistedCors,
   schemaResolver,
-  studioDashboardServiceEp,
   schemaId
 };

@@ -4,7 +4,7 @@ const HIDWallet = require('hid-hd-wallet');
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import { walletAuthRoutes } from './routes/walletAuth';
-import { port, logger, walletOptions, mnemonic, studioDashboardServiceEp, schemaId, jwtSecret, jwtExpiryInMilli } from './config';
+import { port, logger, walletOptions, mnemonic, schemaId, studioServerBaseUrl, jwtSecret, jwtExpiryInMilli } from './config';
 import authRoutes from './routes/auth';
 import blogRoutes from './routes/blog';
 import appRoutes from './routes/app';
@@ -33,7 +33,7 @@ export default function app() {
   const hidWalletInstance = new HIDWallet(walletOptions);
   const hypersignAuthOptions = {
     serviceName: 'Entity Studio Dashboard',
-    serviceEp: studioDashboardServiceEp,
+    serviceEp: studioServerBaseUrl,
     schemaId,
     accessToken: {
       secret: jwtSecret,
