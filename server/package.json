@@ -1,9 +1,9 @@
 {
-  "name": "studio-server",
+  "name": "entity-studio-dashboard-service",
   "version": "1.0.4",
-  "description": "Server for hypersign studio web portal",
+  "description": "Backend service for SSI playground",
   "main": "dist/index",
-  "typings": "dist/index",
+  "typings": "dist/index",  
   "scripts": {
     "setup": "npm run build && npm run newdb && npm run bootstrap",
     "newdb": "npm run start -- --newdb",
