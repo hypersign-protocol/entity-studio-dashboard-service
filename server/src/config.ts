@@ -53,9 +53,7 @@ const did = {
 };
 const studioServerBaseUrl = process.env.STUDIO_SERVER_BASE_URL;
 //Secrets
-const rawData = fs.readFileSync('hypersign.json');
-const hypersignjsondata = JSON.parse(rawData.toString());
-const jwtSecret = process.env.JWT_SECRET || hypersignjsondata.jwt.secret || 'secretKey';
+const jwtSecret = process.env.JWT_SECRET || 'secretKey';
 const jwtExpiryInMilli = 240000;
 
 const nodeServer = {
@@ -86,14 +84,15 @@ const hypersignSDK = {
 const mnemonic =
   'retreat seek south invite fall eager engage endorse inquiry sample salad evidence express actor hidden fence anchor crowd two now convince convince park bag';
 const walletOptions = {
-  hidNodeRPCUrl: 'https://rpc.jagrat.hypersign.id/',
-  hidNodeRestUrl: 'https://api.jagrat.hypersign.id/',
+  hidNodeRPCUrl: process.env.HID_NETWORK_RPC || 'https://rpc.jagrat.hypersign.id/',
+  hidNodeRestUrl: process.env.HID_NETWORK_API || 'https://api.jagrat.hypersign.id/',
 };
 const pathToIssueCred = process.env.PATH_TO_ISSUE_CRED;
 const whitelistedCors = process.env.WHITELISTED_CORS || ['*'];
 const schemaResolver =
   process.env.RPC_ENDPOINT || 'https://api.jagrat.hypersign.id/hypersign-protocol/hidnode/ssi/schema/';
-
+const studioDashboardServiceEp = process.env.STUDIO_DASHBOARD_SERVICE_PUBLIC_EP || `http://localhost:${process.env.PORT}`
+const schemaId = process.env.EMAIL_CREDENTITAL_SCHEMA_ID || "sch:hid:testnet:zufjU7LuQuJNFiUpuhCwYkTrakUu1VmtxE9SPi5TwfUB:1.0"
 export {
   port,
   host,
@@ -118,4 +117,6 @@ export {
   sse_client,
   whitelistedCors,
   schemaResolver,
+  studioDashboardServiceEp,
+  schemaId
 };

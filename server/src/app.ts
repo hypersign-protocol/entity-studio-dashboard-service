@@ -4,7 +4,7 @@ const HIDWallet = require('hid-hd-wallet');
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import { walletAuthRoutes } from './routes/walletAuth';
-import { port, logger, walletOptions, mnemonic } from './config';
+import { port, logger, walletOptions, mnemonic, studioDashboardServiceEp, schemaId, jwtSecret, jwtExpiryInMilli } from './config';
 import authRoutes from './routes/auth';
 import blogRoutes from './routes/blog';
 import appRoutes from './routes/app';
@@ -31,10 +31,25 @@ export default function app() {
   const server = http.createServer(app);
 
   const hidWalletInstance = new HIDWallet(walletOptions);
+  const hypersignAuthOptions = {
+    serviceName: 'Entity Studio Dashboard',
+    serviceEp: studioDashboardServiceEp,
+    schemaId,
+    accessToken: {
+      secret: jwtSecret,
+      expiryTime: jwtExpiryInMilli,
+    },
+    refreshToken: {
+      secret: jwtSecret,
+      expiryTime: jwtExpiryInMilli,
+    },
+    networkUrl: walletOptions.hidNodeRPCUrl,
+    networkRestUrl: walletOptions.hidNodeRestUrl
+  }
   hidWalletInstance
     .generateWallet({ mnemonic })
     .then(async () => {
-      hypersign = new HypersignAuth(server, hidWalletInstance.offlineSigner);
+      hypersign = new HypersignAuth(server, hidWalletInstance.offlineSigner, hypersignAuthOptions);
       await hypersign.init();
       app.use(express.static('public'));
 
