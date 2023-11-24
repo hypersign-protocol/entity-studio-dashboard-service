@@ -24,10 +24,10 @@ logger.setLevel(process.env.LOG_LEVEL || 'info');
 
 const port = process.env.PORT || 5000;
 const host = process.env.HOST || 'localhost';
-const WALLET_WEBHOOK = process.env.WALLET_WEB_HOOK;
-const WALLET_WEB_HOOK_ORG_DID = process.env.WALLET_WEB_HOOK_ORG_DID;
-const WALLET_WEB_HOOK_CREAD = process.env.WALLET_WEB_HOOK_CREAD;
-const ORG_SERVICE_ENDPOINT_GET_STATUS = process.env.ORG_SERVICE_END_POINT;
+const WALLET_WEBHOOK = `${process.env.STUDIO_SERVER_BASE_URL}api/v1/schema/status`;
+const WALLET_WEB_HOOK_ORG_DID = `${process.env.STUDIO_SERVER_BASE_URL}api/v1/org/status`;
+const WALLET_WEB_HOOK_CREAD = `${process.env.STUDIO_SERVER_BASE_URL}api/v1/credential/status`;
+const ORG_SERVICE_ENDPOINT_GET_STATUS = `${process.env.STUDIO_SERVER_BASE_URL}api/v1/org`;
 const bootstrapConfig = {
   keysfilePath: path.join(__dirname + '/keys.json'),
   schemafilePath: path.join(__dirname + '/schema.json'),
@@ -53,9 +53,7 @@ const did = {
 };
 const studioServerBaseUrl = process.env.STUDIO_SERVER_BASE_URL;
 //Secrets
-const rawData = fs.readFileSync('hypersign.json');
-const hypersignjsondata = JSON.parse(rawData.toString());
-const jwtSecret = process.env.JWT_SECRET || hypersignjsondata.jwt.secret || 'secretKey';
+const jwtSecret = process.env.JWT_SECRET || 'secretKey';
 const jwtExpiryInMilli = 240000;
 
 const nodeServer = {
@@ -69,14 +67,6 @@ const dbConnUrl =
     ? process.env.DB_URL
     : 'mongodb://admin:admin@cluster0-shard-00-00.jg0ef.mongodb.net:27017,cluster0-shard-00-01.jg0ef.mongodb.net:27017,cluster0-shard-00-02.jg0ef.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-n72avn-shard-0&authSource=admin&retryWrites=true&w=majority';
 // DID Related:
-const mail = {
-  host: process.env.MAIL_HOST || 'smtp.gmail.com',
-  port: process.env.MAIL_PORT || 465,
-  user: process.env.MAIL_USERNAME || 'example@gmail.com',
-  pass: process.env.MAIL_PASSWORD || 'ExamplePassword1@',
-  name: process.env.MAIL_NAME || 'Hypermine Admin',
-};
-
 const options = { nodeUrl: `${nodeServer.baseURl}`, didScheme: 'did:hs' };
 const hypersignSDK = {
   did: hsdk.did(options),
@@ -86,14 +76,14 @@ const hypersignSDK = {
 const mnemonic =
   'retreat seek south invite fall eager engage endorse inquiry sample salad evidence express actor hidden fence anchor crowd two now convince convince park bag';
 const walletOptions = {
-  hidNodeRPCUrl: 'https://rpc.jagrat.hypersign.id/',
-  hidNodeRestUrl: 'https://api.jagrat.hypersign.id/',
+  hidNodeRPCUrl: process.env.HID_NETWORK_RPC || 'https://rpc.jagrat.hypersign.id/',
+  hidNodeRestUrl: process.env.HID_NETWORK_API || 'https://api.jagrat.hypersign.id/',
 };
 const pathToIssueCred = process.env.PATH_TO_ISSUE_CRED;
 const whitelistedCors = process.env.WHITELISTED_CORS || ['*'];
 const schemaResolver =
   process.env.RPC_ENDPOINT || 'https://api.jagrat.hypersign.id/hypersign-protocol/hidnode/ssi/schema/';
-
+const schemaId = process.env.EMAIL_CREDENTITAL_SCHEMA_ID || "sch:hid:testnet:zufjU7LuQuJNFiUpuhCwYkTrakUu1VmtxE9SPi5TwfUB:1.0"
 export {
   port,
   host,
@@ -103,7 +93,6 @@ export {
   jwtSecret,
   jwtExpiryInMilli,
   nodeServer,
-  mail,
   bootstrapConfig,
   hypersignSDK,
   dbConnUrl,
@@ -118,4 +107,5 @@ export {
   sse_client,
   whitelistedCors,
   schemaResolver,
+  schemaId
 };

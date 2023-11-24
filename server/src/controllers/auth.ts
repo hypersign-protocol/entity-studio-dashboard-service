@@ -1,14 +1,11 @@
 import { Request, Response } from 'express';
 import { User } from '../services/user.service';
-import IUser from '../models/IUser';
-import { logger, jwtSecret, jwtExpiryInMilli, mail, port, host } from '../config';
+import { logger, jwtSecret, jwtExpiryInMilli } from '../config';
 import jwt from 'jsonwebtoken';
 import { hypersignSDK } from '../config';
-import { retrive, store } from '../utils/file';
+import { store } from '../utils/file';
 import path from 'path';
 import fs from 'fs';
-import regMailTemplate from '../mailTemplates/registration';
-import { MailService } from '../services/mail.service';
 
 const check = (req: Request, res: Response) => {
   const param = {
@@ -25,63 +22,6 @@ const check = (req: Request, res: Response) => {
   query = query.slice(0, query.length - 1);
   res.redirect(`http://localhost:8080/login${query}`);
 };
-
-const register_old = async (req: Request, res: Response) => {
-  try {
-    logger.debug(req.body);
-    const body: IUser = req.body;
-    const user = new User({ ...body });
-    // if(user.publicKey == "") throw new Error("PublicKey field can not be null")
-    const userindbstr = await user.fetch();
-    if (userindbstr) throw new Error(`User ${user.publicKey} already exists`);
-    const createdU = await user.create();
-    res.status(200).send({ status: 200, message: createdU, error: null });
-  } catch (e) {
-    res.status(500).send({ status: 500, message: null, error: e });
-  }
-};
-
-const register = async (req: Request, res: Response) => {
-  try {
-    logger.debug(req.body);
-    const body: IUser = req.body;
-    const user = new User({ ...body });
-    const userindbstr = await user.fetch({
-      email: user.email,
-      publicKey: user.publicKey,
-    });
-    if (userindbstr) throw new Error(`User ${user.email} already exists. Please login with Hypersign Credential`);
-
-    // will use the publicKey field for storing did
-    // Generate Verifiable credential for this
-    const createdU = await user.create();
-    const userData = JSON.parse(createdU);
-    jwt.sign(userData, jwtSecret, { expiresIn: jwtExpiryInMilli }, async (err, token) => {
-      if (err) throw new Error(err);
-      const link = `http://${host}:${port}/api/auth/credential?token=${token}`;
-      const mailService = new MailService({ ...mail });
-      let mailTemplate = regMailTemplate;
-      mailTemplate = mailTemplate.replace('@@RECEIVERNAME@@', user.fname);
-      mailTemplate = mailTemplate.replace('@@LINK@@', link);
-      try {
-        //TODO: Send email
-        logger.debug('Before sending the mail');
-        const info = await mailService.sendEmail(user.email, mailTemplate, 'Account Registration | Hypersign Studio');
-        logger.debug('Mail is sent ' + info.messageId);
-        res.status(200).send({
-          status: 200,
-          message: info,
-          error: null,
-        });
-      } catch (e) {
-        throw new Error(`Could not send email to ${user.email}. Please check the email address properly.`);
-      }
-    });
-  } catch (e) {
-    res.status(500).send({ status: 500, message: null, error: e });
-  }
-};
-
 const getCredential = (req, res) => {
   try {
     const token = req.query.token;
@@ -207,7 +147,6 @@ const getNewChallenge = (req: Request, res: Response) => {
 
 export default {
   check,
-  register,
   login,
   recover,
   getNewChallenge,
