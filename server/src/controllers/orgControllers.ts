@@ -52,6 +52,7 @@ const CreateOrg = async (req: Request, res: Response, next: NextFunction) => {
     // QrData.data.logo = org.logo
     // QrData.data.status = org.status
     QrData.data.serviceEndpoint = `${ORG_SERVICE_ENDPOINT_GET_STATUS}`;
+
     logger.info('OrgCtrl:: CreateOrg() method ends...');
     return next(ApiResonse.success({ org, QrData }));
   } catch (e) {
@@ -116,6 +117,7 @@ const GetOrgByIdSSE = async (req: Request, res: Response, next: NextFunction) =>
     const DELAY = 5000;
     const STOP = 5000 * 60;
     const id = req.params.id;
+
     res.setHeader('Access-Control-Allow-Origin', `${sse_client}`);
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Access-Control-Allow-Credentials', 'true');

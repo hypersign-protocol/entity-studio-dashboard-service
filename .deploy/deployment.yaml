@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: studio-playground
+  namespace: hypermine-development
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: studio-playground
+  template:
+    metadata:
+      labels:
+        app: studio-playground
+    spec:
+      containers:
+        - name: studio-playground
+          image: __GOOGLE_ARTIFACT_URL__/__GOOGLE_PROJECT_ID__/__GOOGLE_ARTIFACT_REPO__/playground-server:__LATEST_RELEASE_TAG__
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: __PORT__
+          env:
+            - name: WHITELISTED_CORS
+              values: '["http://localhost:9000","http://localhost:9001","http://192.168.29.12:9001", "https://localhost:9001", "http://192.168.29.209:9001", "http://entity.hypersign.id","https://entity.hypersign.id","http://localhost:9001", "https://wallet-stage.hypersign.id", "http://localhost:4999","192.168.29.13","http://localhost:1234","http://localhost:4000","https://wallet-prajna.hypersign.id" "*"]'
+            - name: NODE_ENV
+              values: "__NODE_ENV__"
+            - name: HOST
+              values: "__HOST__"
+            - name: PORT
+              values: __PORT__
+            - name: LOG_FILEPATH
+              values: "__LOG_FILEPATH__"
+            - name: LOG_DIR
+              values: "__LOG_DIR__"
+            - name: LOG_TIMESTAMP_FORMAT
+              values: "__LOG_TIMESTAMP_FORMAT__"
+            - name: LOG_LEVEL
+              values: "__LOG_LEVEL__"
+            - name: DATABASE_FILEPATH
+              values: "__DATABASE_FILEPATH__"
+            - name: DID_METHOD_NAME
+              values: "__DID_METHOD_NAME__"
+            - name: DID_PREFIX
+              values: "__DID_PREFIX__"
+            - name: JWT_SECRET
+              values: "__JWT_SECRET__"
+            - name: STUDIO_SERVER_BASE_URL
+              values: "__STUDIO_SERVER_BASE_URL__"
+            - name: SSE_CLIENT_URL
+              values: "__SSE_CLIENT_URL__"
+            - name: NODE_SERVER_DID_CREATE_EP
+              values: "__NODE_SERVER_DID_CREATE_EP__"
+            - name: NODE_SERVER_SCHEMA_CREATE_EP
+              values: "__NODE_SERVER_SCHEMA_CREATE_EP__"
+            - name: MAIL_HOST
+              values: "__MAIL_HOST__"
+            - name: MAIL_PORT
+              values: "__MAIL_PORT__"
+            - name: MAIL_USERNAME
+              values: "__MAIL_USERNAME__"
+            - name: MAIL_PASSWORD
+              values: "__MAIL_PASSWORD__"
+            - name: MAIL_NAME
+              values: "__MAIL_NAME__"
+            - name: HID_NETWORK_RPC
+              values: "__HID_NETWORK_RPC__"
+            - name: HID_NETWORK_API
+              values: "__HID_NETWORK_API__"
+            - name: PATH_TO_ISSUE_CRED
+              values: "__PATH_TO_ISSUE_CRED__"
+            - name: EMAIL_CREDENTITAL_SCHEMA_ID
+              values: "__EMAIL_CREDENTITAL_SCHEMA_ID__"
+            - name: DB_URL
+              values: "__DB_URL__"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: studio-playground-service
+  namespace: hypermine-development
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
+spec:
+  type: NodePort
+  selector:
+    app: studio-playground
+  ports:
+    - port: __PORT__
+      targetPort: __PORT__
+      protocol: TCP

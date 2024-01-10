@@ -43,7 +43,7 @@ export async function isValidField(req, res, next) {
     const schemaRpc = schemaResolver + schemaId + ':';
     const schemaDetail = await fetch(schemaRpc);
     const resp = await schemaDetail.json();
-    const configuredSchemaProperties = JSON.parse(resp.schema[0].schema.properties);
+    const configuredSchemaProperties = JSON.parse(resp.credentialSchemas[0].credentialSchemaDocument.schema.properties);
     const tempFields = {};
     fields.forEach((element) => {
       tempFields[element.name] = element.value;

@@ -57,7 +57,7 @@ const jwtSecret = process.env.JWT_SECRET || 'secretKey';
 const jwtExpiryInMilli = 240000;
 
 const nodeServer = {
-  baseURl: process.env.NODE_SERVER_BASE_URL || 'http://localhost:5000/',
+  baseURl: process.env.STUDIO_SERVER_BASE_URL || 'http://localhost:5000/',
   didCreateEp: process.env.NODE_SERVER_DID_CREATE_EP || 'api/did/create_tmp',
   schemaCreateEp: process.env.NODE_SERVER_SCHEMA_CREATE_EP || 'api/schema/create',
   schemaGetEp: process.env.NODE_SERVER_SCHEMA_GET_EP || 'api/schema/get',
@@ -82,7 +82,7 @@ const walletOptions = {
 const pathToIssueCred = process.env.PATH_TO_ISSUE_CRED;
 const whitelistedCors = process.env.WHITELISTED_CORS || ['*'];
 const schemaResolver =
-  process.env.RPC_ENDPOINT || 'https://api.jagrat.hypersign.id/hypersign-protocol/hidnode/ssi/schema/';
+  process.env.RPC_ENDPOINT || 'https://api.prajna.hypersign.id/hypersign-protocol/hidnode/ssi/schema/';
 const schemaId = process.env.EMAIL_CREDENTITAL_SCHEMA_ID || "sch:hid:testnet:zufjU7LuQuJNFiUpuhCwYkTrakUu1VmtxE9SPi5TwfUB:1.0"
 export {
   port,

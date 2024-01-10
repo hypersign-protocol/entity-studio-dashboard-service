@@ -49,6 +49,7 @@ export default function app() {
   hidWalletInstance
     .generateWallet({ mnemonic })
     .then(async () => {
+      
       hypersign = new HypersignAuth(server, hidWalletInstance.offlineSigner, hypersignAuthOptions);
       await hypersign.init();
       app.use(express.static('public'));

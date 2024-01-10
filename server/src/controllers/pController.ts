@@ -34,10 +34,11 @@ const verifyPresentation = async (vp, challenge, issuerDid, holderDid, domain, h
   await hsSdk.init();
   const holderVerificationMethodId = vp.proof.verificationMethod;
   const issuerVerificationMethodId = vp.verifiableCredential[0].proof.verificationMethod;
+
   const result = await hsSdk.vp.verify({
     signedPresentation: vp,
     challenge,
-    domain,
+    domain: vp.proof.domain,
     issuerDid,
     //holderDid,
     holderDidDocSigned: JSON.parse(holderDidDocSigned),

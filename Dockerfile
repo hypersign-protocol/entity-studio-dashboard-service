@@ -1,6 +1,12 @@
 FROM node:16
 WORKDIR /usr/src/app
-ADD ./server/ /usr/src/app/
-RUN npm cache clean --force
+COPY ./package.json .
+COPY ./tsconfig.json .
+COPY . .
 RUN npm install
-CMD ["npm","run", "dev"]
+RUN npm run build
+CMD ["npm","run", "start"]
+
+
+
+
