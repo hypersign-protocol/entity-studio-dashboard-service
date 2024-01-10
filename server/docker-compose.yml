@@ -11,7 +11,7 @@ services:
   
   entity-studio-dashboard-service:
     container_name: "entity-studio-dashboard-service"
-    image: "abc"
+    build: "."
     ports:
       - "9000:9000"
     environment:
