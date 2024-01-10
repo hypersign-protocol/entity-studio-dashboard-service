@@ -1,0 +1,127 @@
+name: Playground Build and deploy Pipeline
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]-rc.[0-9]+"
+
+jobs:
+  Build-Pipeline:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: code checkout
+        uses: actions/checkout@v3
+      # - name: Set Latest Tag
+      #   run: echo "LATEST_RELEASE_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+
+      - id: "auth"
+        uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}"
+
+      - name: install gcloud cli tools
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{secrets.GOOGLE_PROJECT_ID}}
+          service_account_key: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
+          install_components: "gke-gcloud-auth-plugin"
+          export_default_credentials: true
+      - name: "Use gcloud CLI"
+        run: "gcloud info"
+      - name: "Docker Auth"
+        run: gcloud auth configure-docker ${{secrets.GOOGLE_ARTIFACT_URL}}
+      - name: "Docker Build and Push"
+        working-directory: server
+        env:
+          GOOGLE_PROJECT_ID: ${{secrets.GOOGLE_PROJECT_ID}}
+          GOOGLE_ARTIFACT_URL: ${{secrets.GOOGLE_ARTIFACT_URL}}
+          GOOGLE_ARTIFACT_REPO: ${{secrets.GOOGLE_ARTIFACT_REPO}}
+        run:
+          docker build -t $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/playground-server:${{ env.LATEST_RELEASE_TAG }} .
+
+          docker push  $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/playground-server:${{ env.LATEST_RELEASE_TAG }}
+  Deploy-Pipeline:
+    needs: [Build-Pipeline]
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: code checkout
+        uses: actions/checkout@v3
+
+      - name: Set Latest Tag
+        run: echo "LATEST_RELEASE_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+
+      - id: "auth"
+        uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}"
+      - name: install gcloud cli tools
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{secrets.GOOGLE_PROJECT_ID}}
+          service_account_key: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
+          install_components: "gke-gcloud-auth-plugin"
+          export_default_credentials: true
+      - name: "Configure kubectl"
+        run: gcloud container clusters get-credentials hypermine-gke --region=asia-south1
+      - name: Replace tags
+        run: find .deploy/deployment.yaml -type f -exec sed  -i -e "s#__LATEST_RELEASE_TAG__#${{ env.LATEST_RELEASE_TAG }}#" {} \;
+      - name: "Replace secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i ''s/__GOOGLE_ARTIFACT_URL__/${{ secrets.GOOGLE_ARTIFACT_URL }}/g'' {} \;
+      - name: "Replace secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i ''s/__GOOGLE_ARTIFACT_REPO__/${{ secrets.GOOGLE_ARTIFACT_REPO }}/g'' {} \;
+      - name: "Replace secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i ''s/__GOOGLE_PROJECT_ID__/${{ secrets.GOOGLE_PROJECT_ID }}/g'' {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__NODE_ENV__#${{ vars.NODE_ENV }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__HOST__#${{ vars.HOST }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__PORT__#${{ vars.PORT }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__LOG_FILEPATH__#${{ vars.LOG_FILEPATH }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__LOG_DIR__#${{ vars.LOG_DIR }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__LOG_TIMESTAMP_FORMAT__#${{ vars.LOG_TIMESTAMP_FORMAT }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__DATABASE_FILEPATH__#${{ vars.DATABASE_FILEPATH }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__DID_METHOD_NAME__#${{ vars.DID_METHOD_NAME }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__DID_PREFIX__#${{ vars.DID_PREFIX }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__JWT_SECRET__#${{ vars.JWT_SECRET }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__STUDIO_SERVER_BASE_URL__#${{ vars.STUDIO_SERVER_BASE_URL }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__SSE_CLIENT_URL__#${{ vars.SSE_CLIENT_URL }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__NODE_SERVER_DID_CREATE_EP__#${{ vars.NODE_SERVER_DID_CREATE_EP }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__NODE_SERVER_SCHEMA_CREATE_EP__#${{ vars.NODE_SERVER_SCHEMA_CREATE_EP }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__MAIL_HOST__#${{ vars.MAIL_HOST }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__MAIL_PORT__#${{ vars.MAIL_PORT }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__MAIL_USERNAME__#${{ vars.MAIL_USERNAME }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__MAIL_PASSWORD__#${{ vars.MAIL_PASSWORD }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__MAIL_NAME__#${{ vars.MAIL_NAME }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__HID_NETWORK_RPC__#${{ vars.HID_NETWORK_RPC }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__HID_NETWORK_API__#${{ vars.HID_NETWORK_API }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__PATH_TO_ISSUE_CRED__#${{ vars.PATH_TO_ISSUE_CRED }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__EMAIL_CREDENTITAL_SCHEMA_ID__#${{ vars.EMAIL_CREDENTITAL_SCHEMA_ID }}#" {} \;
+      - name: "Replace Secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__DB_URL__#${{ vars.DB_URL }}#" {} \;
+      - name: "Deploy to GKE"
+        run: kubectl apply -f .deploy/deployment.yaml
