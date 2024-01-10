@@ -30,7 +30,7 @@ spec:
             - name: HOST
               values: "__HOST__"
             - name: PORT
-              values: __PORT__
+              values: "__PORT__"
             - name: LOG_FILEPATH
               values: "__LOG_FILEPATH__"
             - name: LOG_DIR
