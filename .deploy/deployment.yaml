@@ -30,7 +30,7 @@ spec:
             - name: HOST
               value: __HOST__
             - name: PORT
-              value: __PORT__
+              value: "__PORT__"
             - name: LOG_FILEPATH
               value: __LOG_FILEPATH__
             - name: LOG_DIR
@@ -58,7 +58,7 @@ spec:
             - name: MAIL_HOST
               value: __MAIL_HOST__
             - name: MAIL_PORT
-              value: __MAIL_PORT__
+              value: "__MAIL_PORT__"
             - name: MAIL_USERNAME
               value: __MAIL_USERNAME__
             - name: MAIL_PASSWORD
