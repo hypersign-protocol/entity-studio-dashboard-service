@@ -122,6 +122,6 @@ jobs:
       - name: "Replace Secrets"
         run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__EMAIL_CREDENTITAL_SCHEMA_ID__#${{ vars.EMAIL_CREDENTITAL_SCHEMA_ID }}#" {} \;
       - name: "Replace Secrets"
-        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__DB_URL__#${{ vars.DB_URL }}#" {} \;
+        run: find .deploy/deployment.yaml -type f -exec sed  -i -e "s#__DB_URL__#${{ vars.DB_URL }}#" {} \;
       - name: "Deploy to GKE"
         run: kubectl apply -f .deploy/deployment.yaml
