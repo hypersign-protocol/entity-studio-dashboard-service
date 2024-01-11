@@ -4,7 +4,16 @@ const HIDWallet = require('hid-hd-wallet');
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import { walletAuthRoutes } from './routes/walletAuth';
-import { port, logger, walletOptions, mnemonic, schemaId, studioServerBaseUrl, jwtSecret, jwtExpiryInMilli } from './config';
+import {
+  port,
+  logger,
+  walletOptions,
+  mnemonic,
+  schemaId,
+  studioServerBaseUrl,
+  jwtSecret,
+  jwtExpiryInMilli,
+} from './config';
 import authRoutes from './routes/auth';
 import blogRoutes from './routes/blog';
 import appRoutes from './routes/app';
@@ -44,12 +53,11 @@ export default function app() {
       expiryTime: jwtExpiryInMilli,
     },
     networkUrl: walletOptions.hidNodeRPCUrl,
-    networkRestUrl: walletOptions.hidNodeRestUrl
-  }
+    networkRestUrl: walletOptions.hidNodeRestUrl,
+  };
   hidWalletInstance
     .generateWallet({ mnemonic })
     .then(async () => {
-      
       hypersign = new HypersignAuth(server, hidWalletInstance.offlineSigner, hypersignAuthOptions);
       await hypersign.init();
       app.use(express.static('public'));
@@ -58,7 +66,9 @@ export default function app() {
       app.use(cookieParser());
       app.use(express.json());
       app.use(express.static('public'));
-
+      app.get('/api/health', async (req, res, next) => {
+        res.json({ status: 'OK' });
+      });
       app.use('/api/app', appRoutes);
       app.use('/api/auth', authRoutes);
       app.use('/api/blog', blogRoutes);
