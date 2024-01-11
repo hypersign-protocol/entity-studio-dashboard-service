@@ -24,7 +24,7 @@ spec:
             - containerPort: __PORT__
           env:
             - name: WHITELISTED_CORS
-              value: '["http://localhost:9000","http://localhost:9001","http://192.168.29.12:9001", "https://localhost:9001", "http://192.168.29.209:9001", "http://entity.hypersign.id","https://entity.hypersign.id","http://localhost:9001", "https://wallet-stage.hypersign.id", "http://localhost:4999","192.168.29.13","http://localhost:1234","http://localhost:4000","https://wallet-prajna.hypersign.id" "*"]'
+              value: '["http://localhost:9000","https://entity.studio.hypersign.id","http://localhost:9001","http://192.168.29.12:9001", "https://localhost:9001", "http://192.168.29.209:9001", "http://entity.hypersign.id","https://entity.hypersign.id","http://localhost:9001", "https://wallet-stage.hypersign.id", "http://localhost:4999","192.168.29.13","http://localhost:1234","http://localhost:4000","https://wallet-prajna.hypersign.id" "*"]'
             - name: NODE_ENV
               value: __NODE_ENV__
             - name: HOST
