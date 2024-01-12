@@ -83,7 +83,7 @@ const pathToIssueCred = process.env.PATH_TO_ISSUE_CRED;
 const whitelistedCors = process.env.WHITELISTED_CORS || ['*'];
 const schemaResolver =
   process.env.RPC_ENDPOINT || 'https://api.prajna.hypersign.id/hypersign-protocol/hidnode/ssi/schema/';
-const schemaId = process.env.EMAIL_CREDENTITAL_SCHEMA_ID || "sch:hid:testnet:zufjU7LuQuJNFiUpuhCwYkTrakUu1VmtxE9SPi5TwfUB:1.0"
+const schemaId = process.env.EMAIL_CREDENTITAL_SCHEMA_ID || "sch:hid:testnet:z6MkoTFHzx3XPXAvAVAN9CWMh91vH53m4kTFiVPypC22c7fB:1.0"
 export {
   port,
   host,
