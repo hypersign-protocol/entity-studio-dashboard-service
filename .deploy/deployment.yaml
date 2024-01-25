@@ -18,8 +18,11 @@ spec:
           image: __GOOGLE_ARTIFACT_URL__/__GOOGLE_PROJECT_ID__/__GOOGLE_ARTIFACT_REPO__/playground-server:__LATEST_RELEASE_TAG__
           resources:
             limits:
-              memory: "1Gi"
-              cpu: "500m"
+              memory: "256Mi"
+              cpu: "250m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
           ports:
             - containerPort: __PORT__
           env:
